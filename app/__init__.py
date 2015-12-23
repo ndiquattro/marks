@@ -16,4 +16,4 @@ from .views.home import home
 app.register_blueprint(home)
 
 # Final Import
-from app import views
+from app import models, views
