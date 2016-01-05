@@ -40,6 +40,10 @@ class Students(db.Model):
         db.session.add(newstudent)
         db.session.commit()
 
+    @classmethod
+    def get_all(cls, yearid):
+        return cls.query.filter_by(yearid=yearid).all()
+
 
 # Subjects Table
 class Subjects(db.Model):
@@ -60,7 +64,7 @@ class Subjects(db.Model):
 
     @classmethod
     def allsubs(cls, yearid):
-        return cls.query.filter_by(yearid=yearid).all()
+        return cls.query.filter_by(yearid=yearid).order_by('name').all()
 
 
 # Cycle
@@ -87,10 +91,33 @@ class Assignments(db.Model):
         db.session.add(newrec)
         db.session.commit()
 
+        return newrec
+
+    @classmethod
+    def lookup_sub(cls, subid):
+        return cls.query.filter_by(subjid=subid).order_by('date desc').all()
+
 
 # Scores
 class Scores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     assignid = db.Column(db.Integer, db.ForeignKey('assignments.id'))
     stuid = db.Column(db.Integer, db.ForeignKey('students.id'))
-    value = db.Column(db.Integer, index=True, unique=False)
+    value = db.Column(db.Integer)
+
+    @classmethod
+    def is_empty(cls, assmid):
+        return cls.query.filter_by(assignid=assmid).all()
+
+    @classmethod
+    def add(cls, sinfo):
+        newrec = cls(**sinfo)
+        db.session.add(newrec)
+        db.session.commit()
+
+    @classmethod
+    def update(cls, info):
+        rec = cls.query.\
+            filter_by(stuid=info['stuid'], assignid=info['assignid']).first()
+        rec.value = info['value']
+        db.session.commit()

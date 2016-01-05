@@ -12,10 +12,12 @@ db = SQLAlchemy(app)
 # Import Blueprints
 from .views.home import home
 from .views.add import add
+from .views.view import view
 
 # Blueprints
 app.register_blueprint(home)
 app.register_blueprint(add)
+app.register_blueprint(view)
 
 # Final Import
 from app import models, views

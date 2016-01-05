@@ -1,0 +1,19 @@
+<h4>Scores</h4>
+<form action="" method="post" name="scores">
+    {{ scores.csrf_token }}
+    <table class="table">
+        <thead>
+        <tr>
+            <td>Name</td>
+            <td>Score</td>
+        </tr>
+        </thead>
+        {% for student in scores.scores %}
+            <tr>
+                <td>{{ student.firstname.data }}{{ student.firstname }}{{ student.stuid }}</td>
+                <td>{{ student.score }}{{ student.csrf_token }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <input type="submit" name="commit" value="Commit Changes">
+</form>

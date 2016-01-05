@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, session
-from ..models import Years, Students, Subjects, Assignments
+from ..models import Years, Students, Subjects, Assignments, Scores
 from app.forms import addforms
 
 # Register blueprint
@@ -48,7 +48,7 @@ def add_students():
         flash('Added %s %s to year %s' % (form.fname.data, form.lname.data,
                                       yinfo.year))
 
-        return redirect(url_for('home.index'))
+        return redirect(url_for('add.add_students'))
 
     return render_template('add/students.html', form=form)
 
@@ -69,7 +69,7 @@ def add_subject():
         # Notify User
         flash('Added %s to year %s' % (form.name.data, yinfo.year))
 
-        return redirect(url_for('home.index'))
+        return redirect(url_for('add.add_subject'))
 
     return render_template('add/subject.html', form=form)
 
@@ -86,15 +86,26 @@ def add_assignment():
     if form.validate_on_submit():
         # Get subject info
         sinfo = Subjects.lookup(form.subject.data)
-        print sinfo
+
         # Add to database
-        Assignments.add({'name': form.name.data,
-                         'date': form.date.data,
-                         'type': form.scty.data,
-                         'subref': sinfo})
+        newassm = Assignments.add({'name': form.name.data,
+                                 'date': form.date.data,
+                                 'type': form.scty.data,
+                                 'subref': sinfo})
+
+        # Get Students
+        studs = Students.get_all(session['yearid'])
+
+        # Add NULL default Scores
+        for student in studs:
+            info = {'value': 0,
+                    'studref': student,
+                    'assref': newassm}
+            Scores.add(info)
+
         # Notify User
         flash('Added %s to %s' % (form.name.data, form.subject.data))
 
-        return redirect(url_for('home.index'))
+        return redirect(url_for('add.add_assignment'))
 
     return render_template('add/assignment.html', form=form)
