@@ -18,8 +18,8 @@ class AddSubject(Form):
 
 
 class AddAssignment(Form):
-    name = StringField('Assignent Name', validators=[DataRequired()])
-    date = DateField('Date', format="%m/%d/%y", validators=[DataRequired()])
+    name = StringField('Assignment Name')
+    date = DateField('Date', format="%m/%d/%y")
     subject = SelectField('Subject')
     scty = SelectField('Score Type', choices=[('pts', 'Points'),
                                               ('cat', 'In or Not')])

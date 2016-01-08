@@ -1,0 +1,8 @@
+a.editable-click {
+    color: cornflowerblue;
+    border-bottom: None;
+}
+a.editable-click:hover {
+    color: #47a447;
+    border-bottom-color: #47a447;
+}

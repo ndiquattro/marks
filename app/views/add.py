@@ -17,6 +17,7 @@ def add_year():
                          'school': ayform.school.data})
 
         # Make new year the active year
+        session.permanent = True
         session['yearid'] = yid
         session['yearlab'] = ayform.year.data.year
         session['school'] = ayform.school.data
@@ -80,11 +81,12 @@ def add_assignment():
     form = addforms.AddAssignment()
 
     # Add subject choices
-    form.subject.choices = [(x.name, x.name)
+    form.subject.choices = [(str(x.id), x.name)
                             for x in Subjects.allsubs(session['yearid'])]
 
     if form.validate_on_submit():
         # Get subject info
+        print form.subject.data
         sinfo = Subjects.lookup(form.subject.data)
 
         # Add to database
@@ -104,7 +106,7 @@ def add_assignment():
             Scores.add(info)
 
         # Notify User
-        flash('Added %s to %s' % (form.name.data, form.subject.data))
+        flash('Added %s to %s' % (form.name.data, sinfo.name))
 
         return redirect(url_for('add.add_assignment'))
 
