@@ -24,6 +24,8 @@ from app import models, views
 # Create API
 manager = APIManager(app, flask_sqlalchemy_db=db)
 manager.create_api(models.Years, methods=['GET', 'POST', 'DELETE', 'PUT'])
+manager.create_api(models.Students, methods=['GET', 'POST', 'DELETE', 'PUT'])
+manager.create_api(models.Cycles, methods=['GET', 'POST', 'DELETE', 'PUT'])
 manager.create_api(models.Subjects, methods=['GET', 'POST', 'DELETE', 'PUT'])
 manager.create_api(models.Assignments, methods=['GET', 'POST', 'DELETE', 'PUT'])
 manager.create_api(models.Scores, methods=['GET', 'POST', 'DELETE', 'PUT'])

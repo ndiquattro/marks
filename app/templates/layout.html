@@ -11,16 +11,7 @@
           rel="stylesheet">
     <link href="../static/css/marks.css" rel="stylesheet">
 
-    <!-- Import JS Libs -->
-    <script type="text/javascript"
-            src="../static/bower_components/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript"
-            src="../static/bower_components/angular/angular.min.js"></script>
-    <script type="text/javascript"
-            src="../static/bower_components/angular-xeditable/dist/js/xeditable.min.js"></script>
-    <script type="text/javascript" src="../static/js/app.js"></script>
+
 
     <title>{% block title %}{% endblock %}</title>
 </head>
@@ -46,23 +37,8 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                       role="button" aria-haspopup="true" aria-expanded="false">Add<span
-                            class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href={{ url_for('add.add_year') }}>Year</a></li>
-                        <li>
-                            <a href={{ url_for('add.add_students') }}>Students</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href={{ url_for('add.add_subject') }}>Subject</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href={{ url_for('add.add_assignment') }}>Assignment</a>
-                        </li>
-                    </ul>
-                </li>
+                <li><a href={{ url_for('home.gradebook') }}>Gradebook</a></li>
+                <li><a href={{ url_for('home.admin') }}>Administrate</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if session['school'] %}
@@ -96,5 +72,15 @@
 
     </div>
 </div>
+    <!-- Import JS Libs -->
+    <script type="text/javascript"
+            src="../static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="../static/bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript"
+            src="../static/bower_components/angular-xeditable/dist/js/xeditable.min.js"></script>
+    <script type="text/javascript" src="../static/js/app.js"></script>
 </body>
 </html>

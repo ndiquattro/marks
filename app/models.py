@@ -8,7 +8,7 @@ class Years(db.Model):
     year = db.Column(db.Integer, index=True, unique=False)
     student = db.relationship('Students', backref='yearref', lazy='dynamic')
     subject = db.relationship('Subjects', backref='yearref', lazy='dynamic')
-    cycle = db.relationship('Cycles', backref='yearref', lazy='dynamic')
+    # cycle = db.relationship('Cycles', backref='yearref', lazy='dynamic')
 
 
 # Students Table
@@ -32,8 +32,9 @@ class Subjects(db.Model):
 class Cycles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=False)
+    start = db.Column(db.Date)
+    end = db.Column(db.Date)
     yearid = db.Column(db.Integer, db.ForeignKey('years.id'))
-    # assign = db.relationship('Assignments', backref='cycref', lazy='dynamic')
 
 
 # Assignments Table
@@ -43,7 +44,6 @@ class Assignments(db.Model):
     date = db.Column(db.Date)
     type = db.Column(db.String(64))
     subjid = db.Column(db.Integer, db.ForeignKey('subjects.id'))
-    # cycle = db.Column(db.Integer, db.ForeignKey('cycles.id'))
     score = db.relationship('Scores', backref='assref', lazy='dynamic')
 
 

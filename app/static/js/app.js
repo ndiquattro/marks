@@ -28,7 +28,7 @@ app.controller('GradesCtrl', function($scope, $http){
 
     // Get Scores
     $scope.scores = [];
-    $scope.getscores = function(cassm){
+    $scope.getscores = function(cassm) {
         var queryObject = {filters: [{"name": "assignid", "op":"eq", "val": cassm}]};
         $http.get('/api/scores', {params: {q: queryObject}}).success(function (data) {
             $scope.scores = data.objects;
@@ -39,4 +39,24 @@ app.controller('GradesCtrl', function($scope, $http){
     $scope.updateScore = function(data, scoreid){
         return $http.put('/api/scores/'+ scoreid, {value: data});
     };
+});
+
+// Admin Controller
+app.controller('AdminCtrl', function($scope, $http){
+    // Initiate Variables
+    $scope.ccat = 0;
+    $scope.cats = ['Years', 'Students', 'Subjects', 'Assignments'];
+    $scope.stored = [];
+
+    // Get stored
+    $scope.getStored = function(clickedcat) {
+
+        var url = '/api/' + clickedcat.toLowerCase();
+        $http.get(url).success(function(data){
+           $scope.stored = data.objects;
+        });
+    };
+
+
+
 });
