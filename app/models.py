@@ -10,6 +10,10 @@ class Years(db.Model):
     subject = db.relationship('Subjects', backref='yearref', lazy='dynamic')
     # cycle = db.relationship('Cycles', backref='yearref', lazy='dynamic')
 
+    @classmethod
+    def get(cls, yid):
+        return cls.query.get(yid)
+
 
 # Students Table
 class Students(db.Model):

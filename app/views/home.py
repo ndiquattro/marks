@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, session
+from flask import Blueprint, current_app, session, jsonify
+from ..models import Years
 
 # Register blueprint
 home = Blueprint('home', __name__)
@@ -6,17 +7,7 @@ home = Blueprint('home', __name__)
 
 @home.route('/')
 def index():
-    return redirect(url_for('home.gradebook'))
-
-
-@home.route('/admin')
-def admin():
-    return render_template('admin.html')
-
-
-@home.route('/gradebook')
-def gradebook():
-    return render_template('gradebook.html')
+    return current_app.send_static_file('index.html')
 
 
 @home.route('/_setyear/<int:yearid>')
@@ -24,3 +15,14 @@ def setyear(yearid):
     # Make new year the active year
     session.permanent = True
     session['yearid'] = yearid
+
+
+@home.route('/api/_curyear')
+def curyear():
+    # Query
+    cyear = Years.get(session['yearid'])
+
+    # Parse query
+    data = {'id': cyear.id, 'year': cyear.year, 'school': cyear.school}
+
+    return jsonify(data=data)

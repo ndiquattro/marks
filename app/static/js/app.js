@@ -1,62 +1,57 @@
 // Initiate app
-var app = angular.module('gradebook', ["xeditable"]);
+angular.module('Marks', ['xeditable', 'ngRoute', 'restangular'])
+    .config(function ($routeProvider, RestangularProvider) {
+        'use strict';
 
-app.run(function(editableOptions) {
-  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
-});
-
-// Grades Controller
-app.controller('GradesCtrl', function($scope, $http){
-    // Initate variables
-    $scope.csub = 0;
-    $scope.cassm = 0;
-
-    // Get Subjects List
-    $scope.subjects = [];
-    $http.get('/api/subjects').success(function(data){
-        $scope.subjects = data.objects;
-    });
-
-    // Get Assignments
-    $scope.cassms = [];
-    $scope.getassms = function(csub) {
-        var queryObject = {filters: [{"name": "subjid", "op":"eq", "val": csub}]};
-        $http.get('/api/assignments', {params: {q: queryObject}}).success(function (data) {
-            $scope.cassms = data.objects;
+        // Set Routes
+        $routeProvider
+            .when('/gradebook', {
+                templateUrl: 'static/views/gradebook.html',
+                controller: 'GbookCtrl',
+                controllerAs: 'gbook',
+                reloadOnSearch: false,
+                activetab: 'gbook',
+                resolve: {GbookFactory: function(GbookFactory) {
+                    return GbookFactory;
+                    }
+                }
+            })
+            .when('/admin', {
+                templateUrl: 'static/views/admin.html',
+                controller: 'AdminCtrl',
+                controllerAs: 'admin',
+                reloadOnSearch: false,
+                activetab: 'admin'
+            }).otherwise({
+                redirectTo: '/gradebook'
         });
-    };
 
-    // Get Scores
-    $scope.scores = [];
-    $scope.getscores = function(cassm) {
-        var queryObject = {filters: [{"name": "assignid", "op":"eq", "val": cassm}]};
-        $http.get('/api/scores', {params: {q: queryObject}}).success(function (data) {
-            $scope.scores = data.objects;
+
+        // configure restangular
+        RestangularProvider.setBaseUrl('/api');
+
+        // configure the response extractor for each request
+        RestangularProvider.setResponseExtractor(function(response, operation) {
+          // This is a get for a list
+          var newResponse;
+          if (operation === 'getList') {
+            // Return the result objects as an array and attach the metadata
+            newResponse = response.objects;
+            newResponse.metadata = {
+              numResults: response.num_results,
+              page: response.page,
+              totalPages: response.total_pages
+            };
+          } else {
+            // This is an element
+            newResponse = response;
+          }
+          return newResponse;
         });
-    };
 
-    // Update Score
-    $scope.updateScore = function(data, scoreid){
-        return $http.put('/api/scores/'+ scoreid, {value: data});
-    };
-});
-
-// Admin Controller
-app.controller('AdminCtrl', function($scope, $http){
-    // Initiate Variables
-    $scope.ccat = 0;
-    $scope.cats = ['Years', 'Students', 'Subjects', 'Assignments'];
-    $scope.stored = [];
-
-    // Get stored
-    $scope.getStored = function(clickedcat) {
-
-        var url = '/api/' + clickedcat.toLowerCase();
-        $http.get(url).success(function(data){
-           $scope.stored = data.objects;
-        });
-    };
-
-
-
+    }).run(function(editableOptions, $rootScope){
+        editableOptions.theme = 'bs3';
+        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection){
+            console.log(event, current, previous, rejection)
+        })
 });
