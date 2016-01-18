@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Marks">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Import CSS -->
+    <link href="static/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="static/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/bower_components/angular-xeditable/dist/css/xeditable.css" rel="stylesheet">
+    <link href="static/bower_components/angular-pickadate/dist/angular-pickadate.css" rel="stylesheet">
+    <link href="static/css/marks.css" rel="stylesheet">
+
+    <title>Marks</title>
+
+</head>
+<body>
+    <!-- Navigation -->
+    <navbar></navbar>
+
+    <!-- Main View -->
+    <div class="row">
+        <div class="container-fluid" ng-view></div>
+    </div>
+
+    <!-- Import JS Libs -->
+    <script src="static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="static/bower_components/angular/angular.min.js"></script>
+    <script src="static/bower_components/angular-xeditable/dist/js/xeditable.min.js"></script>
+    <script src="static/bower_components/angular-route/angular-route.min.js"> </script>
+    <script src="static/bower_components/angular-pickadate/dist/angular-pickadate.min.js"></script>
+    <script src="static/bower_components/lodash/lodash.min.js"></script>
+    <script src="static/bower_components/restangular/dist/restangular.min.js"></script>
+
+    <!-- Marks app JS -->
+    <script src="static/app/app.js"></script>
+
+    <script src="static/app/gradebook/GbookCtrl.js"></script>
+    <script src="static/app/admin/AdminCtrl.js"></script>
+
+    <script src="static/app/layout/NavDrctv.js"></script>
+    <script src="static/app/admin/components/addYearDrctv.js"></script>
+
+    <script src="static/app/data/DataFactory.js"></script>
+
+</body>
+</html>

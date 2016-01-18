@@ -7,7 +7,7 @@ home = Blueprint('home', __name__)
 
 @home.route('/')
 def index():
-    return current_app.send_static_file('index.html')
+    return current_app.send_static_file('app/layout/index.html')
 
 
 @home.route('/_setyear/<int:yearid>')
