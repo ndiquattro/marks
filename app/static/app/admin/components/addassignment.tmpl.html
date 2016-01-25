@@ -1,0 +1,51 @@
+<div class="col-md-6">
+  <h4>Add</h4>
+  <form name="vm.AssmForm" ng-submit="vm.addAssm()" class="form-horizontal"
+        novalidate>
+
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.name)">
+      <label class="col-md-4 control-label">Assignment Name:</label>
+      <div class="col-md-6">
+        <input type="text" name="name" class="form-control"
+               ng-model="vm.adata.name" ng-maxlength="64" required>
+        <p ng-show="vm.YearForm.name.$error.maxlength" class="help-block">School
+          name is too long.</p>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.date)">
+      <label class="col-md-4 control-label">Date Assigned</label>
+      <div class="col-md-6">
+        <input type="date" name="date" ng-model="vm.adata.date"
+               class="form-control" required>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.type)">
+      <label class="col-md-4 control-label">Type</label>
+      <div class="col-md-6">
+        <select name="type" ng-model="vm.adata.type" ng-options="type as type for type in vm.types" required>
+          <option value="">Select Type</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.subj)">
+      <label class="col-md-4 control-label">Subject</label>
+      <div class="col-md-6">
+        <select name="subj" ng-model="vm.adata.subjid" ng-options="subject.id as subject.name for subject in vm.subjects" required>
+          <option value="">Select Subject</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary"
+                ng-disabled="vm.AssmForm.$invalid">Add Assignment
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>

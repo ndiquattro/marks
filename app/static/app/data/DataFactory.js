@@ -3,26 +3,32 @@ angular
     .factory('DataFactory', DataFactory);
 
 function DataFactory($http, Restangular) {
-    // Factory object
-    var fact = {
-        Years: Restangular.service('years'),
-        Students: Restangular.service('students'),
-        Subjects: Restangular.service('subjects'),
-        Assignments: Restangular.service('assignments'),
-        Scores: Restangular.service('scores'),
-        CurYear: CurYear,
-    };
+  // Factory object
+  var fact = {
+    Years: Restangular.service('years'),
+    Students: Restangular.service('students'),
+    Subjects: Restangular.service('subjects'),
+    Assignments: Restangular.service('assignments'),
+    Scores: Restangular.service('scores'),
+    CurYear: CurYear,
+    SetYear: SetYear
+  };
 
-    // Set Active Year
-    fact.activeYear = {};
-    $http.get('/api/_curyear').then(function(data) {
-        fact.activeYear = data.data.data;
-    });
+  // Set Active Year
+  fact.activeYear = {};
+  $http.get('/api/_curyear').then(function (data) {
+    fact.activeYear = data.data.data;
+  });
 
-    return fact;
+  return fact;
 
-    function CurYear() {
-        return $http.get('/api/_curyear');
-    }
+  function CurYear() {
+    return $http.get('/api/_curyear');
+  }
+
+  function SetYear(id) {
+    $http.post('/api/_setyear/' + id);
+  };
+
 };
 

@@ -1,40 +1,59 @@
 <div class="col-md-6">
-    <h4>Add</h4>
-    <form name="addyear" class="form-horizontal">
-        <div class="form-group">
-            <label for="name" class="col-md-4 control-label">School Name:</label>
-            <div class="col-md-6">
-                <input type="text" ng-model="vm.pdata.school" class="form-control" id="name">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="firstday" class="col-md-4 control-label">First day of School:</label>
-            <div class="col-md-6">
-                <input type="date" ng-model="vm.pdata.year" class="form-control" id="firstday">
-            </div>
-        </div>
-        <div class="form-group">
-             <div class="col-md-offset-4 col-md-6 text-center">
-                <button ng-click="vm.addYear()" type="submit" class="btn btn-default">Add Year</button>
-             </div>
-        </div>
-    </form>
+  <h4>Add</h4>
+  <form name="vm.YearForm" ng-submit="vm.addYear()" class="form-horizontal"
+        novalidate>
+
+    <div class="form-group" ng-class="vm.setClass(vm.YearForm.name)">
+      <label class="col-md-4 control-label">School Name:</label>
+      <div class="col-md-6">
+        <input type="text" name="name" class="form-control"
+               ng-model="vm.pdata.school" ng-maxlength="64" required>
+        <p ng-show="vm.YearForm.name.$error.maxlength" class="help-block">School
+          name is too long.</p>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="vm.setClass(vm.YearForm.firstday)">
+      <label class="col-md-4 control-label">First day of School:</label>
+      <div class="col-md-6">
+        <input type="date" name="firstday" ng-model="vm.pdata.year"
+               class="form-control" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary"
+                ng-disabled="vm.YearForm.$invalid">Add Year
+        </button>
+      </div>
+    </div>
+
+  </form>
 </div>
 
 <div class="col-md-6">
-    <h4>Saved</h4>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-            <th>Year</th>
-                <th>School</th>
-                <th>Activate</th>
-            </tr>
-        </thead>
-        <tr ng-repeat="year in vm.years">
-            <td>{{ year.year | date:'yyyy' }}</td>
-            <td>{{ year.school }}</td>
-            <td>Activate</td>
-        </tr>
-    </table>
+  <h4>Saved</h4>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Year</th>
+      <th>School</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="year in vm.years" ng-class="{'success': vm.setNew(year.year)}" >
+      <td>{{ year.year | date:'yyyy' }}</td>
+      <td>{{ year.school }}</td>
+      <td>
+        <div class="btn-group btn-group-xs" role="group">
+          <button type="button" class="btn btn-default" ng-click="vm.delYear(year.id)">
+            <span class="glyphicon glyphicon-remove"></span> Delete
+          </button>
+          <button type="button" class="btn btn-default" ng-click="vm.selYear(year.id)">
+            <span class="glyphicon glyphicon-unchecked"></span> Activate
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
 </div>

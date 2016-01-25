@@ -1,5 +1,5 @@
 angular
-    .module('Marks', ['xeditable', 'ngRoute', 'restangular'])
+    .module('Marks', ['xeditable', 'ngRoute', 'restangular', 'ui.bootstrap'])
     .config(config);
 
 function config($routeProvider, RestangularProvider) {
@@ -10,7 +10,7 @@ function config($routeProvider, RestangularProvider) {
         .when('/gradebook', {
             templateUrl: 'static/app/gradebook/gradebook.html',
             controller: 'GbookCtrl',
-            controllerAs: 'gbook',
+            controllerAs: 'vm',
             reloadOnSearch: false,
             resolve: {DataFactory: function(DataFactory) {return DataFactory}
             }

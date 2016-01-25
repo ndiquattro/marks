@@ -10,11 +10,13 @@ def index():
     return current_app.send_static_file('app/layout/index.html')
 
 
-@home.route('/_setyear/<int:yearid>')
+@home.route('/api/_setyear/<int:yearid>', methods=['POST'])
 def setyear(yearid):
     # Make new year the active year
     session.permanent = True
     session['yearid'] = yearid
+
+    return jsonify(data="OK")
 
 
 @home.route('/api/_curyear')
