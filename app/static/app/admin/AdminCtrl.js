@@ -11,9 +11,9 @@ function AdminCtrl($scope, $location) {
   vm.ccat = [];
 
   // Update based on URL
+  setNav();
   $scope.$on('$routeUpdate', function () {
-    var search = $location.search();
-    vm.ccat = search.ccat;
+    setNav();
   });
 
   // Select category
@@ -25,5 +25,10 @@ function AdminCtrl($scope, $location) {
   // Check active
   vm.isActive = function (cat) {
     return vm.ccat === cat
+  };
+
+  function setNav() {
+    var search = $location.search();
+    vm.ccat = search.ccat;
   };
 };

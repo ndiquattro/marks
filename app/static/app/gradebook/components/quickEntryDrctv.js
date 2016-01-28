@@ -22,6 +22,7 @@ function quickEntry() {
     vm.setFocus = setFocus;
 
     getScores(vm.cassm);
+    getMaxScore(vm.cassm);
 
     function getScores(assmid) {
     // Grab data
@@ -70,6 +71,13 @@ function quickEntry() {
       if (event.which === 13) {
         $(id).focus();
       }
+    };
+
+    function getMaxScore(assmid) {
+      DataFactory.Assignments.one(assmid).get()
+          .then(function(assm) {
+            vm.max = assm.max;
+          });
     };
 
   };

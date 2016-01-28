@@ -2,12 +2,12 @@
   <thead>
   <tr>
     <th>Name</th>
-    <th>Score</th>
+    <th>Score <small>(max: {{ vm.max }})</small></th>
   </tr>
   </thead>
   <tr ng-repeat="score in vm.entered">
     <td class="text-center">{{ score.studref.first_name }}</td>
-    <td class="text-center">{{ score.value }}</td>
+    <td class="text-center">{{ score.value | PerView: vm.max }}</td>
   </tr>
   <tr>
     <form name="vm.EditForm" autocomplete=off>

@@ -22,6 +22,7 @@ function editScores() {
 
     $scope.$watch('vm.cassm', function() {
       getScores(vm.cassm);
+      getMaxScore(vm.cassm);
     });
 
     // Functions
@@ -34,7 +35,7 @@ function editScores() {
       DataFactory.Scores.getList({q: qobj})
           .then(function (data) {
             vm.scores = data;
-          })
+          });
     };
 
     function upScore(data, scrid) {
@@ -48,6 +49,14 @@ function editScores() {
     function selectAll(form) {
       var input = form.$editables[0].inputEl;
       setTimeout(function () { input.select(); }, 50);
+    };
+
+    function getMaxScore(assmid) {
+      DataFactory.Assignments.one(assmid).get()
+          .then(function(assm) {
+            vm.max = assm.max;
+            vm.type = assm.type;
+          });
     };
   };
 

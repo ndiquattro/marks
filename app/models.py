@@ -4,11 +4,11 @@ from . import db
 # Years Table
 class Years(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school = db.Column(db.String(64), index=True, unique=False)
-    year = db.Column(db.Integer, index=True, unique=False)
+    school = db.Column(db.String(255))
+    year = db.Column(db.Integer)
     student = db.relationship('Students', backref='yearref', lazy='dynamic')
     subject = db.relationship('Subjects', backref='yearref', lazy='dynamic')
-    # cycle = db.relationship('Cycles', backref='yearref', lazy='dynamic')
+    cycle = db.relationship('Cycles', backref='yearref', lazy='dynamic')
 
     @classmethod
     def get(cls, yid):
@@ -19,15 +19,15 @@ class Years(db.Model):
 class Students(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     yearid = db.Column(db.Integer, db.ForeignKey('years.id'))
-    first_name = db.Column(db.String(64), index=True, unique=False)
-    last_name = db.Column(db.String(64), index=True, unique=False)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
     score = db.relationship('Scores', backref='studref', lazy='dynamic')
 
 
 # Subjects Table
 class Subjects(db.Model):
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    name = db.Column(db.String(64), index=True, unique=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
     yearid = db.Column(db.Integer, db.ForeignKey('years.id'))
     assign = db.relationship('Assignments', backref='subref', lazy='dynamic')
 
@@ -35,7 +35,7 @@ class Subjects(db.Model):
 # Cycle
 class Cycles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=False)
+    name = db.Column(db.String(255))
     start = db.Column(db.Date)
     end = db.Column(db.Date)
     yearid = db.Column(db.Integer, db.ForeignKey('years.id'))
@@ -44,9 +44,10 @@ class Cycles(db.Model):
 # Assignments Table
 class Assignments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=False)
+    name = db.Column(db.String(255))
     date = db.Column(db.Date)
-    type = db.Column(db.String(64))
+    type = db.Column(db.String(255))
+    max = db.Column(db.Integer)
     subjid = db.Column(db.Integer, db.ForeignKey('subjects.id'))
     score = db.relationship('Scores', backref='assref', lazy='dynamic')
 

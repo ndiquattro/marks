@@ -11,6 +11,7 @@ function GbookCtrl(DataFactory, $location, $scope) {
   vm.isActiveSub = isActiveSub;
   vm.setQuick = setQuick;
   vm.quickmode = false;
+  vm.quickAddAssm = quickAddAssm;
 
   // Update based on URL
   setNav();
@@ -22,6 +23,7 @@ function GbookCtrl(DataFactory, $location, $scope) {
   var curyear = DataFactory.activeYear.id;
   getSubjects();
 
+  // Functions
   function isActiveSub(subid) {
     return vm.csub === subid;
   };
@@ -44,6 +46,11 @@ function GbookCtrl(DataFactory, $location, $scope) {
 
   function setQuick() {
     vm.quickmode = !vm.quickmode;
+  };
+
+  function quickAddAssm(subid) {
+    $location.search({'ccat': 'Assignments', 'sub': subid})
+    $location.path('/admin');
   };
 
   function setNav() {

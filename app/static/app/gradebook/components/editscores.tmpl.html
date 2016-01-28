@@ -2,16 +2,23 @@
   <thead>
   <tr>
     <th>Name</th>
-    <th>Score</th>
+    <th ng-if="vm.type == 'Points'">Score <small>(max: {{ vm.max }})</small></th>
+    <th ng-if="vm.type == 'Checks'">Checked</th>
   </tr>
   </thead>
   <tr ng-repeat="score in vm.scores">
     <td class="text-center">{{ score.studref.first_name }}</td>
     <td class="text-center">
-      <a editable-text="score.value" e-style="width:50px;" buttons="no"
+      <a ng-if="vm.type == 'Points'" editable-text="score.value" e-style="width:50px;" buttons="no"
          onbeforesave="vm.upScore($data, score.id)"
          onshow="vm.selectAll($form)">
-        {{ score.value }}
+        {{ score.value | PerView: vm.max:vm.type }}
+      </a>
+
+      <a ng-if="vm.type == 'Checks'" editable-checkbox="score.value" e-style="width:50px;" buttons="no"
+         onbeforesave="vm.upScore($data, score.id)" e-ng-true-value="1" e-ng-false-value="0" e-ng-checked="score.value">
+        <span ng-if="score.value" style="font-size:1.5em;" class='glyphicon glyphicon-check'></span>
+        <span ng-if="!score.value" style="font-size:1.5em;" class='glyphicon glyphicon-unchecked'></span>
       </a>
     </td>
   </tr>

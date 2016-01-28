@@ -11,7 +11,7 @@ function addAssm() {
   };
   return directive;
 
-  function addAssmCtrl(DataFactory) {
+  function addAssmCtrl(DataFactory, $location) {
     var vm = this;
 
     var curyear = DataFactory.activeYear.id;
@@ -40,14 +40,12 @@ function addAssm() {
                     DataFactory.Scores.post({stuid: student.id,
                       assignid: newassm.id, value: 0});
 
-                  })
-
+                  });
+                  $location.search({'csub': vm.adata.subjid,
+                    'cassm': newassm.id})
+                  $location.path('/gradebook')
                 });
           });
-
-      vm.adata = {};
-      vm.AssmForm.$setPristine();
-      vm.AssmForm.$setUntouched();
     };
 
     function getSubjects() {
@@ -59,6 +57,7 @@ function addAssm() {
       DataFactory.Subjects.getList({q: qobj})
           .then(function(data){
             vm.subjects = data;
+            setDefault();
           });
     };
 
@@ -71,6 +70,13 @@ function addAssm() {
 
         return 'has-error'
 
+      }
+    };
+
+    function setDefault() {
+      var params = $location.search();
+      if (params.sub) {
+        vm.adata.subjid = params.sub;
       }
     };
   };
