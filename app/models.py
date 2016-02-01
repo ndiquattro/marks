@@ -21,8 +21,18 @@ class Students(db.Model):
     yearid = db.Column(db.Integer, db.ForeignKey('years.id'))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
+    unique = db.Column(db.Integer)
     score = db.relationship('Scores', backref='studref', lazy='dynamic')
 
+    @classmethod
+    def get_students(cls, yid):
+        return cls.query.filter_by(yearid=yid).order_by('first_name').all()
+
+    @classmethod
+    def set_unique(cls, id, uindex):
+        student = cls.query.get(id)
+        student.unique = uindex
+        db.session.commit()
 
 # Subjects Table
 class Subjects(db.Model):

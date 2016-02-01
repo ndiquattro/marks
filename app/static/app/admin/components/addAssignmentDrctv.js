@@ -38,7 +38,7 @@ function addAssm() {
 
                   students.plain().forEach(function(student) {
                     DataFactory.Scores.post({stuid: student.id,
-                      assignid: newassm.id, value: 0});
+                      assignid: newassm.id, value: null});
 
                   });
                   $location.search({'csub': vm.adata.subjid,

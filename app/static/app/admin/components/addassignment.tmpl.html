@@ -3,6 +3,16 @@
   <form name="vm.AssmForm" ng-submit="vm.addAssm()" class="form-horizontal"
         novalidate>
 
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.subj)">
+      <label class="col-md-4 control-label">Subject</label>
+      <div class="col-md-6">
+        <select class="form-control" name="subj" ng-model="vm.adata.subjid"
+                ng-options="subject.id as subject.name for subject in vm.subjects"
+                required>
+          <option value="">Select Subject</option>
+        </select>
+      </div>
+    </div>
     <div class="form-group" ng-class="vm.setClass(vm.AssmForm.name)">
       <label class="col-md-4 control-label">Assignment Name:</label>
       <div class="col-md-6">
@@ -24,26 +34,19 @@
     <div class="form-group" ng-class="vm.setClass(vm.AssmForm.type)">
       <label class="col-md-4 control-label">Type</label>
       <div class="col-md-6">
-        <select name="type" ng-model="vm.adata.type" ng-options="type as type for type in vm.types" required>
+        <select class="form-control" name="type" ng-model="vm.adata.type"
+                ng-options="type as type for type in vm.types" required>
           <option value="">Select Type</option>
         </select>
       </div>
     </div>
 
-    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.max)" ng-if="vm.adata.type === 'Points'">
+    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.max)"
+         ng-if="vm.adata.type === 'Points'">
       <label class="col-md-4 control-label">Max Points</label>
       <div class="col-md-6">
-       <input type="number" name="max" ng-model="vm.adata.max"
-              class="form-control" required>
-      </div>
-    </div>
-
-    <div class="form-group" ng-class="vm.setClass(vm.AssmForm.subj)">
-      <label class="col-md-4 control-label">Subject</label>
-      <div class="col-md-6">
-        <select name="subj" ng-model="vm.adata.subjid" ng-options="subject.id as subject.name for subject in vm.subjects" required>
-          <option value="">Select Subject</option>
-        </select>
+        <input type="number" name="max" ng-model="vm.adata.max"
+               class="form-control" required>
       </div>
     </div>
 
@@ -56,4 +59,8 @@
     </div>
 
   </form>
+</div>
+<div class="col-md-6">
+  <h4>Saved</h4>
+  <assm-view csub="vm.adata.subjid"></assm-view>
 </div>

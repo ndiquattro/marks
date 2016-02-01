@@ -8,7 +8,7 @@
   </ul>
 </div>
 <div class="col-md-5" ng-if=vm.csub>
-  <h4>Assignments <small><span class="glyphicon glyphicon-plus" ng-click="vm.quickAddAssm(vm.csub)"></span></small></h4>
+  <h4>Assignments <small><a ng-click="vm.quickAddAssm(vm.csub)"><span class="glyphicon glyphicon-plus"></span></a></small></h4>
   <assm-view csub="vm.csub" cassm="vm.cassm"></assm-view>
 </div>
 
@@ -17,7 +17,7 @@
     <span>Scores</span>
     <button class='btn btn-default btn-sm pull-right'
             ng-class="{'active': vm.quickmode}"
-            ng-click="vm.setQuick()">Quick Entry</button>
+            ng-click="vm.setQuick()"><span class="glyphicon glyphicon-fast-forward"></span> Quick Entry</button>
   </h4>
   <quick-entry ng-if="vm.quickmode" cassm="vm.cassm"></quick-entry>
   <edit-scores ng-if="!vm.quickmode" cassm="vm.cassm"></edit-scores>

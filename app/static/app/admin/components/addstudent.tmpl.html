@@ -35,7 +35,8 @@
   <table class="table table-hover">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Name <small>(Total: {{ stu.students.length }})</small></th>
+        <th></th>
       </tr>
     </thead>
     <tr ng-repeat="student in stu.students" ng-class="{'success': stu.setNew(student.id)}" >

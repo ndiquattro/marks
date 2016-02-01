@@ -18,6 +18,7 @@ function editScores() {
 
     vm.scores = [];
     vm.upScore = upScore;
+    vm.togCheck = togCheck;
     vm.selectAll = selectAll;
 
     $scope.$watch('vm.cassm', function() {
@@ -58,6 +59,14 @@ function editScores() {
             vm.type = assm.type;
           });
     };
+
+    function togCheck(scrid) {
+      DataFactory.Scores.one(scrid).get()
+          .then(function (score) {
+            score.value = !score.value;
+            score.save();
+          });
+    }
   };
 
 }

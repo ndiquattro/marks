@@ -40,10 +40,12 @@ function addStudent() {
     function addStu() {
       vm.studata.yearid = curyear;
       DataFactory.Students.post(vm.studata);
+      DataFactory.uniqueCheck(curyear);
       vm.studata = {};
       getStudents();
       vm.StudentForm.$setPristine();
       vm.StudentForm.$setUntouched();
+
     };
 
     function delStu(id) {

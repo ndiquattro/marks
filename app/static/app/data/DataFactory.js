@@ -11,7 +11,8 @@ function DataFactory($http, Restangular) {
     Assignments: Restangular.service('assignments'),
     Scores: Restangular.service('scores'),
     CurYear: CurYear,
-    SetYear: SetYear
+    SetYear: SetYear,
+    uniqueCheck: uniqueCheck
   };
 
   // Set Active Year
@@ -28,6 +29,10 @@ function DataFactory($http, Restangular) {
 
   function SetYear(id) {
     $http.post('/api/_setyear/' + id);
+  };
+
+  function uniqueCheck(id) {
+    $http.post('/add/_uniquecheck/' + id)
   };
 
 };

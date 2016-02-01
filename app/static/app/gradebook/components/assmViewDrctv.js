@@ -20,7 +20,9 @@ function assmView() {
     vm.setAssm = setAssm;
 
     $scope.$watch('vm.csub', function() {
-      getAssignments(vm.csub);
+      if (vm.csub !== undefined) {
+        getAssignments(vm.csub);
+      }
     });
 
     // Functions
@@ -41,9 +43,11 @@ function assmView() {
     };
 
     function setAssm(id) {
-      // Update URL
-      $location.search({csub: vm.csub, cassm: id});
-      vm.cassm = id;
+      if ($location.path() !== '/admin') {
+        // Update URL
+        $location.search({csub: vm.csub, cassm: id});
+        vm.cassm = id;
+      }
     };
 
   };

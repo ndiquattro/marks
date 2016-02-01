@@ -34,6 +34,7 @@
 <script src="static/bower_components/restangular/dist/restangular.min.js"></script>
 <script src="static/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
 <script src="static/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script src="static/bower_components/angular-messages/angular-messages.min.js"></script>
 
 <!-- Marks app Angular JS -->
 <script src="static/app/app.js"></script>
@@ -55,5 +56,8 @@
 
 <script src="static/app/gradebook/GbookFltrs.js"></script>
 
+<script type="text/ng-template" id="error-messages">
+  <span class="text-danger" ng-message="max">Above max score!</span>
+</script>
 </body>
 </html>

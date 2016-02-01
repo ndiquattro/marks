@@ -1,5 +1,6 @@
 angular
-    .module('Marks', ['xeditable', 'ngRoute', 'restangular', 'ui.bootstrap'])
+    .module('Marks', ['xeditable', 'ngRoute', 'restangular', 'ui.bootstrap',
+      'ngMessages'])
     .config(config);
 
 function config($routeProvider, RestangularProvider) {
