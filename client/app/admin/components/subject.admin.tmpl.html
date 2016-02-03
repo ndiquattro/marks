@@ -1,0 +1,45 @@
+<div class="col-md-6">
+  <h4>Add</h4>
+  <form name="vm.SubjectForm" ng-submit="vm.addSub()" class="form-horizontal"
+        novalidate autocomplete="off">
+
+    <div class="form-group" ng-class="vm.setClass(vm.SubjectForm.subname)">
+      <label class="col-md-4 control-label">Subject Name:</label>
+      <div class="col-md-6">
+        <input type="text" name="subname" class="form-control"
+               ng-model="vm.subdata.name" ng-maxlength="64" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary"
+                ng-disabled="vm.SubjectForm.$invalid">Add Subject
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<div class="col-md-6">
+  <h4>Saved</h4>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tr ng-repeat="subject in vm.subjects" ng-class="{'success': vm.setNew(subject.id)}" >
+      <td>{{ subject.name }}</td>
+      <td>
+        <div class="btn-group btn-group-xs" role="group">
+          <button type="button" class="btn btn-default" ng-click="vm.delSub(subject.id)">
+            <span class="glyphicon glyphicon-remove"></span> Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Marks">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- Import CSS -->
+  <link href="client/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="client/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="client/bower_components/angular-xeditable/dist/css/xeditable.css" rel="stylesheet">
+  <link href="client/bower_components/angular-pickadate/dist/angular-pickadate.css" rel="stylesheet">
+  <link href="client/bower_components/angular-bootstrap/ui-bootstrap-csp.css" rel="stylesheet">
+  <link href="client/css/marks.css" rel="stylesheet">
+
+  <title>Marks</title>
+
+</head>
+<body>
+<!-- Navigation -->
+<navbar></navbar>
+
+<!-- Main View -->
+<div class="row">
+  <div class="container-fluid" ng-view></div>
+</div>
+
+<!-- Import JS Libs -->
+<script src="client/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="client/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="client/bower_components/angular/angular.min.js"></script>
+<script src="client/bower_components/angular-xeditable/dist/js/xeditable.min.js"></script>
+<script src="client/bower_components/angular-route/angular-route.min.js"></script>
+<script src="client/bower_components/angular-pickadate/dist/angular-pickadate.min.js"></script>
+<script src="client/bower_components/lodash/lodash.min.js"></script>
+<script src="client/bower_components/restangular/dist/restangular.min.js"></script>
+<script src="client/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+<script src="client/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script src="client/bower_components/angular-messages/angular-messages.min.js"></script>
+
+<!-- Marks app Angular JS -->
+<script src="client/app/app.js"></script>
+
+<!-- layout -->
+<script src="client/app/layout/nav.directive.js"></script>
+
+<!-- data factories -->
+<script src="client/app/data/gbookdata.factory.js"></script>
+<script src="client/app/data/sesh.factory.js"></script>
+<script src="client/app/data/dbfuns.factory.js"></script>
+
+<!-- Admin -->
+<script src="client/app/admin/admin.controller.js"></script>
+<script src="client/app/admin/components/year.admin.directive.js"></script>
+<script src="client/app/admin/components/student.admin.directive.js"></script>
+<script src="client/app/admin/components/subject.admin.directive.js"></script>
+<script src="client/app/admin/components/assignment.admin.directive.js"></script>
+
+<!-- Gradebook -->
+<script src="client/app/gradebook/gradebook.controller.js"></script>
+<script src="client/app/gradebook/gradebook.filters.js"></script>
+<script src="client/app/gradebook/components/assignmentview.directive.js"></script>
+<script src="client/app/gradebook/components/scoresview.directive.js"></script>
+<script src="client/app/gradebook/components/quickentry.directive.js"></script>
+
+
+<script type="text/ng-template" id="error-messages">
+  <span class="text-danger" ng-message="max">Above max score!</span>
+</script>
+</body>
+</html>

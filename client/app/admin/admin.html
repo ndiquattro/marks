@@ -1,0 +1,18 @@
+<div class="col-md-2">
+  <h4>Categories</h4>
+  <ul class="nav nav-pills nav-stacked">
+    <li role="presentation" ng-repeat="cat in vm.cats"
+        ng-class="{'active':vm.isActive(cat)}">
+      <a href ng-click=vm.selectCat(cat)>{{ cat }}</a>
+    </li>
+  </ul>
+</div>
+
+<div class="col-md-10">
+  <div class="row">
+    <add-year ng-if="vm.isActive('Years')"></add-year>
+    <add-student ng-if="vm.isActive('Students')"></add-student>
+    <add-subject ng-if="vm.isActive('Subjects')"></add-subject>
+    <add-assm ng-if="vm.isActive('Assignments')"></add-assm>
+  </div>
+</div>

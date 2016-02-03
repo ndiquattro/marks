@@ -1,0 +1,24 @@
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th ng-if="vm.type == 'Points'">Score <small>(max: {{ vm.max }})</small></th>
+    <th ng-if="vm.type == 'Checks'">Checked</th>
+  </tr>
+  </thead>
+  <tr ng-repeat="score in vm.scores">
+    <td class="text-center">{{ score.studref | showName }}</td>
+    <td class="text-center">
+      <a ng-if="vm.type == 'Points'" editable-text="score.value" e-style="width:50px;" buttons="no"
+         onbeforesave="vm.upScore($data, score)"
+         onshow="vm.selectAll($form)">
+        {{ score.value | perView: vm.max }}
+      </a>
+
+      <a ng-if="vm.type == 'Checks'" ng-click="vm.togCheck(score)">
+        <span ng-if="score.value" style="font-size:1.5em;" class='glyphicon glyphicon-check'></span>
+        <span ng-if="!score.value" style="font-size:1.5em;" class='glyphicon glyphicon-unchecked'></span>
+      </a>
+    </td>
+  </tr>
+</table>

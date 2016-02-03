@@ -1,0 +1,53 @@
+<div class="col-md-6">
+  <h4>Add</h4>
+  <form name="vm.StudentForm" ng-submit="vm.addStu()" class="form-horizontal"
+        novalidate autocomplete="off">
+
+    <div class="form-group" ng-class="vm.setClass(vm.StudentForm.fname)">
+      <label class="col-md-4 control-label">First Name:</label>
+      <div class="col-md-6">
+        <input type="text" name="fname" class="form-control"
+               ng-model="vm.studata.first_name" ng-maxlength="64" required>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="vm.setClass(vm.StudentForm.lname)">
+      <label class="col-md-4 control-label">Last Name:</label>
+      <div class="col-md-6">
+        <input type="text" name="lname" class="form-control"
+               ng-model="vm.studata.last_name" ng-maxlength="64" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary"
+                ng-disabled="vm.StudentForm.$invalid">Add Student
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<div class="col-md-6">
+  <h4>Saved</h4>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Name <small>(Total: {{ vm.students.length }})</small></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tr ng-repeat="student in vm.students" ng-class="{'success': vm.setNew(student.id)}" >
+      <td>{{student.first_name}} {{ student.last_name }}</td>
+      <td>
+        <div class="btn-group btn-group-xs" role="group">
+          <button type="button" class="btn btn-default" ng-click="vm.delStu(student.id)">
+            <span class="glyphicon glyphicon-remove"></span> Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
