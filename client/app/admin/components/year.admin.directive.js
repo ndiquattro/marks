@@ -17,39 +17,66 @@
 
     YearCtrl.$inject = ['gbookData', 'seshService'];
 
-    function YearCtrl(gbookData, seshService) {
+    function YearCtrl(gbookData, seshService, $window) {
       var vm = this;
 
+      vm.edit = false;
       vm.pdata = {};
       vm.years = [];
       vm.addYear = addYear;
       vm.delYear = delYear;
+      vm.editYear = editYear;
+      vm.isNew = isNew;
+      vm.isEdit = isEdit;
       vm.selYear = selYear;
       vm.setClass = setClass;
-      vm.setNew = setNew;
 
       activate();
 
       // Functions
       function activate() {
         getYears();
+        vm.formtitle = "Add";
+        vm.btext = "Add Year";
       };
 
       function addYear() {
-        gbookData.Years.post(vm.pdata);
-        vm.newYear = vm.pdata.year;
+        if (vm.edit) {
+          gbookData.Years.one(vm.pdata.id).get().then(function(year) {
+            year.school = vm.pdata.school;
+            year.year = vm.pdata.year;
+            year.put();
+            vm.edit = false;
+            activate();
+            clearForm();
+          });
+        } else {
+          gbookData.Years.post(vm.pdata).then(function(year) {
+            vm.newYear = year.id;
+          });
+          getYears();
+          clearForm();
+        };
+      };
+
+      function clearForm() {
         vm.pdata = {};
-        getYears();
         vm.YearForm.$setPristine();
         vm.YearForm.$setUntouched();
       };
 
-      function delYear(id) {
-        gbookData.Years.one(id).get()
-            .then(function (year) {
-              year.remove();
-              getYears();
-            });
+      function delYear(year) {
+        year.remove();
+        getYears();
+      };
+
+      function editYear(year) {
+        vm.edit = year.id;
+        vm.formtitle = "Edit";
+        vm.btext = "Save Changes";
+        vm.pdata.year = new Date(year.year);
+        vm.pdata.school = year.school;
+        vm.pdata.id = year.id;
       };
 
       function getYears() {
@@ -60,8 +87,21 @@
             });
       };
 
+      function isNew(yearid) {
+        if (yearid === vm.newYear) {
+          return 'success'
+        }
+      };
+
+      function isEdit(yearid) {
+        if (yearid === vm.edit){
+          return 'active'
+        }
+      };
+
       function selYear(id) {
         seshService.setYear(id);
+        $window.location.reload();
       };
 
       function setClass(form) {
@@ -72,9 +112,7 @@
         };
       };
 
-      function setNew(date) {
-        return Date.parse(date) === Date.parse(vm.newYear);
-      };
+
     };
   };
 })();

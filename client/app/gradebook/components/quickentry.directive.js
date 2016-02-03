@@ -91,7 +91,7 @@
           if (vm.assm.type === 'Checks') {
             vm.newValue = 1;
             vm.upScore(event);
-          }
+          };
         }
       };
 
