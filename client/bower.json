@@ -24,6 +24,7 @@
     "angular-resource": "~1.4.8",
     "restangular": "~1.5.1",
     "lodash": "3.10.1",
-    "angular-messages": "1.4.8"
+    "angular-messages": "1.4.8",
+    "angularjs-datepicker": "^0.2.16"
   }
 }

@@ -22,6 +22,8 @@
     function AssmViewCtrl(gbookData, $scope, $location) {
       var vm = this;
 
+      vm.delAssm = delAssm;
+      vm.editAssm = editAssm;
       vm.isActiveAssign = isActiveAssign;
       vm.setAssm = setAssm;
 
@@ -35,12 +37,28 @@
         }
       };
 
+      function delAssm(assm) {
+        assm.remove();
+        activate();
+      };
+
+      function editAssm(assm) {
+        $location.search({ccat: "Assignments", eassm: assm.id});
+        $location.path('/admin');
+      };
+
       function getAssignments(subjid) {
         // Grab data
-        var qobj = {
-          filters: [{"name": "subjid", "op": "eq", "val": subjid}],
-          order_by: [{"field": "date", "direction": "desc"}]
+        if (subjid === null) {
+          var qobj = {
+            filters: [{"name": "subjid", "op": "is_null"}],
+            order_by: [{"field": "date", "direction": "desc"}]};
+        } else {
+          var qobj = {
+            filters: [{"name": "subjid", "op": "eq", "val": subjid}],
+            order_by: [{"field": "date", "direction": "desc"}]};
         };
+
         gbookData.Assignments.getList({q: qobj})
             .then(function(data) {
               vm.assignments = data;

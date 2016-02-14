@@ -18,7 +18,7 @@
   };
 
   function showName() {
-    return function (input) {
+    return function(input) {
       if (input.unique !== null) {
         if (input.unique >= input.last_name.length) {
           return input.first_name + " " + input.last_name
@@ -33,4 +33,5 @@
       }
     };
   };
+
 })();

@@ -15,9 +15,9 @@
 
     return directive;
 
-    YearCtrl.$inject = ['gbookData', 'seshService'];
+    YearCtrl.$inject = ['gbookData', 'seshService', '$window', '$filter'];
 
-    function YearCtrl(gbookData, seshService, $window) {
+    function YearCtrl(gbookData, seshService, $window, $filter) {
       var vm = this;
 
       vm.edit = false;
@@ -36,8 +36,7 @@
       // Functions
       function activate() {
         getYears();
-        vm.formtitle = "Add";
-        vm.btext = "Add Year";
+        defaultText();
       };
 
       function addYear() {
@@ -51,6 +50,7 @@
             clearForm();
           });
         } else {
+          vm.pdata.year = new Date(vm.pdata.year);
           gbookData.Years.post(vm.pdata).then(function(year) {
             vm.newYear = year.id;
           });
@@ -70,13 +70,24 @@
         getYears();
       };
 
+      function defaultText() {
+        vm.formtitle = "Add";
+        vm.btext = "Add Year";
+      };
+
       function editYear(year) {
-        vm.edit = year.id;
-        vm.formtitle = "Edit";
-        vm.btext = "Save Changes";
-        vm.pdata.year = new Date(year.year);
-        vm.pdata.school = year.school;
-        vm.pdata.id = year.id;
+        if (vm.edit === year.id) {
+          vm.edit = false;
+          vm.pdata = {};
+          defaultText();
+        } else {
+          vm.edit = year.id;
+          vm.formtitle = "Edit";
+          vm.btext = "Save Changes";
+          vm.pdata.year = $filter('date')(year.year, "MMMM d, yyyy");
+          vm.pdata.school = year.school;
+          vm.pdata.id = year.id;
+        };
       };
 
       function getYears() {

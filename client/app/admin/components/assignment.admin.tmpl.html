@@ -1,7 +1,7 @@
 <div class="col-md-6">
-  <h4>Add</h4>
+  <h4>{{ vm.title }}</h4>
   <form name="vm.AssmForm" ng-submit="vm.addAssm()" class="form-horizontal"
-        novalidate>
+        novalidate autocomplete="off">
 
     <div class="form-group" ng-class="vm.setClass(vm.AssmForm.subj)">
       <label class="col-md-4 control-label">Subject</label>
@@ -26,8 +26,11 @@
     <div class="form-group" ng-class="vm.setClass(vm.AssmForm.date)">
       <label class="col-md-4 control-label">Date Assigned</label>
       <div class="col-md-6">
-        <input type="date" name="date" ng-model="vm.adata.date"
-               class="form-control" required>
+        <datepicker date-format="MMMM d, yyyy">
+          <input type="text" name="date" ng-model="vm.adata.date"
+                 class="form-control" placeholder="Click to choose a date"
+                 required readonly>
+        </datepicker>
       </div>
     </div>
 
@@ -53,7 +56,7 @@
     <div class="form-group">
       <div class="col-md-offset-4 col-md-6 text-center">
         <button type="submit" class="btn btn-primary"
-                ng-disabled="vm.AssmForm.$invalid">Add Assignment
+                ng-disabled="vm.AssmForm.$invalid">{{ vm.btxt }}
         </button>
       </div>
     </div>
@@ -61,6 +64,6 @@
   </form>
 </div>
 <div class="col-md-6">
-  <h4>Saved</h4>
-  <assm-view csub="vm.adata.subjid"></assm-view>
+  <h4>Orphaned Assignments</h4>
+  <assm-view csub="null"></assm-view>
 </div>

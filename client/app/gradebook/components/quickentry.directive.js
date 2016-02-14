@@ -107,6 +107,11 @@
         gbookData.Assignments.one(id).get()
             .then(function(assm) {
               vm.assm = assm;
+              if (vm.assm.type == 'Points') {
+                vm.valTitle = "Score";
+              } else {
+                vm.valTitle = "Checked";
+              };
             });
       };
 

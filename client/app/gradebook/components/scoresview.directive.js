@@ -23,6 +23,8 @@
       var vm = this;
 
       vm.scores = [];
+      vm.checkCheck = checkCheck;
+      vm.isType = isType;
       vm.selectAll = selectAll;
       vm.togCheck = togCheck;
       vm.upScore = upScore;
@@ -35,7 +37,15 @@
       // Functions
       function activate() {
         getScores(vm.cassm);
-        getMaxScore(vm.cassm);
+        getAssmInfo(vm.cassm);
+      };
+
+      function checkCheck(val) {
+        if (val) {
+          return 'glyphicon glyphicon-check'
+        } else {
+          return 'glyphicon glyphicon-unchecked'
+        };
       };
 
       function getScores(assmid) {
@@ -50,6 +60,10 @@
             });
       };
 
+      function isType(type) {
+        return type === vm.type;
+      };
+
       function upScore(data, score) {
         score.value = data;
         score.save();
@@ -62,11 +76,16 @@
         }, 50);
       };
 
-      function getMaxScore(assmid) {
+      function getAssmInfo(assmid) {
         gbookData.Assignments.one(assmid).get()
             .then(function (assm) {
               vm.max = assm.max;
               vm.type = assm.type;
+              if (vm.type == 'Points') {
+                vm.valTitle = 'Score';
+              } else {
+                vm.valTitle = 'Checked';
+              };
             });
       };
 

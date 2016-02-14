@@ -2,11 +2,7 @@
   <thead>
   <tr>
     <th>Name</th>
-    <th ng-if="vm.assmType('Points')">Score
-      <small>(max: {{ vm.assm.max }})</small>
-    </th>
-    <th ng-if="vm.assmType('Checks')">
-      Checked
+    <th>{{ vm.valTitle }} <small ng-show="vm.assmType('Points')">(max: {{ vm.assm.max }})</small>
     </th>
   </tr>
   </thead>

@@ -20,11 +20,14 @@
     function StudentCtrl(gbookData, seshService, dbFuns) {
       var vm = this;
 
+      vm.edit = false;
       vm.studata = {};
       vm.students = [];
 
       vm.addStu = addStu;
       vm.delStu = delStu;
+      vm.editStu = editStu;
+      vm.isEdit = isEdit;
       vm.setClass = setClass;
 
       activate();
@@ -33,6 +36,7 @@
       function activate() {
         vm.cyearid = seshService.activeyear.id;
         getStudents();
+        defaultText();
       };
 
       function addStu() {
@@ -45,12 +49,27 @@
         vm.StudentForm.$setUntouched();
       };
 
-      function delStu(id) {
-        var student = gbookData.Students.one(id).get()
-            .then(function(student) {
-              student.remove();
-              getStudents();
-            });
+      function delStu(student) {
+        student.remove();
+        getStudents();
+      };
+
+      function defaultText() {
+        vm.title = "Add";
+        vm.btxt = "Add Student";
+      }
+
+      function editStu(stu) {
+        if (vm.edit === stu.id) {
+          vm.edit = false;
+          vm.studata = {};
+          defaultText();
+        } else {
+          vm.edit = stu.id;
+          vm.studata = stu;
+          vm.title = "Edit";
+          vm.btxt = "Save Changes";
+        };
       };
 
       function getStudents() {
@@ -63,6 +82,12 @@
             .then(function(data) {
               vm.students = data;
             });
+      };
+
+      function isEdit(id) {
+        if (id === vm.edit) {
+          return 'active'
+        }
       };
 
       function setClass(form) {

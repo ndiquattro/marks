@@ -6,6 +6,7 @@
     <th></th>
   </tr>
   </thead>
+  <tbody>
   <tr ng-repeat="assm in vm.assignments"
       ng-class="vm.isActiveAssign(assm.id)"
       ng-click="vm.setAssm(assm.id)">
@@ -16,12 +17,17 @@
       {{ assm.date | date:'MMMM d'}}
     </td>
     <td>
-      <a ng-click="vm.editAssm(assm.id)">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-      <a ng-click="vm.delAssm(assm.id)">
-        <span class="glyphicon glyphicon-remove"></span>
-      </a>
+      <div class="btn-group btn-group-xs text-center" role="group">
+        <button type="button" class="btn btn-default"
+                ng-click="vm.editAssm(assm)">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button type="button" class="btn btn-default"
+                ng-click="vm.delAssm(assm)">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
     </td>
   </tr>
+  </tbody>
 </table>

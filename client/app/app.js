@@ -3,7 +3,7 @@
 
   angular
       .module('Marks', ['xeditable', 'ngRoute', 'restangular', 'ui.bootstrap',
-        'ngMessages'])
+        'ngMessages', '720kb.datepicker'])
       .config(config);
 
   config.$inject = ['$routeProvider', 'RestangularProvider'];

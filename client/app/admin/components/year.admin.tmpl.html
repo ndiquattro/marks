@@ -8,16 +8,16 @@
       <div class="col-md-6">
         <input type="text" name="name" class="form-control"
                ng-model="vm.pdata.school" ng-maxlength="64" required>
-        <p ng-show="vm.YearForm.name.$error.maxlength" class="help-block">School
-          name is too long.</p>
       </div>
     </div>
 
     <div class="form-group" ng-class="vm.setClass(vm.YearForm.firstday)">
       <label class="col-md-4 control-label">First day of School:</label>
       <div class="col-md-6">
-        <input type="date" name="firstday" ng-model="vm.pdata.year"
-               class="form-control" required>
+            <datepicker date-format="MMMM d, yyyy">
+            <input type="text" name="firstday" ng-model="vm.pdata.year"
+                   class="form-control" placeholder="Click to choose a date" required readonly>
+            </datepicker>
       </div>
     </div>
 
@@ -42,18 +42,21 @@
       <th></th>
     </tr>
     </thead>
-    <tr ng-repeat="year in vm.years" ng-class="vm.isNew(year.id)" >
+    <tr ng-repeat="year in vm.years" ng-class="vm.isNew(year.id)">
       <td>{{ year.year | date:'yyyy' }}</td>
       <td>{{ year.school }}</td>
       <td>
         <div class="btn-group btn-group-xs" role="group">
-          <button type="button" class="btn btn-default" ng-click="vm.selYear(year.id)">
+          <button type="button" class="btn btn-default"
+                  ng-click="vm.selYear(year.id)">
             <span class="glyphicon glyphicon-asterisk"></span> Activate
           </button>
-          <button type="button" class="btn btn-default" ng-class="vm.isEdit(year.id)" ng-click="vm.editYear(year)">
+          <button type="button" class="btn btn-default"
+                  ng-class="vm.isEdit(year.id)" ng-click="vm.editYear(year)">
             <span class="glyphicon glyphicon-pencil"></span> Edit
           </button>
-          <button type="button" class="btn btn-default" ng-click="vm.delYear(year)">
+          <button type="button" class="btn btn-default"
+                  ng-click="vm.delYear(year)">
             <span class="glyphicon glyphicon-remove"></span> Delete
           </button>
         </div>

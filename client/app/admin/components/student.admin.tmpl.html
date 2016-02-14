@@ -1,5 +1,5 @@
 <div class="col-md-6">
-  <h4>Add</h4>
+  <h4>{{ vm.title }}</h4>
   <form name="vm.StudentForm" ng-submit="vm.addStu()" class="form-horizontal"
         novalidate autocomplete="off">
 
@@ -22,7 +22,7 @@
     <div class="form-group">
       <div class="col-md-offset-4 col-md-6 text-center">
         <button type="submit" class="btn btn-primary"
-                ng-disabled="vm.StudentForm.$invalid">Add Student
+                ng-disabled="vm.StudentForm.$invalid">{{ vm.btxt }}
         </button>
       </div>
     </div>
@@ -34,16 +34,25 @@
   <h4>Saved</h4>
   <table class="table table-hover">
     <thead>
-      <tr>
-        <th>Name <small>(Total: {{ vm.students.length }})</small></th>
-        <th></th>
-      </tr>
+    <tr>
+      <th>Name
+        <small>(Total: {{ vm.students.length }})</small>
+      </th>
+      <th></th>
+    </tr>
     </thead>
-    <tr ng-repeat="student in vm.students" ng-class="{'success': vm.setNew(student.id)}" >
-      <td>{{student.first_name}} {{ student.last_name }}</td>
+    <tr ng-repeat="student in vm.students"
+        ng-class="{'success': vm.setNew(student.id)}">
+      <td>{{ student.first_name }} {{ student.last_name }}</td>
       <td>
         <div class="btn-group btn-group-xs" role="group">
-          <button type="button" class="btn btn-default" ng-click="vm.delStu(student.id)">
+          <button type="button" class="btn btn-default"
+                  ng-class="vm.isEdit(student.id)"
+                  ng-click="vm.editStu(student)">
+            <span class="glyphicon glyphicon-pencil"></span> Edit
+          </button>
+          <button type="button" class="btn btn-default"
+                  ng-click="vm.delStu(student)">
             <span class="glyphicon glyphicon-remove"></span> Delete
           </button>
         </div>

@@ -1,5 +1,5 @@
 <div class="col-md-6">
-  <h4>Add</h4>
+  <h4>{{ vm.title }}</h4>
   <form name="vm.SubjectForm" ng-submit="vm.addSub()" class="form-horizontal"
         novalidate autocomplete="off">
 
@@ -14,28 +14,34 @@
     <div class="form-group">
       <div class="col-md-offset-4 col-md-6 text-center">
         <button type="submit" class="btn btn-primary"
-                ng-disabled="vm.SubjectForm.$invalid">Add Subject
+                ng-disabled="vm.SubjectForm.$invalid">{{ vm.btxt }}
         </button>
       </div>
     </div>
 
   </form>
 </div>
-
 <div class="col-md-6">
   <h4>Saved</h4>
   <table class="table table-hover">
     <thead>
-      <tr>
-        <th>Name</th>
-        <th></th>
-      </tr>
+    <tr>
+      <th>Name</th>
+      <th></th>
+    </tr>
     </thead>
-    <tr ng-repeat="subject in vm.subjects" ng-class="{'success': vm.setNew(subject.id)}" >
+    <tr ng-repeat="subject in vm.subjects"
+        ng-class="vm.isNew(subject.id)">
       <td>{{ subject.name }}</td>
       <td>
         <div class="btn-group btn-group-xs" role="group">
-          <button type="button" class="btn btn-default" ng-click="vm.delSub(subject.id)">
+          <button type="button" class="btn btn-default"
+                  ng-class="vm.isEdit(subject.id)"
+                  ng-click="vm.editSub(subject)">
+            <span class="glyphicon glyphicon-pencil"></span> Edit
+          </button>
+          <button type="button" class="btn btn-default"
+                  ng-click="vm.delSub(subject)">
             <span class="glyphicon glyphicon-remove"></span> Delete
           </button>
         </div>
