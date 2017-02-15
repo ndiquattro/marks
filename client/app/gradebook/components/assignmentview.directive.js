@@ -38,7 +38,18 @@
       };
 
       function delAssm(assm) {
+        // Remove scores associated with this assignment
+        var qobj = {
+            filters: [{"name": "assignid", "op": "eq", "val": assm.id}]};
+        gbookData.Scores.getList({q: qobj}).then(function(scores) {
+          scores.forEach(function(score) {score.remove()})
+        })
+
+        // Remove assignment
         assm.remove();
+
+        // Clear cassm and reactivate
+        $location.search({cassm: null});
         activate();
       };
 

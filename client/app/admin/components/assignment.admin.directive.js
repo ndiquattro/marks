@@ -61,7 +61,7 @@
       };
 
       function fillScores(newassm) {
-        vm.students.plain().forEach(function (student) {
+        vm.students.plain().forEach(function(student) {
           gbookData.Scores.post({
             stuid: student.id,
             assignid: newassm.id,
