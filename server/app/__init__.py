@@ -2,6 +2,8 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.restless import APIManager
 
+from flask_cors import CORS, cross_origin
+
 # Initiate Flask
 app = Flask(__name__,
             instance_relative_config=True,
@@ -9,6 +11,8 @@ app = Flask(__name__,
             static_url_path="/client")
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
+
+CORS(app)
 
 # Connect to database
 db = SQLAlchemy(app)
