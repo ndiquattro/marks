@@ -1,0 +1,10 @@
+<template>
+  <ul class="nav nav-tabs">
+    <li>
+      <h4>Subjects</h4>
+    </li>
+    <li repeat.for="sub of subjects" role="presentation">
+      <a href='gradebook/subject/${ sub.id }'>${ sub.name }</a>
+    </li>
+  </ul>
+</template>
