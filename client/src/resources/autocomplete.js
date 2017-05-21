@@ -11,9 +11,9 @@ export class Autocomplete {
   @bindable({ defaultBindingMode: bindingMode.twoWay }) value;
   @bindable placeholder = '';
   @bindable delay = 300;
-  @bindable({ defaultBindingMode: bindingMode.twoWay }) quickNameFocus;
-  @bindable({ defaultBindingMode: bindingMode.twoWay }) quickScoreFocus;
-  @bindable assmType;
+  @bindable({ defaultBindingMode: bindingMode.twoWay }) nameFocus;
+  @bindable({ defaultBindingMode: bindingMode.twoWay }) scoreFocus;
+  @bindable isPoints;
   @bindable checks;
   id = nextID++;
   expanded = false;
@@ -101,12 +101,11 @@ export class Autocomplete {
   keydown(key) {
     if (!this.expanded) {
       if (key === 13) {
-        if (this.assmType === 'Points') {
-          this.quickNameFocus = false;
-          this.quickScoreFocus = true;
+        if (this.isPoints) {
+          this.nameFocus = false;
+          this.scoreFocus = true;
           return;
         } else {
-          console.log("this is running")
           this.checks({key: key});
           return;
         }

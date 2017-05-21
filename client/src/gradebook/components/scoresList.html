@@ -1,0 +1,39 @@
+<template>
+  <require from="../converters/score-format"></require>
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th></th>
+      <th class='text-center'>${ assignment.type }
+        <small show.bind="isPoints">
+          (max: ${assignment.max})</small></th>
+    </tr>
+    </thead>
+      <tr repeat.for="score of scores">
+        <td class="text-center">${ score.studref.first_name }</td>
+        <td class="text-center" click.delegate="editScore(score)">
+          <!-- View Mode -->
+          <div if.bind="score.id !== editScoreId">
+            <div if.bind="isPoints">
+              ${ score.value  | scoreFormat: assignment}
+            </div>
+            <div if.bind="!isPoints">
+              <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div if.bind="score.id === editScoreId">
+              <input keypress.delegate="updateScore($event.which, score)"
+                     focus.bind="editFocus"
+                     blur.trigger="updateScore('blurred', score)"
+                     value.bind="score.value"
+                     type="number"
+                     style="width: 3.5em">
+          </div>
+        </td>
+      </tr>
+  </table>
+
+</template>

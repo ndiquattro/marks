@@ -1,0 +1,8 @@
+<template>
+  <ul class="nav nav-pills nav-stacked">
+    <li repeat.for="assign of assignments" role="presentation"
+        class="${assign.id === selectedId ? 'active' : ''}">
+      <a href="" click.delegate="chooseAssignment(assign)">${ assign.name }</a>
+    </li>
+  </ul>
+</template>

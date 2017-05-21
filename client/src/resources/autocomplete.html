@@ -11,7 +11,7 @@
          value.bind="inputValue & debounce:delay"
          keydown.delegate="keydown($event.which)"
          blur.trigger="blur()"
-         focus.bind="quickNameFocus">
+         focus.bind="nameFocus">
   <ul class="suggestions" role="listbox"
       if.bind="expanded"
       id.one-time="'au-autocomplate-' + id + '-suggestions'"

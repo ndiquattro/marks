@@ -3,7 +3,7 @@ export class App {
     config.title = 'Marks';
     config.map([
       { route: '', redirect: 'gradebook' },
-      { route: 'gradebook', moduleId: 'gradebook', nav: 1, title: 'Gradebook'},
+      { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook'},
       { route: 'admin',  moduleId: 'admin', nav: 2, title: 'Administration'}
     ]);
 

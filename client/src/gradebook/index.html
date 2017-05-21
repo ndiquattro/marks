@@ -1,0 +1,44 @@
+<template>
+  <require from="./components/assignmentlist"></require>
+  <require from="./components/scoresList"></require>
+  <require from="./components/quickEntry"></require>
+
+  <!-- Subjects Menu -->
+  <ul class="nav nav-tabs">
+    <li>
+      <h4>Subjects</h4>
+    </li>
+    <li repeat.for="sub of subjects" role="presentation"
+        class="${sub.id === subjectSelected.id ? 'active' : ''}">
+      <a href="" click.delegate="selectSubject(sub)">${ sub.name }</a>
+    </li>
+  </ul>
+
+  <!-- Subject Menu Bar -->
+  <div class="row" show.bind="subjectSelected">
+    <ul class="nav nav-pills">
+      <li role="presentation">
+        <a href="#"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
+      </li>
+      <li role="presentation" show.bind="assignmentSelected" class="${quickEntry ? 'active' : ''}">
+        <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i> Quick Entry</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Assignment List -->
+  <div class='row'>
+    <div class='col-md-2' if.bind="subjectSelected">
+      <h5>Assignments</h5>
+      <assignment-list subject.bind="subjectSelected"
+                       select-assignment.call="selectAssignment(assignment)">
+      </assignment-list>
+    </div>
+
+  <!-- Scores List -->
+  <div class='col-md-4' if.bind="assignmentSelected">
+    <h5>Scores</h5>
+    <scores-list if.bind="!quickEntry" assignment.bind="assignmentSelected"></scores-list>
+    <quick-entry if.bind="quickEntry" assignment.bind="assignmentSelected"></quick-entry>
+  </div>
+</template>
