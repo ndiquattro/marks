@@ -38,26 +38,21 @@
             <template replace-part="suggestion">
               <span style="font-style: italic">${suggestion}</span>
             </template>
-          </autocomplete>
-          </div>
-      </td>
+</autocomplete>
+</div>
+</td>
 
-      <!-- Value Input -->
-      <td class="text-center">
-          <div class="form-group">
-            <div if.bind="isPoints" class="form-group">
-              <input value.bind="quickPoints"
-                     class=form-control
-                     style="width: 5em;"
-                     placeholder="Score"
-                     focus.bind="scoreFocus"
-                     keypress.delegate="parseKey($event.which)" />
-            </div>
-            <div if.bind="!isPoints">
-              <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
-            </div>
-          </div>
-      </td>
-    </tr>
-  </table>
+<!-- Value Input -->
+<td class="text-center">
+  <div class="form-group">
+    <div if.bind="isPoints" class="form-group">
+      <input value.bind="quickPoints" class=form-control style="width: 5em;" placeholder="Score" focus.bind="scoreFocus" keypress.delegate="parseKey($event.which)" />
+    </div>
+    <div if.bind="!isPoints">
+      <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+    </div>
+  </div>
+</td>
+</tr>
+</table>
 </template>

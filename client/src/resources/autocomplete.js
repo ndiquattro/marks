@@ -93,7 +93,7 @@ export class Autocomplete {
     const li = ul.children.item(this.index === -1 ? 0 : this.index);
     if (li.offsetTop + li.offsetHeight > ul.offsetHeight) {
       ul.scrollTop += li.offsetHeight;
-    } else if(li.offsetTop < ul.scrollTop) {
+    } else if (li.offsetTop < ul.scrollTop) {
       ul.scrollTop = li.offsetTop;
     }
   }
@@ -104,10 +104,8 @@ export class Autocomplete {
         if (this.isPoints) {
           this.nameFocus = false;
           this.scoreFocus = true;
-          return;
         } else {
           this.checks({key: key});
-          return;
         }
       }
       return true;

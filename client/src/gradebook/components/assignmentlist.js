@@ -1,15 +1,15 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
-import {bindable} from 'aurelia-templating'
+import {bindable} from 'aurelia-templating';
 
 @inject(HttpClient)
 export class AssignmentList {
   @bindable subject;
   @bindable selectAssignment;
 
-  constructor(HttpClient) {
+  constructor(http) {
     // Initalize http client
-    this.http = HttpClient;
+    this.http = http;
 
     // Initalize Selection Indicators
     this.selectedId = false;
@@ -22,9 +22,9 @@ export class AssignmentList {
 
   getAssignments(subject) {
     // Filter object
-    var qobj = {
-      filters: [{"name": "subjid", "op": "eq", "val": subject.id}],
-      order_by: [{"field": "date", "direction": "desc"}]
+    let qobj = {
+      filters: [{'name': 'subjid', 'op': 'eq', 'val': subject.id}],
+      order_by: [{'field': 'date', 'direction': 'desc'}]
     };
 
     // Request Assignments
@@ -35,7 +35,7 @@ export class AssignmentList {
       .then(data => {
         this.assignments = JSON.parse(data.response).objects;
       });
-  };
+  }
 
   chooseAssignment(assignment) {
     this.selectedId = assignment.id;

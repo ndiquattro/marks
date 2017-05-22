@@ -2,10 +2,10 @@ import {HttpClient} from 'aurelia-http-client';
 import {inject} from 'aurelia-framework';
 
 @inject(HttpClient)
-export class gradebook {
-  constructor(HttpClient) {
+export class GradeBook {
+  constructor(http) {
     // Initalize Client
-    this.http = HttpClient;
+    this.http = http;
 
     // Initalize Selection Indicators
     this.subjectSelected = false;

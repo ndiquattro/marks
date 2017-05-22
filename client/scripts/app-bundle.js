@@ -75,7 +75,7 @@ define('gradebook/index',['exports', 'aurelia-http-client', 'aurelia-framework']
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.gradebook = undefined;
+  exports.GradeBook = undefined;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -85,18 +85,18 @@ define('gradebook/index',['exports', 'aurelia-http-client', 'aurelia-framework']
 
   var _dec, _class;
 
-  var gradebook = exports.gradebook = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = function () {
-    function gradebook(HttpClient) {
-      _classCallCheck(this, gradebook);
+  var GradeBook = exports.GradeBook = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = function () {
+    function GradeBook(http) {
+      _classCallCheck(this, GradeBook);
 
-      this.http = HttpClient;
+      this.http = http;
 
       this.subjectSelected = false;
       this.assignmentSelected = false;
       this.quickEntry = false;
     }
 
-    gradebook.prototype.created = function created() {
+    GradeBook.prototype.created = function created() {
       var _this = this;
 
       this.http.get('http://localhost:5000/api/subjects').then(function (data) {
@@ -104,20 +104,20 @@ define('gradebook/index',['exports', 'aurelia-http-client', 'aurelia-framework']
       });
     };
 
-    gradebook.prototype.selectSubject = function selectSubject(subject) {
+    GradeBook.prototype.selectSubject = function selectSubject(subject) {
       this.subjectSelected = subject;
       this.assignmentSelected = false;
     };
 
-    gradebook.prototype.selectAssignment = function selectAssignment(assignment) {
+    GradeBook.prototype.selectAssignment = function selectAssignment(assignment) {
       this.assignmentSelected = assignment;
     };
 
-    gradebook.prototype.toggleQuick = function toggleQuick() {
+    GradeBook.prototype.toggleQuick = function toggleQuick() {
       this.quickEntry = !this.quickEntry;
     };
 
-    return gradebook;
+    return GradeBook;
   }()) || _class);
 });
 define('resources/autocomplete',['exports', 'aurelia-binding', 'aurelia-templating', 'aurelia-dependency-injection', 'aurelia-pal'], function (exports, _aureliaBinding, _aureliaTemplating, _aureliaDependencyInjection, _aureliaPal) {
@@ -294,10 +294,8 @@ define('resources/autocomplete',['exports', 'aurelia-binding', 'aurelia-templati
           if (this.isPoints) {
             this.nameFocus = false;
             this.scoreFocus = true;
-            return;
           } else {
             this.checks({ key: key });
-            return;
           }
         }
         return true;
@@ -406,33 +404,6 @@ define('resources/index',["exports"], function (exports) {
   exports.configure = configure;
   function configure(config) {}
 });
-define('gradebook/converters/score-format',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var ScoreFormatValueConverter = exports.ScoreFormatValueConverter = function () {
-    function ScoreFormatValueConverter() {
-      _classCallCheck(this, ScoreFormatValueConverter);
-    }
-
-    ScoreFormatValueConverter.prototype.toView = function toView(value, assignInfo) {
-      if (assignInfo.type === 'Points') {
-        return Math.round(value / assignInfo.max * 100) + '%';
-      }
-    };
-
-    return ScoreFormatValueConverter;
-  }();
-});
 define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-templating'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaTemplating) {
   'use strict';
 
@@ -493,14 +464,14 @@ define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'a
   var _dec, _class, _desc, _value, _class2, _descriptor, _descriptor2;
 
   var AssignmentList = exports.AssignmentList = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = (_class2 = function () {
-    function AssignmentList(HttpClient) {
+    function AssignmentList(http) {
       _classCallCheck(this, AssignmentList);
 
       _initDefineProp(this, 'subject', _descriptor, this);
 
       _initDefineProp(this, 'selectAssignment', _descriptor2, this);
 
-      this.http = HttpClient;
+      this.http = http;
 
       this.selectedId = false;
     }
@@ -514,8 +485,8 @@ define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'a
       var _this = this;
 
       var qobj = {
-        filters: [{ "name": "subjid", "op": "eq", "val": subject.id }],
-        order_by: [{ "field": "date", "direction": "desc" }]
+        filters: [{ 'name': 'subjid', 'op': 'eq', 'val': subject.id }],
+        order_by: [{ 'field': 'date', 'direction': 'desc' }]
       };
 
       this.http.createRequest('http://localhost:5000/api/assignments').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
@@ -533,120 +504,6 @@ define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'a
     enumerable: true,
     initializer: null
   }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'selectAssignment', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class2)) || _class);
-});
-define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-templating'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaTemplating) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ScoresList = undefined;
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-    });
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
-
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
-
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
-  }
-
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
-
-  var _dec, _class, _desc, _value, _class2, _descriptor;
-
-  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = (_class2 = function () {
-    function ScoresList(HttpClient) {
-      _classCallCheck(this, ScoresList);
-
-      _initDefineProp(this, 'assignment', _descriptor, this);
-
-      this.http = HttpClient;
-
-      this.editScoreId = null;
-    }
-
-    ScoresList.prototype.bind = function bind() {
-      this.getScores(this.assignment);
-      this.isPoints = this.assignment.type === 'Points';
-    };
-
-    ScoresList.prototype.getScores = function getScores(assignment) {
-      var _this = this;
-
-      var qobj = {
-        filters: [{ "name": "assignid", "op": "eq", "val": assignment.id }],
-        order_by: [{ "field": "studref__first_name", "direction": "asc" }]
-      };
-
-      this.http.createRequest('http://localhost:5000/api/scores').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
-        _this.scores = JSON.parse(data.response).objects;
-      });
-    };
-
-    ScoresList.prototype.editScore = function editScore(score) {
-      if (this.isPoints) {
-        this.editScoreId = score.id;
-        this.editFocus = true;
-      } else {
-        score.value = 1 - score.value;
-        this.updateScore('blurred', score);
-      }
-    };
-
-    ScoresList.prototype.updateScore = function updateScore(key, score) {
-      if (key === 13 || key === 'blurred') {
-        this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ "value": score.value }).send();
-
-        this.editScoreId = null;
-      }
-
-      return true;
-    };
-
-    return ScoresList;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'assignment', [_aureliaTemplating.bindable], {
     enumerable: true,
     initializer: null
   })), _class2)) || _class);
@@ -711,7 +568,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
   var _dec, _class, _desc, _value, _class2, _descriptor;
 
   var QuickEntry = exports.QuickEntry = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = (_class2 = function () {
-    function QuickEntry(HttpClient) {
+    function QuickEntry(http) {
       var _this = this;
 
       _classCallCheck(this, QuickEntry);
@@ -735,7 +592,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
         }
       };
 
-      this.http = HttpClient;
+      this.http = http;
 
       this.entered = [];
     }
@@ -754,8 +611,8 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
       var _this2 = this;
 
       var qobj = {
-        filters: [{ "name": "assignid", "op": "eq", "val": assignment.id }],
-        order_by: [{ "field": "studref__first_name", "direction": "asc" }]
+        filters: [{ 'name': 'assignid', 'op': 'eq', 'val': assignment.id }],
+        order_by: [{ 'field': 'studref__first_name', 'direction': 'asc' }]
       };
 
       this.http.createRequest('http://localhost:5000/api/scores').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
@@ -791,7 +648,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
     };
 
     QuickEntry.prototype.updateScore = function updateScore(score) {
-      this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ "value": score.value }).send();
+      this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ 'value': score.value }).send();
     };
 
     return QuickEntry;
@@ -800,11 +657,152 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
     initializer: null
   })), _class2)) || _class);
 });
+define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-templating'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaTemplating) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ScoresList = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _class, _desc, _value, _class2, _descriptor;
+
+  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = (_class2 = function () {
+    function ScoresList(http) {
+      _classCallCheck(this, ScoresList);
+
+      _initDefineProp(this, 'assignment', _descriptor, this);
+
+      this.http = http;
+
+      this.editScoreId = null;
+    }
+
+    ScoresList.prototype.bind = function bind() {
+      this.getScores(this.assignment);
+      this.isPoints = this.assignment.type === 'Points';
+    };
+
+    ScoresList.prototype.getScores = function getScores(assignment) {
+      var _this = this;
+
+      var qobj = {
+        filters: [{ 'name': 'assignid', 'op': 'eq', 'val': assignment.id }],
+        order_by: [{ 'field': 'studref__first_name', 'direction': 'asc' }]
+      };
+
+      this.http.createRequest('http://localhost:5000/api/scores').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
+        _this.scores = JSON.parse(data.response).objects;
+      });
+    };
+
+    ScoresList.prototype.editScore = function editScore(score) {
+      if (this.isPoints) {
+        this.editScoreId = score.id;
+        this.editFocus = true;
+      } else {
+        score.value = 1 - score.value;
+        this.updateScore('blurred', score);
+      }
+    };
+
+    ScoresList.prototype.updateScore = function updateScore(key, score) {
+      if (key === 13 || key === 'blurred') {
+        this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ 'value': score.value }).send();
+
+        this.editScoreId = null;
+      }
+
+      return true;
+    };
+
+    return ScoresList;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'assignment', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class);
+});
+define('gradebook/converters/score-format',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var ScoreFormatValueConverter = exports.ScoreFormatValueConverter = function () {
+    function ScoreFormatValueConverter() {
+      _classCallCheck(this, ScoreFormatValueConverter);
+    }
+
+    ScoreFormatValueConverter.prototype.toView = function toView(value, assignInfo) {
+      if (assignInfo.type === 'Points') {
+        return Math.round(value / assignInfo.max * 100) + '%';
+      }
+    };
+
+    return ScoreFormatValueConverter;
+  }();
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>School Name (2017)</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
 define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of subjects\" role=\"presentation\"\n        class=\"${sub.id === subjectSelected.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"selectSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"subjectSelected\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\">\n        <a href=\"#\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"assignmentSelected\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class='row'>\n    <div class='col-md-2' if.bind=\"subjectSelected\">\n      <h5>Assignments</h5>\n      <assignment-list subject.bind=\"subjectSelected\"\n                       select-assignment.call=\"selectAssignment(assignment)\">\n      </assignment-list>\n    </div>\n\n  <!-- Scores List -->\n  <div class='col-md-4' if.bind=\"assignmentSelected\">\n    <h5>Scores</h5>\n    <scores-list if.bind=\"!quickEntry\" assignment.bind=\"assignmentSelected\"></scores-list>\n    <quick-entry if.bind=\"quickEntry\" assignment.bind=\"assignmentSelected\"></quick-entry>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
 define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assign of assignments\" role=\"presentation\"\n        class=\"${assign.id === selectedId ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"chooseAssignment(assign)\">${ assign.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
+define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class='table table-hover'>\n    <thead>\n      <tr>\n        <th></th>\n        <th class='text-center'>${ assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${assignment.max})</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: assignment}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\" class=form-control style=\"width: 5em;\" placeholder=\"Score\" focus.bind=\"scoreFocus\" keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class='text-center'>${ assignment.type }\n        <small show.bind=\"isPoints\">\n          (max: ${assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of scores\">\n        <td class=\"text-center\">${ score.studref.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\">\n            <div if.bind=\"isPoints\">\n              ${ score.value  | scoreFormat: assignment}\n            </div>\n            <div if.bind=\"!isPoints\">\n              <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </div>\n          </div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"updateScore($event.which, score)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore('blurred', score)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
-define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class='table table-hover'>\n    <thead>\n      <tr>\n        <th></th>\n        <th class='text-center'>${ assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${assignment.max})</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: assignment}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n          </autocomplete>\n          </div>\n      </td>\n\n      <!-- Value Input -->\n      <td class=\"text-center\">\n          <div class=\"form-group\">\n            <div if.bind=\"isPoints\" class=\"form-group\">\n              <input value.bind=\"quickPoints\"\n                     class=form-control\n                     style=\"width: 5em;\"\n                     placeholder=\"Score\"\n                     focus.bind=\"scoreFocus\"\n                     keypress.delegate=\"parseKey($event.which)\" />\n            </div>\n            <div if.bind=\"!isPoints\">\n              <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </div>\n          </div>\n      </td>\n    </tr>\n  </table>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

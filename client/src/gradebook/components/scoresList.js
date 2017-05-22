@@ -1,14 +1,14 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
-import {bindable} from 'aurelia-templating'
+import {bindable} from 'aurelia-templating';
 
 @inject(HttpClient)
 export class ScoresList {
   @bindable assignment;
 
-  constructor(HttpClient) {
+  constructor(http) {
     // Initalize http client
-    this.http = HttpClient;
+    this.http = http;
 
     // Initalize variables
     this.editScoreId = null;
@@ -21,10 +21,10 @@ export class ScoresList {
 
   getScores(assignment) {
     // Filter Object
-    var qobj = {
-      filters: [{"name": "assignid", "op": "eq", "val": assignment.id}],
-      order_by: [{"field": "studref__first_name", "direction": "asc"}]
-    }
+    let qobj = {
+      filters: [{'name': 'assignid', 'op': 'eq', 'val': assignment.id}],
+      order_by: [{'field': 'studref__first_name', 'direction': 'asc'}]
+    };
 
     // Get Data
     this.http.createRequest('http://localhost:5000/api/scores')
@@ -47,11 +47,11 @@ export class ScoresList {
   }
 
   updateScore(key, score) {
-    if(key === 13 || key === 'blurred') {
+    if (key === 13 || key === 'blurred') {
       this.http.createRequest('http://localhost:5000/api/scores/' + score.id)
         .asPut()
-        .withContent({"value": score.value})
-        .send()
+        .withContent({'value': score.value})
+        .send();
 
       // Reset edit
       this.editScoreId = null;
