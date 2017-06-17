@@ -3,7 +3,7 @@ A Gradebook app made to be simple and powerful, for the modern primary school te
 
 
 # Demo
-You can play with a demo version at [marks.quatts.net](marks.quatts.net). Works best in Chrome.
+You can play with a demo version at [marks.quatts.net](http://marks.quatts.net). Works best in Chrome.
 
 # Philosophy
 The primary goal of marks was to create a tool that enables data-driven teaching in primary schools. Primary education provides a unique opportunity for data-driven methods as there typically is one person in charge of a classroom for a long duration. This means many opportunities to track a student's progress and make interventions based on data, given the proper tool.
