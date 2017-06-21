@@ -18,6 +18,7 @@ export class QuickEntry {
     this.getScores(this.assignment);
     this.isPoints = this.assignment.type === 'Points';
     this.nameFocus = true;
+    this.scoreFocus = false;
   }
 
   detached() {
@@ -58,27 +59,35 @@ export class QuickEntry {
       });
   }
 
+  pushScore(score) {
+    // Add to the entered list
+    this.entered.push(score);
+
+    // Remove Score from future suggestions
+    this.notEntered = this.notEntered.filter(item => item.id !== score.id);
+
+    // clear forms and reset focus
+    this.score = null;
+    this.quickPoints = null;
+    this.scoreFocus = false;
+    this.nameFocus = true;
+  }
+
   parseKey(key) {
     if (key === 13) {
-      if (this.isPoints) {
-        this.score.value = this.quickPoints;
-        this.updateScore(this.score);
-      } else {
+      // If Checks type
+      if (!this.isPoints && key === 13) {
         this.score.value = 1;
         this.updateScore(this.score);
+        this.pushScore(this.score);
       }
 
-      // Add to the entered list
-      this.entered.push(this.score);
-
-      // Remove Score from future suggestions
-      this.notEntered = this.notEntered.filter(item => item.id !== this.score.id);
-
-      // clear forms
-      this.score = null;
-      this.quickPoints = null;
-      this.scoreFocus = false;
-      this.nameFocus = true;
+      // If Points type
+      if (this.quickPoints) {
+        this.score.value = this.quickPoints;
+        this.updateScore(this.score);
+        this.pushScore(this.score);
+      }
     } else {
       return true;
     }

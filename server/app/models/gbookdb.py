@@ -56,3 +56,8 @@ class Scores(db.Model, CRUDMixin):
     assignid = db.Column(db.Integer, db.ForeignKey('assignments.id'))
     stuid = db.Column(db.Integer, db.ForeignKey('students.id'))
     value = db.Column(db.Integer)
+
+    @classmethod
+    def add_dummy(cls, stuid, assignid):
+        db.session.add(Scores(stuid=stuid, assignid=assignid, value=None))
+        db.session.commit()

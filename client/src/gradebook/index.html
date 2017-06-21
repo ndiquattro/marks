@@ -2,6 +2,8 @@
   <require from="./components/assignmentlist"></require>
   <require from="./components/scoresList"></require>
   <require from="./components/quickEntry"></require>
+  <require from="./components/addAssignment"></require>
+  <require from="./components/reportAssignment"></require>
 
   <!-- Subjects Menu -->
   <ul class="nav nav-tabs">
@@ -17,28 +19,50 @@
   <!-- Subject Menu Bar -->
   <div class="row" show.bind="subjectSelected">
     <ul class="nav nav-pills">
-      <li role="presentation">
-        <a href="#"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
+      <li role="presentation" class="${addingAssignment ? 'active' : ''}">
+        <a href="#" click.delegate="addAssignment()"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
       </li>
       <li role="presentation" show.bind="assignmentSelected" class="${quickEntry ? 'active' : ''}">
         <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i> Quick Entry</a>
+      </li>
+      <li role="presentation" show.bind="assignmentSelected || editingAssignment" class="${editingAssignment ? 'active' : ''}">
+        <a href="#" click.delegate="editAssignment(assignmentSelected)"><i class="fa fa-pencil"></i> Edit Assignment</a>
+      </li>
+      <li role="presentation" show.bind="assignmentSelected">
+        <a href="#" click.delegate="deleteAssignment(assignmentSelected)"><i class="fa fa-eraser"></i> Delete Assignment</a>
       </li>
     </ul>
   </div>
 
   <!-- Assignment List -->
-  <div class='row'>
-    <div class='col-md-2' if.bind="subjectSelected">
+  <div class="row">
+    <div class="col-md-2" if.bind="subjectSelected">
       <h5>Assignments</h5>
       <assignment-list subject.bind="subjectSelected"
+                       reload.bind="reloadAssignmentsFlag"
                        select-assignment.call="selectAssignment(assignment)">
       </assignment-list>
     </div>
 
-  <!-- Scores List -->
-  <div class='col-md-4' if.bind="assignmentSelected">
-    <h5>Scores</h5>
-    <scores-list if.bind="!quickEntry" assignment.bind="assignmentSelected"></scores-list>
-    <quick-entry if.bind="quickEntry" assignment.bind="assignmentSelected"></quick-entry>
+    <!-- Scores List -->
+    <div class="col-md-4" if.bind="assignmentSelected && !editingAssignment">
+      <h5>Scores</h5>
+      <scores-list if.bind="!quickEntry" assignment.bind="assignmentSelected"></scores-list>
+      <quick-entry if.bind="quickEntry" assignment.bind="assignmentSelected"></quick-entry>
+    </div>
+
+    <!-- Reports -->
+    <div class="col-md-6" if.bind="assignmentSelected && !editingAssignment">
+      <h5>Assesment</h5>
+      <report-assignment assignment.bind="assignmentSelected"></report-assignment>
+    </div>
+
+    <!-- Add Assignment -->
+    <div class="col-md-5" if.bind="addingAssignment || editingAssignment">
+      <add-assignment subject.bind="subjectSelected"
+                      edit.bind="editingAssignment"
+                      reload-assignments.call="reloadAssignments(assignment)">
+      </add-assignment>
+    </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 from flask import Blueprint
-from ..models.gbookdb import Students
+from ..models.gbookdb import Students, Scores
 
 # Register blueprint
 dbfunctions = Blueprint('dbfunctions', __name__, url_prefix="/dbfunctions")
@@ -40,3 +40,15 @@ def ucheck(yearid):
                 Students.set_unique(sinfo[dup].id, uin)
 
     return "OK"
+
+def dummy_scores(result):
+    """ Pad new assignments with Dummy Scores """
+
+    # Get students assigned to this year
+    sinfo = Students.get_byyear(result['subref']['yearid'])
+
+    # Loop through and add dummy scores
+    for i, student in enumerate(sinfo):
+        Scores.add_dummy(student.id, result['id'])
+
+    return "Dummys Added"

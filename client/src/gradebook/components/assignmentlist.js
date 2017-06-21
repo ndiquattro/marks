@@ -5,6 +5,7 @@ import {bindable} from 'aurelia-templating';
 @inject(HttpClient)
 export class AssignmentList {
   @bindable subject;
+  @bindable reload;
   @bindable selectAssignment;
 
   constructor(http) {
@@ -18,6 +19,10 @@ export class AssignmentList {
   subjectChanged() {
     this.getAssignments(this.subject);
     this.selectedId = false;
+  }
+
+  reloadChanged() {
+    this.getAssignments(this.subject);
   }
 
   getAssignments(subject) {

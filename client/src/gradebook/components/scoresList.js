@@ -19,6 +19,10 @@ export class ScoresList {
     this.isPoints = this.assignment.type === 'Points';
   }
 
+  assignmentChanged(newval, oldval) {
+    this.bind();
+  }
+
   getScores(assignment) {
     // Filter Object
     let qobj = {
