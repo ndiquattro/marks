@@ -45,16 +45,16 @@
     </div>
 
     <!-- Scores List -->
-    <div class="col-md-4" if.bind="assignmentSelected && !editingAssignment">
+    <div class="col-md-4" if.bind="assignment.scoresLoaded && !editingAssignment">
       <h5>Scores</h5>
-      <scores-list if.bind="!quickEntry" assignment.bind="assignmentSelected"></scores-list>
-      <quick-entry if.bind="quickEntry" assignment.bind="assignmentSelected"></quick-entry>
+      <scores-list if.bind="!quickEntry"></scores-list>
+      <quick-entry if.bind="quickEntry" assignment.bind="assignment" scores.bind="scores"></quick-entry>
     </div>
 
     <!-- Reports -->
-    <div class="col-md-6" if.bind="assignmentSelected && !editingAssignment">
+    <div class="col-md-6" if.bind="assignment.scoresLoaded && !editingAssignment">
       <h5>Assesment</h5>
-      <report-assignment assignment.bind="assignmentSelected"></report-assignment>
+      <report-assignment reload.bind="assignment.newScores"></report-assignment>
     </div>
 
     <!-- Add Assignment -->

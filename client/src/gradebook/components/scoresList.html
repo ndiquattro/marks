@@ -5,29 +5,29 @@
     <thead>
     <tr>
       <th></th>
-      <th class='text-center'>${ assignment.type }
-        <small show.bind="isPoints">
-          (max: ${assignment.max})</small></th>
+      <th class="text-center">${ assignment.meta.type }
+        <small show.bind="assignment.isPoints">
+          (max: ${assignment.meta.max})</small></th>
     </tr>
     </thead>
-      <tr repeat.for="score of scores">
+      <tr repeat.for="score of assignment.scores">
         <td class="text-center">${ score.studref.first_name }</td>
         <td class="text-center" click.delegate="editScore(score)">
           <!-- View Mode -->
           <div if.bind="score.id !== editScoreId">
-            <div if.bind="isPoints">
-              ${ score.value  | scoreFormat: assignment}
+            <div if.bind="assignment.isPoints">
+              ${ score.value  | scoreFormat: assignment.meta}
             </div>
-            <div if.bind="!isPoints">
+            <div if.bind="!assignment.isPoints">
               <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
             </div>
           </div>
 
           <!-- Edit Mode -->
           <div if.bind="score.id === editScoreId">
-              <input keypress.delegate="updateScore($event.which, score)"
+              <input keypress.delegate="deFocus($event.which)"
                      focus.bind="editFocus"
-                     blur.trigger="updateScore('blurred', score)"
+                     blur.trigger="updateScore(score, $index)"
                      value.bind="score.value"
                      type="number"
                      style="width: 3.5em">

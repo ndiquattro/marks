@@ -1,10 +1,12 @@
-import {HttpClient} from 'aurelia-http-client';
 import {inject} from 'aurelia-framework';
+import {HttpClient} from 'aurelia-http-client';
+import {AssignmentService} from './services/assignmentService';
 
-@inject(HttpClient)
+@inject(AssignmentService, HttpClient)
 export class GradeBook {
-  constructor(http) {
-    // Initalize Client
+  constructor(assignment, http) {
+    // Data Holders
+    this.assignment = assignment;
     this.http = http;
 
     // Initalize Selection Indicators
@@ -26,12 +28,12 @@ export class GradeBook {
   addAssignment() {
     // Flip on add assignment dialog
     this.assignmentSelected = false;
+    this.assignment.clearAssignment();
     this.addingAssignment = true;
   }
 
   editAssignment(assignment) {
-    this.editingAssignment = assignment;
-    // this.assignmentSelected = false;
+    this.editingAssignment = true;
   }
 
   deleteAssignment(assignment) {
@@ -58,7 +60,13 @@ export class GradeBook {
   }
 
   selectAssignment(assignment) {
-    this.assignmentSelected = assignment;
+    // Clear Current
+    this.assignmentSelected = false;
+    this.assignment.clearAssignment();
+
+    // Set Assignment
+    this.assignment.setAssignment(assignment);
+    this.assignmentSelected = true;
   }
 
   reloadAssignments(assignment) {
