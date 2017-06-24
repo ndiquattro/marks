@@ -1,56 +1,69 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
 import {bindable} from 'aurelia-templating';
+import {EventAggregator} from 'aurelia-event-aggregator';
+import {AssignmentService} from '../services/assignmentService';
 
-@inject(HttpClient)
+@inject(HttpClient, AssignmentService, EventAggregator)
 export class AddAssignment {
-  @bindable subject;
-  @bindable edit;
-  @bindable reloadAssignments;
+  @bindable mode;
 
-  constructor(http) {
+  constructor(http, assignment, eventaggregator) {
     this.http = http;
-    this.assignment = {};
+    this.assignment = assignment;
+    this.ea = eventaggregator;
+  }
+
+  created() {
+    this.newAssignment = {};
   }
 
   bind() {
     // Set title
-    if (this.edit) {
+    if (this.mode === 'edit') {
       this.title = 'Edit Assignment';
-      this.btn = 'Save Changes'
-      this.assignment = this.edit;
+      this.btn = 'Save Changes';
+      this.newAssignment = this.assignment.meta;
     } else {
       this.title = 'Add Assignment';
       this.btn = this.title;
     }
   }
 
+  detached() {
+    this.newAssignment = {};
+  }
+
   submitAssignment() {
-    if (this.edit) {
+    if (this.mode === 'edit') {
       // Update Assignment Information
-      this.http.createRequest('http://localhost:5000/api/assignments/' + this.assignment.id)
+      this.http.createRequest('http://localhost:5000/api/assignments/' + this.assignment.meta.id)
         .asPut()
-        .withContent(this.assignment)
-        .send()
-        .then(resp => this.reloadAssignments({assignment: resp.response}));
+        .withContent(this.assignment.meta)
+        .send();
+
+      // Turn off edit mode
+      this.mode = false;
     } else {
-      // Fill in subject id
-      this.assignment.subjid = this.subject.id;
+      // Fill in subject ID
+      this.newAssignment.subjid = this.assignment.subject.id;
 
       // Add assignment information to database
       this.http.createRequest('http://localhost:5000/api/assignments')
         .asPost()
-        .withContent(this.assignment)
+        .withContent(this.newAssignment)
         .send()
-        .then(resp => this.reloadAssignments({assignment: resp.response}));
+        .then(data => {
+          this.ea.publish('reloadAssignments');
 
-      // Clear Binds
-      this.assignment = {};
+          // Clear Binds and Select
+          this.assignment.setAssignment(JSON.parse(data.response));
+          this.mode = false;
+        });
     }
   }
 
-  cancelEdit() {
-    this.reloadAssignments();
+  cancel() {
+    this.mode = false;
   }
-
 }

@@ -1,28 +1,32 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
-import {bindable} from 'aurelia-templating';
+import {EventAggregator} from 'aurelia-event-aggregator';
+import {AssignmentService} from '../services/assignmentService';
 
-@inject(HttpClient)
+@inject(HttpClient, AssignmentService, EventAggregator)
 export class QuickEntry {
-  @bindable assignment;
 
-  constructor(http) {
+  constructor(http, assignment, eventaggregator) {
     // Initalize http client
     this.http = http;
-
-    // Initalize variables
-    this.entered = [];
+    this.assignment = assignment;
+    this.ea = eventaggregator;
   }
 
-  bind() {
-    this.getScores(this.assignment);
-    this.isPoints = this.assignment.type === 'Points';
+  attached() {
+    // Initalize variables
+    this.entered = [];
+    this.notEntered = this.assignment.scores;
+
+    // Set Flags
+    this.isPoints = this.assignment.isPoints;
     this.nameFocus = true;
     this.scoreFocus = false;
   }
 
   detached() {
     this.entered = [];
+    this.notEntered = [];
   }
 
   // Provides autocomplete Suggestions
@@ -41,23 +45,6 @@ export class QuickEntry {
 
     getName: suggestion => suggestion.studref.first_name
   };
-
-  getScores(assignment) {
-    // Filter Object
-    let qobj = {
-      filters: [{'name': 'assignid', 'op': 'eq', 'val': assignment.id}],
-      order_by: [{'field': 'studref__first_name', 'direction': 'asc'}]
-    };
-
-    // Get Data
-    this.http.createRequest('http://localhost:5000/api/scores')
-      .asGet()
-      .withParams({q: JSON.stringify(qobj)})
-      .send()
-      .then(data => {
-        this.notEntered = JSON.parse(data.response).objects;
-      });
-  }
 
   pushScore(score) {
     // Add to the entered list
@@ -98,5 +85,8 @@ export class QuickEntry {
       .asPut()
       .withContent({'value': score.value})
       .send();
+
+    // Tell the app a score has been updated
+    this.ea.publish('scoreUpdate');
   }
 }

@@ -2,20 +2,20 @@
   <require from="../../resources/autocomplete"></require>
   <require from="../converters/score-format"></require>
 
-  <table class='table table-hover'>
+  <table class="table table-hover">
     <thead>
       <tr>
         <th></th>
-        <th class='text-center'>${ assignment.type }
+        <th class="text-center">${ assignment.meta.type }
           <small show.bind="isPoints">
-            (max: ${assignment.max})</small></th>
+            (max: ${assignment.meta.max})</small></th>
       </tr>
     </thead>
     <tr repeat.for="score of entered">
       <td class="text-center">${ score.studref.first_name }</td>
       <td class="text-center">
         <div if.bind="isPoints">
-          ${ score.value  | scoreFormat: assignment}
+          ${ score.value  | scoreFormat: assignment.meta}
         </div>
         <div if.bind="!isPoints">
           <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>

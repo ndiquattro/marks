@@ -1,12 +1,14 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {AssignmentService} from '../services/assignmentService';
 
-@inject(HttpClient, AssignmentService)
+@inject(HttpClient, AssignmentService, EventAggregator)
 export class ScoresList {
-  constructor(http, assignment) {
+  constructor(http, assignment, eventaggregator) {
     // Initalize http client
     this.http = http;
+    this.ea = eventaggregator;
     this.assignment = assignment;
 
     // Initalize variables
@@ -38,7 +40,7 @@ export class ScoresList {
       .send();
 
     // Update Current Scores
-    this.assignment.flagNew();
+    this.ea.publish('scoreUpdate');
 
     // Reset edit
     this.editScoreId = null;

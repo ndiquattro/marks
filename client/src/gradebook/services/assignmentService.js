@@ -1,32 +1,45 @@
 import {HttpClient} from 'aurelia-http-client';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 
-@inject(HttpClient)
+@inject(HttpClient, EventAggregator)
 export class AssignmentService {
-  constructor(http) {
+  constructor(http, eventaggregator) {
     // Injects
     this.http = http;
+    this.ea = eventaggregator;
+  }
 
-    // Data Holders
-    this.meta = {};
-    this.scores = [];
-
-    // Initalize Flags
-    this.newScores = false;
-    this.scoresLoaded = false;
+  setSubject(subject) {
+    this.subject = subject;
+    this.clearAssignment();
+    this.ea.publish('subjectUpdated');
   }
 
   setAssignment(assignment) {
     this.meta = assignment;
-    this.scoresLoaded = false;
     this.isPoints = assignment.type === 'Points';
     this.setScores(assignment.id);
   }
 
+  deleteAssignment() {
+    // Confirm with User
+    let confirmed = confirm('Are you sure you want to delete ' + this.meta.name + '?');
+
+    // If confirmed, delete from database
+    if (confirmed) {
+      this.http.createRequest('http://localhost:5000/api/assignments/' + this.meta.id)
+        .asDelete()
+        .send()
+        .then(resp => this.ea.publish('reloadAssignments'));
+
+      // Reset assignment selection
+      this.clearAssignment();
+    }
+  }
   clearAssignment() {
     this.meta = {};
-    this.scores = [];
-    this.scoresLoaded = false;
+    this.scores = false;
   }
 
   setScores(assignId) {
@@ -43,11 +56,7 @@ export class AssignmentService {
              .send()
              .then(data => {
                this.scores = JSON.parse(data.response).objects;
-               this.scoresLoaded = true;
+               this.ea.publish('scoreUpdate');
              });
-  }
-
-  flagNew() {
-    this.newScores = !this.newScores;
   }
 }

@@ -6,7 +6,7 @@
     <tr>
       <th></th>
       <th class="text-center">${ assignment.meta.type }
-        <small show.bind="assignment.isPoints">
+        <small show.bind="assignment.isPoints && assignment.meta.max !== 0">
           (max: ${assignment.meta.max})</small></th>
     </tr>
     </thead>

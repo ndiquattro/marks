@@ -1,28 +1,26 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-http-client';
-import {bindable} from 'aurelia-templating';
+import {EventAggregator} from 'aurelia-event-aggregator';
+import {AssignmentService} from '../services/assignmentService';
 
-@inject(HttpClient)
+@inject(HttpClient, AssignmentService, EventAggregator)
 export class AssignmentList {
-  @bindable subject;
-  @bindable reload;
-  @bindable selectAssignment;
-
-  constructor(http) {
+  constructor(http, assignment, eventaggregator) {
     // Initalize http client
     this.http = http;
-
-    // Initalize Selection Indicators
-    this.selectedId = false;
+    this.assignment = assignment;
+    this.ea = eventaggregator;
   }
 
-  subjectChanged() {
-    this.getAssignments(this.subject);
-    this.selectedId = false;
+  created() {
+    this.getAssignments(this.assignment.subject);
+    this.subscription = this.ea.subscribe('subjectUpdated', resp => this.getAssignments(this.assignment.subject));
+    this.reload = this.ea.subscribe('reloadAssignments', resp => this.getAssignments(this.assignment.subject));
   }
 
-  reloadChanged() {
-    this.getAssignments(this.subject);
+  detached() {
+    this.subscription.dispose();
+    this.reload.dispose();
   }
 
   getAssignments(subject) {
@@ -40,10 +38,5 @@ export class AssignmentList {
       .then(data => {
         this.assignments = JSON.parse(data.response).objects;
       });
-  }
-
-  chooseAssignment(assignment) {
-    this.selectedId = assignment.id;
-    this.selectAssignment({assignment: assignment});
   }
 }

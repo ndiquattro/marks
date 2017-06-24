@@ -59,5 +59,5 @@ class Scores(db.Model, CRUDMixin):
 
     @classmethod
     def add_dummy(cls, stuid, assignid):
-        db.session.add(Scores(stuid=stuid, assignid=assignid, value=None))
+        db.session.add(Scores(stuid=stuid, assignid=assignid, value=0))
         db.session.commit()

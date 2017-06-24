@@ -11,58 +11,52 @@
       <h4>Subjects</h4>
     </li>
     <li repeat.for="sub of subjects" role="presentation"
-        class="${sub.id === subjectSelected.id ? 'active' : ''}">
-      <a href="" click.delegate="selectSubject(sub)">${ sub.name }</a>
+        class="${sub.id === assignment.subject.id ? 'active' : ''}">
+      <a href="" click.delegate="assignment.setSubject(sub)">${ sub.name }</a>
     </li>
   </ul>
 
   <!-- Subject Menu Bar -->
-  <div class="row" show.bind="subjectSelected">
+  <div class="row" show.bind="assignment.subject">
     <ul class="nav nav-pills">
-      <li role="presentation" class="${addingAssignment ? 'active' : ''}">
+      <li role="presentation" class="${editMode === 'add' ? 'active' : ''}">
         <a href="#" click.delegate="addAssignment()"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
       </li>
-      <li role="presentation" show.bind="assignmentSelected" class="${quickEntry ? 'active' : ''}">
+      <li role="presentation" show.bind="assignment.scores" class="${quickEntry ? 'active' : ''}">
         <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i> Quick Entry</a>
       </li>
-      <li role="presentation" show.bind="assignmentSelected || editingAssignment" class="${editingAssignment ? 'active' : ''}">
-        <a href="#" click.delegate="editAssignment(assignmentSelected)"><i class="fa fa-pencil"></i> Edit Assignment</a>
+      <li role="presentation" show.bind="assignment.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
+        <a href="#" click.delegate="editAssignment()"><i class="fa fa-pencil"></i> Edit Assignment</a>
       </li>
-      <li role="presentation" show.bind="assignmentSelected">
-        <a href="#" click.delegate="deleteAssignment(assignmentSelected)"><i class="fa fa-eraser"></i> Delete Assignment</a>
+      <li role="presentation" show.bind="assignment.scores">
+        <a href="#" click.delegate="assignment.deleteAssignment()"><i class="fa fa-eraser"></i> Delete Assignment</a>
       </li>
     </ul>
   </div>
 
   <!-- Assignment List -->
   <div class="row">
-    <div class="col-md-2" if.bind="subjectSelected">
+    <div class="col-md-2" if.bind="assignment.subject">
       <h5>Assignments</h5>
-      <assignment-list subject.bind="subjectSelected"
-                       reload.bind="reloadAssignmentsFlag"
-                       select-assignment.call="selectAssignment(assignment)">
-      </assignment-list>
+      <assignment-list></assignment-list>
     </div>
 
     <!-- Scores List -->
-    <div class="col-md-4" if.bind="assignment.scoresLoaded && !editingAssignment">
+    <div class="col-md-4" if.bind="assignment.scores && !editMode">
       <h5>Scores</h5>
       <scores-list if.bind="!quickEntry"></scores-list>
-      <quick-entry if.bind="quickEntry" assignment.bind="assignment" scores.bind="scores"></quick-entry>
+      <quick-entry if.bind="quickEntry"></quick-entry>
     </div>
 
     <!-- Reports -->
-    <div class="col-md-6" if.bind="assignment.scoresLoaded && !editingAssignment">
+    <div class="col-md-6" if.bind="assignment.scores && !editMode">
       <h5>Assesment</h5>
-      <report-assignment reload.bind="assignment.newScores"></report-assignment>
+      <report-assignment></report-assignment>
     </div>
 
     <!-- Add Assignment -->
-    <div class="col-md-5" if.bind="addingAssignment || editingAssignment">
-      <add-assignment subject.bind="subjectSelected"
-                      edit.bind="editingAssignment"
-                      reload-assignments.call="reloadAssignments(assignment)">
-      </add-assignment>
+    <div class="col-md-5" if.bind="editMode">
+      <add-assignment mode.two-way="editMode"></add-assignment>
     </div>
   </div>
 </template>
