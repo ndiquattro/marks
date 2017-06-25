@@ -216,7 +216,7 @@ export class ReportAssignment {
 
     let pie = d3.pie()
                 .value(function(d) { return d.count; })
-                .sort(null);
+                .sort((a, b) => a - b);
 
     let legendRectSize = 18;
     let legendSpacing = 4;

@@ -54,7 +54,9 @@ define('main',['exports', './environment'], function (exports, _environment) {
   }
 
   function configure(aurelia) {
-    aurelia.use.standardConfiguration().feature('resources');
+    aurelia.use.standardConfiguration().feature('resources').plugin('aurelia-api', function (config) {
+      config.registerEndpoint('api', 'http://localhost:5000/api').setDefaultEndpoint('api');
+    });
 
     if (_environment2.default.debug) {
       aurelia.use.developmentLogging();
@@ -869,7 +871,9 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
 
       var pie = d3.pie().value(function (d) {
         return d.count;
-      }).sort(null);
+      }).sort(function (a, b) {
+        return a - b;
+      });
 
       var legendRectSize = 18;
       var legendSpacing = 4;
