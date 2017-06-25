@@ -1,25 +1,25 @@
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-http-client';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {AssignmentService} from '../services/assignmentService';
+import {CurrentService} from '../services/currentService';
+import {ApiService} from '../services/apiService';
 
-@inject(HttpClient, AssignmentService, EventAggregator)
+@inject(ApiService, CurrentService, EventAggregator)
 export class QuickEntry {
 
-  constructor(http, assignment, eventaggregator) {
+  constructor(api, current, eventaggregator) {
     // Initalize http client
-    this.http = http;
-    this.assignment = assignment;
+    this.api = api;
+    this.current = current;
     this.ea = eventaggregator;
   }
 
   attached() {
     // Initalize variables
     this.entered = [];
-    this.notEntered = this.assignment.scores;
+    this.notEntered = this.current.scores;
 
     // Set Flags
-    this.isPoints = this.assignment.isPoints;
+    this.isPoints = this.current.isPoints;
     this.nameFocus = true;
     this.scoreFocus = false;
   }
@@ -81,10 +81,8 @@ export class QuickEntry {
   }
 
   updateScore(score) {
-    this.http.createRequest('http://localhost:5000/api/scores/' + score.id)
-      .asPut()
-      .withContent({'value': score.value})
-      .send();
+    // Update Scores
+    this.api.update('scores', score.id, {'value': score.value});
 
     // Tell the app a score has been updated
     this.ea.publish('scoreUpdate');

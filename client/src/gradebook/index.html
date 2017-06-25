@@ -10,46 +10,46 @@
     <li>
       <h4>Subjects</h4>
     </li>
-    <li repeat.for="sub of subjects" role="presentation"
-        class="${sub.id === assignment.subject.id ? 'active' : ''}">
-      <a href="" click.delegate="assignment.setSubject(sub)">${ sub.name }</a>
+    <li repeat.for="sub of current.subjectList" role="presentation"
+        class="${sub.id === current.subject.id ? 'active' : ''}">
+      <a href="" click.delegate="current.setSubject(sub)">${ sub.name }</a>
     </li>
   </ul>
 
   <!-- Subject Menu Bar -->
-  <div class="row" show.bind="assignment.subject">
+  <div class="row" show.bind="current.subject">
     <ul class="nav nav-pills">
       <li role="presentation" class="${editMode === 'add' ? 'active' : ''}">
         <a href="#" click.delegate="addAssignment()"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
       </li>
-      <li role="presentation" show.bind="assignment.scores" class="${quickEntry ? 'active' : ''}">
+      <li role="presentation" show.bind="current.scores" class="${quickEntry ? 'active' : ''}">
         <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i> Quick Entry</a>
       </li>
-      <li role="presentation" show.bind="assignment.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
+      <li role="presentation" show.bind="current.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
         <a href="#" click.delegate="editAssignment()"><i class="fa fa-pencil"></i> Edit Assignment</a>
       </li>
-      <li role="presentation" show.bind="assignment.scores">
-        <a href="#" click.delegate="assignment.deleteAssignment()"><i class="fa fa-eraser"></i> Delete Assignment</a>
+      <li role="presentation" show.bind="current.scores">
+        <a href="#" click.delegate="deleteAssignment()"><i class="fa fa-eraser"></i> Delete Assignment</a>
       </li>
     </ul>
   </div>
 
   <!-- Assignment List -->
   <div class="row">
-    <div class="col-md-2" if.bind="assignment.subject">
+    <div class="col-md-2" if.bind="current.subject">
       <h5>Assignments</h5>
       <assignment-list></assignment-list>
     </div>
 
     <!-- Scores List -->
-    <div class="col-md-4" if.bind="assignment.scores && !editMode">
+    <div class="col-md-4" if.bind="current.scores && !editMode">
       <h5>Scores</h5>
       <scores-list if.bind="!quickEntry"></scores-list>
       <quick-entry if.bind="quickEntry"></quick-entry>
     </div>
 
     <!-- Reports -->
-    <div class="col-md-6" if.bind="assignment.scores && !editMode">
+    <div class="col-md-6" if.bind="current.scores && !editMode">
       <h5>Assesment</h5>
       <report-assignment></report-assignment>
     </div>

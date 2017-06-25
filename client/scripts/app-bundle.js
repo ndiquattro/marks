@@ -54,9 +54,7 @@ define('main',['exports', './environment'], function (exports, _environment) {
   }
 
   function configure(aurelia) {
-    aurelia.use.standardConfiguration().feature('resources').plugin('aurelia-api', function (config) {
-      config.registerEndpoint('api', 'http://localhost:5000/api').setDefaultEndpoint('api');
-    });
+    aurelia.use.standardConfiguration().feature('resources');
 
     if (_environment2.default.debug) {
       aurelia.use.developmentLogging();
@@ -71,7 +69,7 @@ define('main',['exports', './environment'], function (exports, _environment) {
     });
   }
 });
-define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-http-client', './services/assignmentService'], function (exports, _aureliaFramework, _aureliaHttpClient, _assignmentService) {
+define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './services/currentService', './services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -87,32 +85,43 @@ define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-http-client',
 
   var _dec, _class;
 
-  var GradeBook = exports.GradeBook = (_dec = (0, _aureliaFramework.inject)(_assignmentService.AssignmentService, _aureliaHttpClient.HttpClient), _dec(_class = function () {
-    function GradeBook(assignment, http) {
+  var GradeBook = exports.GradeBook = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function GradeBook(current, api, eventaggregator) {
       _classCallCheck(this, GradeBook);
 
-      this.assignment = assignment;
-      this.http = http;
+      this.current = current;
+      this.api = api;
+      this.ea = eventaggregator;
 
       this.quickEntry = false;
       this.editMode = false;
     }
 
     GradeBook.prototype.created = function created() {
-      var _this = this;
-
-      this.http.get('http://localhost:5000/api/subjects').then(function (data) {
-        _this.subjects = JSON.parse(data.response).objects;
-      });
+      this.current.setSubjectList();
     };
 
     GradeBook.prototype.addAssignment = function addAssignment() {
-      this.assignment.clearAssignment();
+      this.current.clearAssignment();
       this.editMode = 'add';
     };
 
     GradeBook.prototype.editAssignment = function editAssignment() {
       this.editMode = 'edit';
+    };
+
+    GradeBook.prototype.deleteAssignment = function deleteAssignment() {
+      var _this = this;
+
+      var confirmed = confirm('Are you sure you want to delete ' + this.current.assignment.name + '?');
+
+      if (confirmed) {
+        this.api.delete('assignments', this.current.assignment.id).then(function (data) {
+          return _this.ea.publish('reloadAssignments');
+        });
+
+        this.current.clearAssignment();
+      }
     };
 
     GradeBook.prototype.toggleQuick = function toggleQuick() {
@@ -406,7 +415,7 @@ define('resources/index',["exports"], function (exports) {
   exports.configure = configure;
   function configure(config) {}
 });
-define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-templating', 'aurelia-event-aggregator', '../services/assignmentService'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaTemplating, _aureliaEventAggregator, _assignmentService) {
+define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-templating', 'aurelia-event-aggregator', '../services/currentService', '../services/apiService'], function (exports, _aureliaFramework, _aureliaTemplating, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -465,14 +474,14 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
 
   var _dec, _class, _desc, _value, _class2, _descriptor;
 
-  var AddAssignment = exports.AddAssignment = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _assignmentService.AssignmentService, _aureliaEventAggregator.EventAggregator), _dec(_class = (_class2 = function () {
-    function AddAssignment(http, assignment, eventaggregator) {
+  var AddAssignment = exports.AddAssignment = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = (_class2 = function () {
+    function AddAssignment(api, current, eventaggregator) {
       _classCallCheck(this, AddAssignment);
 
       _initDefineProp(this, 'mode', _descriptor, this);
 
-      this.http = http;
-      this.assignment = assignment;
+      this.api = api;
+      this.current = current;
       this.ea = eventaggregator;
     }
 
@@ -484,7 +493,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
       if (this.mode === 'edit') {
         this.title = 'Edit Assignment';
         this.btn = 'Save Changes';
-        this.newAssignment = this.assignment.meta;
+        this.newAssignment = this.current.assignment;
       } else {
         this.title = 'Add Assignment';
         this.btn = this.title;
@@ -499,16 +508,16 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
       var _this = this;
 
       if (this.mode === 'edit') {
-        this.http.createRequest('http://localhost:5000/api/assignments/' + this.assignment.meta.id).asPut().withContent(this.assignment.meta).send();
+        this.api.update('assignments', this.current.assignment.id, this.current.assignment);
 
         this.mode = false;
       } else {
-        this.newAssignment.subjid = this.assignment.subject.id;
+        this.newAssignment.subjid = this.current.subject.id;
 
-        this.http.createRequest('http://localhost:5000/api/assignments').asPost().withContent(this.newAssignment).send().then(function (data) {
+        this.api.add('assignments', this.newAssignment).then(function (data) {
           _this.ea.publish('reloadAssignments');
 
-          _this.assignment.setAssignment(JSON.parse(data.response));
+          _this.current.setAssignment(data);
           _this.mode = false;
         });
       }
@@ -524,7 +533,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
     initializer: null
   })), _class2)) || _class);
 });
-define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-event-aggregator', '../services/assignmentService'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaEventAggregator, _assignmentService) {
+define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../services/currentService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -540,49 +549,36 @@ define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'a
 
   var _dec, _class;
 
-  var AssignmentList = exports.AssignmentList = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _assignmentService.AssignmentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function AssignmentList(http, assignment, eventaggregator) {
+  var AssignmentList = exports.AssignmentList = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function AssignmentList(current, eventaggregator) {
       _classCallCheck(this, AssignmentList);
 
-      this.http = http;
-      this.assignment = assignment;
+      this.current = current;
       this.ea = eventaggregator;
     }
 
-    AssignmentList.prototype.created = function created() {
+    AssignmentList.prototype.attached = function attached() {
       var _this = this;
 
-      this.getAssignments(this.assignment.subject);
-      this.subscription = this.ea.subscribe('subjectUpdated', function (resp) {
-        return _this.getAssignments(_this.assignment.subject);
+      this.current.setAssignmentList();
+
+      this.subsub = this.ea.subscribe('subjectSet', function (resp) {
+        return _this.current.setAssignmentList();
       });
       this.reload = this.ea.subscribe('reloadAssignments', function (resp) {
-        return _this.getAssignments(_this.assignment.subject);
+        return _this.current.setAssignmentList();
       });
     };
 
     AssignmentList.prototype.detached = function detached() {
-      this.subscription.dispose();
+      this.subsub.dispose();
       this.reload.dispose();
-    };
-
-    AssignmentList.prototype.getAssignments = function getAssignments(subject) {
-      var _this2 = this;
-
-      var qobj = {
-        filters: [{ 'name': 'subjid', 'op': 'eq', 'val': subject.id }],
-        order_by: [{ 'field': 'date', 'direction': 'desc' }]
-      };
-
-      this.http.createRequest('http://localhost:5000/api/assignments').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
-        _this2.assignments = JSON.parse(data.response).objects;
-      });
     };
 
     return AssignmentList;
   }()) || _class);
 });
-define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-event-aggregator', '../services/assignmentService'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaEventAggregator, _assignmentService) {
+define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../services/currentService', '../services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -598,8 +594,8 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
 
   var _dec, _class;
 
-  var QuickEntry = exports.QuickEntry = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _assignmentService.AssignmentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function QuickEntry(http, assignment, eventaggregator) {
+  var QuickEntry = exports.QuickEntry = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function QuickEntry(api, current, eventaggregator) {
       var _this = this;
 
       _classCallCheck(this, QuickEntry);
@@ -621,16 +617,16 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
         }
       };
 
-      this.http = http;
-      this.assignment = assignment;
+      this.api = api;
+      this.current = current;
       this.ea = eventaggregator;
     }
 
     QuickEntry.prototype.attached = function attached() {
       this.entered = [];
-      this.notEntered = this.assignment.scores;
+      this.notEntered = this.current.scores;
 
-      this.isPoints = this.assignment.isPoints;
+      this.isPoints = this.current.isPoints;
       this.nameFocus = true;
       this.scoreFocus = false;
     };
@@ -672,7 +668,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
     };
 
     QuickEntry.prototype.updateScore = function updateScore(score) {
-      this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ 'value': score.value }).send();
+      this.api.update('scores', score.id, { 'value': score.value });
 
       this.ea.publish('scoreUpdate');
     };
@@ -680,7 +676,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
     return QuickEntry;
   }()) || _class);
 });
-define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-event-aggregator', '../services/assignmentService', 'd3'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaEventAggregator, _assignmentService, _d) {
+define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../services/currentService', 'd3'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _d) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -715,12 +711,11 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
 
   var _dec, _class;
 
-  var ReportAssignment = exports.ReportAssignment = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _assignmentService.AssignmentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function ReportAssignment(http, assignment, eventaggregator) {
+  var ReportAssignment = exports.ReportAssignment = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function ReportAssignment(current, eventaggregator) {
       _classCallCheck(this, ReportAssignment);
 
-      this.http = http;
-      this.assignment = assignment;
+      this.current = current;
       this.ea = eventaggregator;
     }
 
@@ -740,32 +735,11 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
     ReportAssignment.prototype.makePlot = function makePlot() {
       d3.select('svg').remove();
 
-      if (this.assignment.isPoints) {
-        this.renderHistogram(this.assignment.scores, '#content');
+      if (this.current.isPoints) {
+        this.renderHistogram(this.current.scores, '#content');
       } else {
-        this.renderDonut(this.assignment.scores, '#content');
+        this.renderDonut(this.current.scores, '#content');
       }
-    };
-
-    ReportAssignment.prototype.render = function render(data, divElement) {
-      var margin = { top: 20, right: 20, bottom: 30, left: 50 };
-      var width = 500 - margin.left - margin.right;
-      var height = 400 - margin.top - margin.bottom;
-
-      var svg = d3.select(divElement).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-      var x = d3.scaleLinear().range([0, width]).domain([0, 40]);
-
-      var y = d3.scaleLinear().range([height, 0]).domain([0, 40]);
-
-      svg.selectAll('dot').data(data).enter().append('circle').attr('r', 10).attr('cx', function (d) {
-        return x(d.value);
-      }).attr('cy', function (d) {
-        return y(d.value);
-      });
-
-      svg.append('g').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x));
-      svg.append('g').call(d3.axisLeft(y));
     };
 
     ReportAssignment.prototype.renderHistogram = function renderHistogram(data, divElement) {
@@ -783,8 +757,8 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
 
       var x = d3.scaleLinear().range([0, width]);
 
-      if (this.assignment.meta.max !== 0) {
-        x.domain([0, this.assignment.meta.max]);
+      if (this.current.assignment.max !== 0) {
+        x.domain([0, this.current.assignment.max]);
       } else {
         x.domain([0, d3.max(data, function (d) {
           return d.value;
@@ -821,9 +795,9 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
         return formatCount(d.length);
       });
 
-      if (this.assignment.meta.max !== 0) {
+      if (this.current.assignment.max !== 0) {
         g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x).tickFormat(function (d) {
-          return Math.round(d / _this2.assignment.meta.max * 100) + '%';
+          return Math.round(d / _this2.current.assignment.max * 100) + '%';
         }));
       } else {
         g.append('g').attr('class', 'axis axis--x').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x));
@@ -915,7 +889,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
     return ReportAssignment;
   }()) || _class);
 });
-define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-http-client', 'aurelia-event-aggregator', '../services/assignmentService'], function (exports, _aureliaFramework, _aureliaHttpClient, _aureliaEventAggregator, _assignmentService) {
+define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../services/currentService', '../services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -931,19 +905,19 @@ define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurel
 
   var _dec, _class;
 
-  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _assignmentService.AssignmentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function ScoresList(http, assignment, eventaggregator) {
+  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function ScoresList(api, current, eventaggregator) {
       _classCallCheck(this, ScoresList);
 
-      this.http = http;
+      this.api = api;
       this.ea = eventaggregator;
-      this.assignment = assignment;
+      this.current = current;
 
       this.editScoreId = null;
     }
 
     ScoresList.prototype.editScore = function editScore(score) {
-      if (this.assignment.isPoints) {
+      if (this.current.isPoints) {
         this.editScoreId = score.id;
         this.editFocus = true;
       } else {
@@ -961,7 +935,7 @@ define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurel
     };
 
     ScoresList.prototype.updateScore = function updateScore(score) {
-      this.http.createRequest('http://localhost:5000/api/scores/' + score.id).asPut().withContent({ 'value': score.value }).send();
+      this.api.update('scores', score.id, { 'value': score.value });
 
       this.ea.publish('scoreUpdate');
 
@@ -1004,13 +978,13 @@ define('gradebook/converters/score-format',['exports'], function (exports) {
     return ScoreFormatValueConverter;
   }();
 });
-define('gradebook/services/assignmentService',['exports', 'aurelia-http-client', 'aurelia-event-aggregator', 'aurelia-framework'], function (exports, _aureliaHttpClient, _aureliaEventAggregator, _aureliaFramework) {
+define('gradebook/services/apiService',['exports', 'aurelia-http-client', 'aurelia-framework'], function (exports, _aureliaHttpClient, _aureliaFramework) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.AssignmentService = undefined;
+  exports.ApiService = undefined;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -1020,69 +994,134 @@ define('gradebook/services/assignmentService',['exports', 'aurelia-http-client',
 
   var _dec, _class;
 
-  var AssignmentService = exports.AssignmentService = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function AssignmentService(http, eventaggregator) {
-      _classCallCheck(this, AssignmentService);
+  var ApiService = exports.ApiService = (_dec = (0, _aureliaFramework.inject)(_aureliaHttpClient.HttpClient), _dec(_class = function () {
+    function ApiService(http) {
+      _classCallCheck(this, ApiService);
+
+      http.configure(function (config) {
+        config.withBaseUrl('http://localhost:5000/api/').withInterceptor({
+          response: function response(message) {
+            if (message.statusCode !== 204) {
+              return JSON.parse(message.response);
+            }
+          }
+        });
+      });
 
       this.http = http;
+    }
+
+    ApiService.prototype.find = function find(source, query) {
+      var req = this.http.createRequest(source).asGet();
+
+      if (query) {
+        req = req.withParams({ q: JSON.stringify(query) });
+      }
+
+      return req.send();
+    };
+
+    ApiService.prototype.update = function update(source, id, newvals) {
+      return this.http.createRequest(source + '/' + id).asPut().withContent(newvals).send();
+    };
+
+    ApiService.prototype.add = function add(source, newitem) {
+      return this.http.createRequest(source).asPost().withContent(newitem).send();
+    };
+
+    ApiService.prototype.delete = function _delete(source, id) {
+      return this.http.createRequest(source + '/' + id).asDelete().send();
+    };
+
+    return ApiService;
+  }()) || _class);
+});
+define('gradebook/services/currentService',['exports', 'aurelia-event-aggregator', './apiService', 'aurelia-framework'], function (exports, _aureliaEventAggregator, _apiService, _aureliaFramework) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.CurrentService = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var CurrentService = exports.CurrentService = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function CurrentService(api, eventaggregator) {
+      _classCallCheck(this, CurrentService);
+
+      this.api = api;
       this.ea = eventaggregator;
     }
 
-    AssignmentService.prototype.setSubject = function setSubject(subject) {
-      this.subject = subject;
-      this.clearAssignment();
-      this.ea.publish('subjectUpdated');
+    CurrentService.prototype.setSubjectList = function setSubjectList() {
+      var _this = this;
+
+      this.api.find('subjects').then(function (data) {
+        return _this.subjectList = data.objects;
+      });
     };
 
-    AssignmentService.prototype.setAssignment = function setAssignment(assignment) {
-      this.meta = assignment;
+    CurrentService.prototype.setSubject = function setSubject(subject) {
+      this.subject = subject;
+      this.clearAssignment();
+      this.ea.publish('subjectSet');
+    };
+
+    CurrentService.prototype.setAssignmentList = function setAssignmentList() {
+      var _this2 = this;
+
+      var query = {
+        filters: [{ 'name': 'subjid', 'op': 'eq', 'val': this.subject.id }],
+        order_by: [{ 'field': 'date', 'direction': 'desc' }]
+      };
+
+      this.api.find('assignments', query).then(function (data) {
+        return _this2.assignmentList = data.objects;
+      });
+    };
+
+    CurrentService.prototype.setAssignment = function setAssignment(assignment) {
+      this.assignment = assignment;
       this.isPoints = assignment.type === 'Points';
       this.setScores(assignment.id);
     };
 
-    AssignmentService.prototype.deleteAssignment = function deleteAssignment() {
-      var _this = this;
-
-      var confirmed = confirm('Are you sure you want to delete ' + this.meta.name + '?');
-
-      if (confirmed) {
-        this.http.createRequest('http://localhost:5000/api/assignments/' + this.meta.id).asDelete().send().then(function (resp) {
-          return _this.ea.publish('reloadAssignments');
-        });
-
-        this.clearAssignment();
-      }
-    };
-
-    AssignmentService.prototype.clearAssignment = function clearAssignment() {
-      this.meta = {};
+    CurrentService.prototype.clearAssignment = function clearAssignment() {
+      this.assignment = false;
       this.scores = false;
     };
 
-    AssignmentService.prototype.setScores = function setScores(assignId) {
-      var _this2 = this;
+    CurrentService.prototype.setScores = function setScores(assignId) {
+      var _this3 = this;
 
-      var qobj = {
+      var query = {
         filters: [{ 'name': 'assignid', 'op': 'eq', 'val': assignId }],
         order_by: [{ 'field': 'studref__first_name', 'direction': 'asc' }]
       };
 
-      this.http.createRequest('http://localhost:5000/api/scores').asGet().withParams({ q: JSON.stringify(qobj) }).send().then(function (data) {
-        _this2.scores = JSON.parse(data.response).objects;
-        _this2.ea.publish('scoreUpdate');
+      this.api.find('scores', query).then(function (data) {
+        _this3.scores = data.objects;
+        _this3.ea.publish('scoreUpdate');
       });
     };
 
-    return AssignmentService;
+    return CurrentService;
   }()) || _class);
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>School Name (2017)</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
-define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n  <require from=\"./components/addAssignment\"></require>\n  <require from=\"./components/reportAssignment\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of subjects\" role=\"presentation\"\n        class=\"${sub.id === assignment.subject.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"assignment.setSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"assignment.subject\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\" class=\"${editMode === 'add' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"addAssignment()\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"assignment.scores\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"assignment.scores || editMode === 'edit'\" class=\"${editMode === 'edit' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"editAssignment()\"><i class=\"fa fa-pencil\"></i> Edit Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"assignment.scores\">\n        <a href=\"#\" click.delegate=\"assignment.deleteAssignment()\"><i class=\"fa fa-eraser\"></i> Delete Assignment</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class=\"row\">\n    <div class=\"col-md-2\" if.bind=\"assignment.subject\">\n      <h5>Assignments</h5>\n      <assignment-list></assignment-list>\n    </div>\n\n    <!-- Scores List -->\n    <div class=\"col-md-4\" if.bind=\"assignment.scores && !editMode\">\n      <h5>Scores</h5>\n      <scores-list if.bind=\"!quickEntry\"></scores-list>\n      <quick-entry if.bind=\"quickEntry\"></quick-entry>\n    </div>\n\n    <!-- Reports -->\n    <div class=\"col-md-6\" if.bind=\"assignment.scores && !editMode\">\n      <h5>Assesment</h5>\n      <report-assignment></report-assignment>\n    </div>\n\n    <!-- Add Assignment -->\n    <div class=\"col-md-5\" if.bind=\"editMode\">\n      <add-assignment mode.two-way=\"editMode\"></add-assignment>\n    </div>\n  </div>\n</template>\n"; });
+define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n  <require from=\"./components/addAssignment\"></require>\n  <require from=\"./components/reportAssignment\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of current.subjectList\" role=\"presentation\"\n        class=\"${sub.id === current.subject.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"current.subject\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\" class=\"${editMode === 'add' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"addAssignment()\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores || editMode === 'edit'\" class=\"${editMode === 'edit' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"editAssignment()\"><i class=\"fa fa-pencil\"></i> Edit Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\">\n        <a href=\"#\" click.delegate=\"deleteAssignment()\"><i class=\"fa fa-eraser\"></i> Delete Assignment</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class=\"row\">\n    <div class=\"col-md-2\" if.bind=\"current.subject\">\n      <h5>Assignments</h5>\n      <assignment-list></assignment-list>\n    </div>\n\n    <!-- Scores List -->\n    <div class=\"col-md-4\" if.bind=\"current.scores && !editMode\">\n      <h5>Scores</h5>\n      <scores-list if.bind=\"!quickEntry\"></scores-list>\n      <quick-entry if.bind=\"quickEntry\"></quick-entry>\n    </div>\n\n    <!-- Reports -->\n    <div class=\"col-md-6\" if.bind=\"current.scores && !editMode\">\n      <h5>Assesment</h5>\n      <report-assignment></report-assignment>\n    </div>\n\n    <!-- Add Assignment -->\n    <div class=\"col-md-5\" if.bind=\"editMode\">\n      <add-assignment mode.two-way=\"editMode\"></add-assignment>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
 define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submitAssignment()\"\n        autocomplete=\"off\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name\"\n               required>\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date\" required>\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type\" required>\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max\" required>\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
-define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assign of assignments\"\n        role=\"presentation\"\n        class=\"${assign.id === assignment.meta.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"assignment.setAssignment(assign)\">${ assign.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
-define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ assignment.meta.type }\n          <small show.bind=\"isPoints\">\n            (max: ${assignment.meta.max})</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: assignment.meta}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
+define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
+define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: current.assignment}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/reportAssignment.html', ['module'], function(module) { module.exports = "<template>\n<style>\n\n.bar rect {\nfill: steelblue;\n}\n\n.bar text {\nfill: #fff;\nfont: 10px sans-serif;\n}\n\ndiv.tooltip {\n    position: absolute;\n    text-align: center;\n    width: auto;\n    height: auto;\n    padding: 2px;\n    font: 16px sans-serif;\n    background: lightsteelblue;\n    border: 0px;\n    border-radius: 8px;\n    pointer-events: none;\n\n}\n\n.arc text {\n  font: 10px sans-serif;\n  text-anchor: middle;\n}\n\n.arc path {\n  stroke: #fff;\n}\n\n.legend {\n    font-size: 13px;\n  }\n  h1 {\n  font-size: 15px;\n  text-align: center;\n\t}\n  rect {\n    stroke-width: 2;\n  }\n\n  .tooltip2 {\n  box-shadow: 0 0 5px #999999;\n  display: none;\n  font-size: 12px;\n  left: 130px;\n  padding: 10px;\n  position: absolute;\n  text-align: center;\n  top: 95px;\n  width: 80px;\n  z-index: 10;\n  line-height: 140%; /*Interlineado*/\n  font-family: \"Open Sans\", sans-serif;\n  font-weight: 300;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n\t}\n\n  .label {\n   font-weight: 600;\n  }\n\n</style>\n  <div id=\"content\"></div>\n</template>\n"; });
-define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ assignment.meta.type }\n        <small show.bind=\"assignment.isPoints && assignment.meta.max !== 0\">\n          (max: ${assignment.meta.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of assignment.scores\">\n        <td class=\"text-center\">${ score.studref.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\">\n            <div if.bind=\"assignment.isPoints\">\n              ${ score.value  | scoreFormat: assignment.meta}\n            </div>\n            <div if.bind=\"!assignment.isPoints\">\n              <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </div>\n          </div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
+define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.studref.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\">\n            <div if.bind=\"current.isPoints\">\n              ${ score.value  | scoreFormat: current.assignment}\n            </div>\n            <div if.bind=\"!current.isPoints\">\n              <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </div>\n          </div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

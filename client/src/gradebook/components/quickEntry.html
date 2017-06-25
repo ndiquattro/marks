@@ -6,16 +6,16 @@
     <thead>
       <tr>
         <th></th>
-        <th class="text-center">${ assignment.meta.type }
+        <th class="text-center">${ current.assignment.type }
           <small show.bind="isPoints">
-            (max: ${assignment.meta.max})</small></th>
+            (max: ${ current.assignment.max })</small></th>
       </tr>
     </thead>
     <tr repeat.for="score of entered">
       <td class="text-center">${ score.studref.first_name }</td>
       <td class="text-center">
         <div if.bind="isPoints">
-          ${ score.value  | scoreFormat: assignment.meta}
+          ${ score.value  | scoreFormat: current.assignment}
         </div>
         <div if.bind="!isPoints">
           <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
@@ -47,6 +47,7 @@
   <div class="form-group">
     <div if.bind="isPoints" class="form-group">
       <input value.bind="quickPoints"
+             type="number"
              class="form-control"
              style="width: 5em;"
              placeholder="Score"

@@ -1,22 +1,22 @@
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-http-client';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {AssignmentService} from '../services/assignmentService';
+import {CurrentService} from '../services/currentService';
+import {ApiService} from '../services/apiService';
 
-@inject(HttpClient, AssignmentService, EventAggregator)
+@inject(ApiService, CurrentService, EventAggregator)
 export class ScoresList {
-  constructor(http, assignment, eventaggregator) {
+  constructor(api, current, eventaggregator) {
     // Initalize http client
-    this.http = http;
+    this.api = api;
     this.ea = eventaggregator;
-    this.assignment = assignment;
+    this.current = current;
 
     // Initalize variables
     this.editScoreId = null;
   }
 
   editScore(score) {
-    if (this.assignment.isPoints) {
+    if (this.current.isPoints) {
       this.editScoreId = score.id;
       this.editFocus = true;
     } else {
@@ -34,10 +34,8 @@ export class ScoresList {
   }
 
   updateScore(score) {
-    this.http.createRequest('http://localhost:5000/api/scores/' + score.id)
-      .asPut()
-      .withContent({'value': score.value})
-      .send();
+    // Update Scores
+    this.api.update('scores', score.id, {'value': score.value});
 
     // Update Current Scores
     this.ea.publish('scoreUpdate');

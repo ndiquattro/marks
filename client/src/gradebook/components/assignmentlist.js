@@ -1,42 +1,26 @@
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-http-client';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {AssignmentService} from '../services/assignmentService';
+import {CurrentService} from '../services/currentService';
 
-@inject(HttpClient, AssignmentService, EventAggregator)
+@inject(CurrentService, EventAggregator)
 export class AssignmentList {
-  constructor(http, assignment, eventaggregator) {
-    // Initalize http client
-    this.http = http;
-    this.assignment = assignment;
+  constructor(current, eventaggregator) {
+    // Injects
+    this.current = current;
     this.ea = eventaggregator;
   }
 
-  created() {
-    this.getAssignments(this.assignment.subject);
-    this.subscription = this.ea.subscribe('subjectUpdated', resp => this.getAssignments(this.assignment.subject));
-    this.reload = this.ea.subscribe('reloadAssignments', resp => this.getAssignments(this.assignment.subject));
+  attached() {
+    // Populate List
+    this.current.setAssignmentList();
+
+    // Set up Subscriptions
+    this.subsub = this.ea.subscribe('subjectSet', resp => this.current.setAssignmentList());
+    this.reload = this.ea.subscribe('reloadAssignments', resp => this.current.setAssignmentList());
   }
 
   detached() {
-    this.subscription.dispose();
+    this.subsub.dispose();
     this.reload.dispose();
-  }
-
-  getAssignments(subject) {
-    // Filter object
-    let qobj = {
-      filters: [{'name': 'subjid', 'op': 'eq', 'val': subject.id}],
-      order_by: [{'field': 'date', 'direction': 'desc'}]
-    };
-
-    // Request Assignments
-    this.http.createRequest('http://localhost:5000/api/assignments')
-      .asGet()
-      .withParams({q: JSON.stringify(qobj)})
-      .send()
-      .then(data => {
-        this.assignments = JSON.parse(data.response).objects;
-      });
   }
 }

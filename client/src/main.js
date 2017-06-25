@@ -3,13 +3,7 @@ import environment from './environment';
 export function configure(aurelia) {
   aurelia.use
     .standardConfiguration()
-    .feature('resources')
-    .plugin('aurelia-api', config => {
-      // Register hosts
-      config
-        .registerEndpoint('api', 'http://localhost:5000/api')
-        .setDefaultEndpoint('api');
-    });
+    .feature('resources');
 
   if (environment.debug) {
     aurelia.use.developmentLogging();

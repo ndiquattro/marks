@@ -5,20 +5,20 @@
     <thead>
     <tr>
       <th></th>
-      <th class="text-center">${ assignment.meta.type }
-        <small show.bind="assignment.isPoints && assignment.meta.max !== 0">
-          (max: ${assignment.meta.max})</small></th>
+      <th class="text-center">${ current.assignment.type }
+        <small show.bind="current.isPoints && current.assignment.max !== 0">
+          (max: ${current.assignment.max})</small></th>
     </tr>
     </thead>
-      <tr repeat.for="score of assignment.scores">
+      <tr repeat.for="score of current.scores">
         <td class="text-center">${ score.studref.first_name }</td>
         <td class="text-center" click.delegate="editScore(score)">
           <!-- View Mode -->
           <div if.bind="score.id !== editScoreId">
-            <div if.bind="assignment.isPoints">
-              ${ score.value  | scoreFormat: assignment.meta}
+            <div if.bind="current.isPoints">
+              ${ score.value  | scoreFormat: current.assignment}
             </div>
-            <div if.bind="!assignment.isPoints">
+            <div if.bind="!current.isPoints">
               <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
             </div>
           </div>

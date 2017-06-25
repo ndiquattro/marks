@@ -1,15 +1,13 @@
 import {inject} from 'aurelia-framework';
-import {HttpClient} from 'aurelia-http-client';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {AssignmentService} from '../services/assignmentService';
+import {CurrentService} from '../services/currentService';
 import * as d3 from 'd3';
 
-@inject(HttpClient, AssignmentService, EventAggregator)
+@inject(CurrentService, EventAggregator)
 export class ReportAssignment {
-  constructor(http, assignment, eventaggregator) {
+  constructor(current, eventaggregator) {
     // Initalize http client
-    this.http = http;
-    this.assignment = assignment;
+    this.current = current;
     this.ea = eventaggregator;
   }
 
@@ -27,52 +25,11 @@ export class ReportAssignment {
     d3.select('svg').remove();
 
     // Render proper Plot
-    if (this.assignment.isPoints) {
-      this.renderHistogram(this.assignment.scores, '#content');
+    if (this.current.isPoints) {
+      this.renderHistogram(this.current.scores, '#content');
     } else {
-      this.renderDonut(this.assignment.scores, '#content');
+      this.renderDonut(this.current.scores, '#content');
     }
-  }
-
-  render(data, divElement) {
-    // Height and width
-    let margin = {top: 20, right: 20, bottom: 30, left: 50};
-    let width = 500 - margin.left - margin.right;
-    let height = 400 - margin.top - margin.bottom;
-
-    // Define Plot
-    let svg = d3.select(divElement)
-                .append('svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    //Axes
-    let x = d3.scaleLinear()
-              .range([0, width])
-              .domain([0, 40]);
-
-    let y = d3.scaleLinear()
-              .range([height, 0])
-              .domain([0, 40]);
-
-    // // Scale the range of the data
-    // x.domain(d3.extent(data, function(d) { return d.stuid; }));
-    // y.domain([0, d3.max(data, function(d) { return d.value; })]);
-
-    // Add the scatter
-    svg.selectAll('dot')
-       .data(data)
-       .enter()
-       .append('circle')
-       .attr('r', 10)
-       .attr('cx', (d) => x(d.value))
-       .attr('cy', (d) => y(d.value));
-
-    // Add the Axes
-    svg.append('g').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x));
-    svg.append('g').call(d3.axisLeft(y));
   }
 
   renderHistogram(data, divElement) {
@@ -95,8 +52,8 @@ export class ReportAssignment {
     let x = d3.scaleLinear()
               .range([0, width]);
 
-    if (this.assignment.meta.max !== 0) {
-      x.domain([0, this.assignment.meta.max]);
+    if (this.current.assignment.max !== 0) {
+      x.domain([0, this.current.assignment.max]);
     } else {
       x.domain([0, d3.max(data, (d) => d.value)]);
     }
@@ -148,12 +105,12 @@ export class ReportAssignment {
         .attr('text-anchor', 'middle')
         .text((d) => formatCount(d.length));
 
-    if (this.assignment.meta.max !== 0) {
+    if (this.current.assignment.max !== 0) {
       g.append('g')
           .attr('class', 'axis axis--x')
           .attr('transform', 'translate(0,' + height + ')')
           .call(d3.axisBottom(x)
-              .tickFormat((d) => Math.round((d / this.assignment.meta.max) * 100) + '%'));
+              .tickFormat((d) => Math.round((d / this.current.assignment.max) * 100) + '%'));
     } else {
       g.append('g')
           .attr('class', 'axis axis--x')
