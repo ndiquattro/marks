@@ -474,11 +474,15 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradeb
     }
 
     AddYear.prototype.attached = function attached() {
+      this.reset();
+      this.setYearList();
+    };
+
+    AddYear.prototype.reset = function reset() {
       this.newYear = {};
       this.mode = 'add';
       this.title = 'Year';
       this.bttn = 'Add Year';
-      this.setYearList();
     };
 
     AddYear.prototype.setYearList = function setYearList() {
@@ -489,12 +493,8 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradeb
       };
 
       this.api.find('years', query).then(function (data) {
-        _this.years = data.objects;
+        return _this.years = data.objects;
       });
-    };
-
-    AddYear.prototype.setYear = function setYear(year) {
-      this.current.setYear(year);
     };
 
     AddYear.prototype.edit = function edit(year) {
@@ -502,11 +502,6 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradeb
       this.mode = 'edit';
       this.title = 'Edit Year';
       this.bttn = 'Save Changes';
-    };
-
-    AddYear.prototype.cancel = function cancel() {
-      this.newYear = {};
-      this.mode = 'add';
     };
 
     AddYear.prototype.delete = function _delete(year) {
@@ -521,7 +516,7 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradeb
       }
     };
 
-    AddYear.prototype.submitYear = function submitYear() {
+    AddYear.prototype.submit = function submit() {
       var _this3 = this;
 
       if (this.mode === 'edit') {
@@ -537,8 +532,7 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradeb
         });
       }
 
-      this.newYear = {};
-      this.mode = 'add';
+      this.reset();
     };
 
     return AddYear;
@@ -1320,13 +1314,17 @@ define('admin/components/addStudent',['exports', 'aurelia-framework', '../../gra
     }
 
     AddStudent.prototype.attached = function attached() {
+      this.reset();
+      this.students = [];
+
+      this.setStudentList();
+    };
+
+    AddStudent.prototype.reset = function reset() {
       this.mode = 'add';
       this.title = 'Add Student';
       this.bttn = 'Add Student';
       this.newStudent = {};
-      this.students = [];
-
-      this.setStudentList();
     };
 
     AddStudent.prototype.setStudentList = function setStudentList() {
@@ -1338,15 +1336,8 @@ define('admin/components/addStudent',['exports', 'aurelia-framework', '../../gra
       };
 
       this.api.find('students', query).then(function (data) {
-        _this.students = data.objects;
+        return _this.students = data.objects;
       });
-    };
-
-    AddStudent.prototype.cancel = function cancel() {
-      this.mode = 'add';
-      this.title = 'Add Student';
-      this.bttn = 'Add Student';
-      this.newStudent = {};
     };
 
     AddStudent.prototype.edit = function edit(student) {
@@ -1374,7 +1365,7 @@ define('admin/components/addStudent',['exports', 'aurelia-framework', '../../gra
 
       if (this.mode === 'edit') {
         this.api.update('students', this.newStudent.id, this.newStudent).then(function (resp) {
-          return _this3.cancel();
+          return _this3.reset();
         });
       } else {
         this.newStudent.yearid = this.current.year.id;
@@ -1413,14 +1404,14 @@ define('admin/components/addSubject',['exports', 'aurelia-framework', '../../gra
     }
 
     AddSubject.prototype.attached = function attached() {
+      this.reset();
+    };
+
+    AddSubject.prototype.reset = function reset() {
       this.mode = 'add';
       this.title = 'Add Subject';
       this.bttn = 'Add Subject';
       this.newSubject = {};
-    };
-
-    AddSubject.prototype.cancel = function cancel() {
-      this.attached();
     };
 
     AddSubject.prototype.edit = function edit(subject) {
@@ -1448,14 +1439,14 @@ define('admin/components/addSubject',['exports', 'aurelia-framework', '../../gra
 
       if (this.mode === 'edit') {
         this.api.update('subjects', this.newSubject.id, this.newSubject).then(function (resp) {
-          return _this2.cancel();
+          return _this2.reset();
         });
       } else {
         this.newSubject.yearid = this.current.year.id;
 
         this.api.add('subjects', this.newSubject).then(function (resp) {
           _this2.current.setSubjectList();
-          _this2.cancel();
+          _this2.reset();
         });
       }
     };
@@ -1468,12 +1459,12 @@ define('text!resources/autocomplete.css', ['module'], function(module) { module.
 define('text!admin/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/addYear\"></require>\n  <require from=\"./components/addStudent\"></require>\n  <require from=\"./components/addSubject\"></require>\n\n  <div class=\"col-md-2\">\n    <h4>Add</h4>\n    <ul class=\"nav nav-pills nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"category of addCats\"\n          class=\"${ category === categorySelected ? 'active' : ''}\">\n        <a href click.delegate=\"setCategory(category)\">${ category }</a>\n      </li>\n    </ul>\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <add-year if.bind=\"categorySelected === 'Years'\"></add-year>\n      <add-student if.bind=\"categorySelected === 'Students'\"></add-student>\n      <add-subject if.bind=\"categorySelected === 'Subjects'\"></add-subject>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n  <require from=\"./components/addAssignment\"></require>\n  <require from=\"./components/reportAssignment\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of current.subjectList\" role=\"presentation\"\n        class=\"${sub.id === current.subject.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"current.subject\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\" class=\"${editMode === 'add' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"addAssignment()\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores || editMode === 'edit'\" class=\"${editMode === 'edit' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"editAssignment()\"><i class=\"fa fa-pencil\"></i> Edit Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\">\n        <a href=\"#\" click.delegate=\"deleteAssignment()\"><i class=\"fa fa-eraser\"></i> Delete Assignment</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class=\"row\">\n    <div class=\"col-md-2\" if.bind=\"current.subject\">\n      <h5>Assignments</h5>\n      <assignment-list></assignment-list>\n    </div>\n\n    <!-- Scores List -->\n    <div class=\"col-md-4\" if.bind=\"current.scores && !editMode\">\n      <h5>Scores</h5>\n      <scores-list if.bind=\"!quickEntry\"></scores-list>\n      <quick-entry if.bind=\"quickEntry\"></quick-entry>\n    </div>\n\n    <!-- Reports -->\n    <div class=\"col-md-6\" if.bind=\"current.scores && !editMode\">\n      <h5>Assesment</h5>\n      <report-assignment></report-assignment>\n    </div>\n\n    <!-- Add Assignment -->\n    <div class=\"col-md-5\" if.bind=\"editMode\">\n      <add-assignment mode.two-way=\"editMode\"></add-assignment>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
-define('text!admin/components/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submitYear()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.year\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!admin/components/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submit()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.year\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"current.setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submitAssignment()\"\n        autocomplete=\"off\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name\"\n               required>\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date\" required>\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type\" required>\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max\" required>\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
 define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
 define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: current.assignment}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/reportAssignment.html', ['module'], function(module) { module.exports = "<template>\n<style>\n\n.bar rect {\nfill: steelblue;\n}\n\n.bar text {\nfill: #fff;\nfont: 10px sans-serif;\n}\n\ndiv.tooltip {\n    position: absolute;\n    text-align: center;\n    width: auto;\n    height: auto;\n    padding: 2px;\n    font: 16px sans-serif;\n    background: lightsteelblue;\n    border: 0px;\n    border-radius: 8px;\n    pointer-events: none;\n\n}\n\n.arc text {\n  font: 10px sans-serif;\n  text-anchor: middle;\n}\n\n.arc path {\n  stroke: #fff;\n}\n\n.legend {\n    font-size: 13px;\n  }\n  h1 {\n  font-size: 15px;\n  text-align: center;\n\t}\n  rect {\n    stroke-width: 2;\n  }\n\n  .tooltip2 {\n  box-shadow: 0 0 5px #999999;\n  display: none;\n  font-size: 12px;\n  left: 130px;\n  padding: 10px;\n  position: absolute;\n  text-align: center;\n  top: 95px;\n  width: 80px;\n  z-index: 10;\n  line-height: 140%; /*Interlineado*/\n  font-family: \"Open Sans\", sans-serif;\n  font-weight: 300;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n\t}\n\n  .label {\n   font-weight: 600;\n  }\n\n</style>\n  <div id=\"content\"></div>\n</template>\n"; });
 define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.studref.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\">\n            <div if.bind=\"current.isPoints\">\n              ${ score.value  | scoreFormat: current.assignment}\n            </div>\n            <div if.bind=\"!current.isPoints\">\n              <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </div>\n          </div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
-define('text!admin/components/addStudent.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.first_name\" required>\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.last_name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name\n          <small>(Total: ${ students.length })</small>\n        </th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"student of students\">\n        <td>${ student.first_name } ${ student.last_name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ newStudent.id === student.id ? 'active' : '' }\"\n                    click.delegate=\"edit(student)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(student)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!admin/components/addStudent.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.first_name\" required>\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.last_name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name\n          <small>(Total: ${ students.length })</small>\n        </th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"student of students\">\n        <td>${ student.first_name } ${ student.last_name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ newStudent.id === student.id ? 'active' : '' }\"\n                    click.delegate=\"edit(student)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(student)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 define('text!admin/components/addSubject.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Subject Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newSubject.name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"subject of current.subjectList\">\n        <td>${ subject.name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ subject.id === newSubject.id ? 'active' : ''}\" click.delegate=\"edit(subject)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\" click.delegate=\"delete(subject)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

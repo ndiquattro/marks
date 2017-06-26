@@ -10,14 +10,14 @@ export class AddSubject {
   }
 
   attached() {
+    this.reset();
+  }
+
+  reset() {
     this.mode = 'add';
     this.title = 'Add Subject';
     this.bttn = 'Add Subject';
     this.newSubject = {};
-  }
-
-  cancel() {
-    this.attached();
   }
 
   edit(subject) {
@@ -40,7 +40,7 @@ export class AddSubject {
   submit() {
     if (this.mode === 'edit') {
       this.api.update('subjects', this.newSubject.id, this.newSubject)
-              .then(resp => this.cancel());
+              .then(resp => this.reset());
     } else {
       // Add Current year
       this.newSubject.yearid = this.current.year.id;
@@ -48,7 +48,7 @@ export class AddSubject {
       this.api.add('subjects', this.newSubject)
               .then(resp => {
                 this.current.setSubjectList();
-                this.cancel();
+                this.reset();
               });
     }
   }

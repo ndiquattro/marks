@@ -11,11 +11,15 @@ export class AddYear {
   }
 
   attached() {
+    this.reset();
+    this.setYearList();
+  }
+
+  reset() {
     this.newYear = {};
     this.mode = 'add';
     this.title = 'Year';
     this.bttn = 'Add Year';
-    this.setYearList();
   }
 
   setYearList() {
@@ -24,13 +28,7 @@ export class AddYear {
     };
 
     this.api.find('years', query)
-            .then(data => {
-              this.years = data.objects;
-            });
-  }
-
-  setYear(year) {
-    this.current.setYear(year);
+            .then(data => this.years = data.objects);
   }
 
   edit(year) {
@@ -38,11 +36,6 @@ export class AddYear {
     this.mode = 'edit';
     this.title = 'Edit Year';
     this.bttn = 'Save Changes';
-  }
-
-  cancel() {
-    this.newYear = {};
-    this.mode = 'add';
   }
 
   delete(year) {
@@ -54,7 +47,7 @@ export class AddYear {
     }
   }
 
-  submitYear() {
+  submit() {
     if (this.mode === 'edit') {
       this.api.update('years', this.newYear.id, this.newYear)
               .then(resp => {
@@ -71,7 +64,6 @@ export class AddYear {
     }
 
     // reset
-    this.newYear = {};
-    this.mode = 'add';
+    this.reset();
   }
 }

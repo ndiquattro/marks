@@ -10,14 +10,18 @@ export class AddStudent {
   }
 
   attached() {
-    this.mode = 'add';
-    this.title = 'Add Student';
-    this.bttn = 'Add Student';
-    this.newStudent = {};
+    this.reset();
     this.students = [];
 
     // Get students
     this.setStudentList();
+  }
+
+  reset() {
+    this.mode = 'add';
+    this.title = 'Add Student';
+    this.bttn = 'Add Student';
+    this.newStudent = {};
   }
 
   setStudentList() {
@@ -27,16 +31,7 @@ export class AddStudent {
     };
 
     this.api.find('students', query)
-            .then(data => {
-              this.students = data.objects;
-            });
-  }
-
-  cancel() {
-    this.mode = 'add';
-    this.title = 'Add Student';
-    this.bttn = 'Add Student';
-    this.newStudent = {};
+            .then(data => this.students = data.objects);
   }
 
   edit(student) {
@@ -59,7 +54,7 @@ export class AddStudent {
   submit() {
     if (this.mode === 'edit') {
       this.api.update('students', this.newStudent.id, this.newStudent)
-              .then(resp => this.cancel());
+              .then(resp => this.reset());
     } else {
       // Add Current year
       this.newStudent.yearid = this.current.year.id;
@@ -68,5 +63,4 @@ export class AddStudent {
               .then(resp => this.attached());
     }
   }
-
 }

@@ -3,7 +3,7 @@
 
   <div class="col-md-6">
     <h4>${ title }</h4>
-    <form class="form-horizontal" submit.delegate="submitYear()">
+    <form class="form-horizontal" submit.delegate="submit()">
 
       <!-- Name Form -->
       <div class="form-group">
@@ -29,7 +29,7 @@
           <button type="submit" class="btn btn-primary">
             ${ bttn }
           </button>
-          <button click.delegate="cancel()" class="btn btn-danger">
+          <button click.delegate="reset()" class="btn btn-danger">
             Cancel
           </button>
         </div>
@@ -54,7 +54,7 @@
         <td>
           <div class="btn-group btn-group-xs" role="group">
             <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
-                    click.delegate="setYear(year)">
+                    click.delegate="current.setYear(year)">
               <i class="fa fa-bolt"></i> Activate
             </button>
             <button type="button" class="btn btn-default ${ year.id === newYear.id ? 'active' : ''}"
