@@ -1,9 +1,10 @@
-define('app',['exports'], function (exports) {
+define('app',['exports', 'aurelia-framework', './gradebook/services/currentService'], function (exports, _aureliaFramework, _currentService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  exports.App = undefined;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -11,20 +12,24 @@ define('app',['exports'], function (exports) {
     }
   }
 
-  var App = exports.App = function () {
-    function App() {
-      _classCallCheck(this, App);
-    }
+  var _dec, _class;
 
+  var App = exports.App = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService), _dec(_class = function () {
     App.prototype.configureRouter = function configureRouter(config, router) {
       config.title = 'Marks';
-      config.map([{ route: '', redirect: 'gradebook' }, { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook' }, { route: 'admin', moduleId: 'admin', nav: 2, title: 'Administration' }]);
+      config.map([{ route: '', redirect: 'gradebook' }, { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook' }, { route: 'admin', moduleId: './admin/index', nav: 2, title: 'Administration' }]);
 
       this.router = router;
     };
 
+    function App(current) {
+      _classCallCheck(this, App);
+
+      this.current = current;
+    }
+
     return App;
-  }();
+  }()) || _class);
 });
 define('environment',["exports"], function (exports) {
   "use strict";
@@ -68,6 +73,34 @@ define('main',['exports', './environment'], function (exports, _environment) {
       return aurelia.setRoot();
     });
   }
+});
+define('admin/index',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var Admin = exports.Admin = function () {
+    function Admin() {
+      _classCallCheck(this, Admin);
+
+      this.addCats = ['Years', 'Students', 'Subjects'];
+      this.categorySelected = false;
+    }
+
+    Admin.prototype.setCategory = function setCategory(category) {
+      this.categorySelected = category;
+    };
+
+    return Admin;
+  }();
 });
 define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './services/currentService', './services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
@@ -414,6 +447,102 @@ define('resources/index',["exports"], function (exports) {
   });
   exports.configure = configure;
   function configure(config) {}
+});
+define('admin/components/addYear',['exports', 'aurelia-framework', '../../gradebook/services/currentService', '../../gradebook/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AddYear = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var AddYear = exports.AddYear = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService), _dec(_class = function () {
+    function AddYear(current, api) {
+      _classCallCheck(this, AddYear);
+
+      this.current = current;
+      this.api = api;
+      this.mode = 'add';
+    }
+
+    AddYear.prototype.attached = function attached() {
+      this.newYear = {};
+      this.mode = 'add';
+      this.title = 'Year';
+      this.bttn = 'Add Year';
+      this.setYearList();
+    };
+
+    AddYear.prototype.setYearList = function setYearList() {
+      var _this = this;
+
+      var query = {
+        order_by: [{ 'field': 'year', 'direction': 'desc' }]
+      };
+
+      this.api.find('years', query).then(function (data) {
+        _this.years = data.objects;
+      });
+    };
+
+    AddYear.prototype.setYear = function setYear(year) {
+      this.current.setYear(year);
+    };
+
+    AddYear.prototype.edit = function edit(year) {
+      this.newYear = year;
+      this.mode = 'edit';
+      this.title = 'Edit Year';
+      this.bttn = 'Save Changes';
+    };
+
+    AddYear.prototype.cancel = function cancel() {
+      this.newYear = {};
+      this.mode = 'add';
+    };
+
+    AddYear.prototype.delete = function _delete(year) {
+      var _this2 = this;
+
+      var confirmed = confirm('Are you sure you want to delete ' + year.school + ' (' + year.year + ')' + '?');
+
+      if (confirmed) {
+        this.api.delete('years', year.id).then(function (data) {
+          return _this2.setYearList();
+        });
+      }
+    };
+
+    AddYear.prototype.submitYear = function submitYear() {
+      var _this3 = this;
+
+      if (this.mode === 'edit') {
+        this.api.update('years', this.newYear.id, this.newYear).then(function (resp) {
+          if (_this3.newYear.id === _this3.current.year.id) {
+            _this3.current.setYear(_this3.newYear);
+          }
+        });
+      } else {
+        this.api.add('years', this.newYear).then(function (resp) {
+          _this3.setYearList();
+          _this3.setYear(resp);
+        });
+      }
+
+      this.newYear = {};
+      this.mode = 'add';
+    };
+
+    return AddYear;
+  }()) || _class);
 });
 define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-templating', 'aurelia-event-aggregator', '../services/currentService', '../services/apiService'], function (exports, _aureliaFramework, _aureliaTemplating, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
@@ -1058,6 +1187,8 @@ define('gradebook/services/currentService',['exports', 'aurelia-event-aggregator
 
       this.api = api;
       this.ea = eventaggregator;
+
+      this.year = JSON.parse(localStorage.getItem('currentYear'));
     }
 
     CurrentService.prototype.setSubjectList = function setSubjectList() {
@@ -1112,13 +1243,58 @@ define('gradebook/services/currentService',['exports', 'aurelia-event-aggregator
       });
     };
 
+    CurrentService.prototype.setYear = function setYear(year) {
+      this.year = year;
+      localStorage.setItem('currentYear', JSON.stringify(year));
+
+      this.clearAssignment();
+      this.subjectList = false;
+      this.assignmentList = false;
+    };
+
     return CurrentService;
   }()) || _class);
 });
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>School Name (2017)</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
+define('resources/converters/dateFormat',['exports', 'moment'], function (exports, _moment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DateFormatValueConverter = undefined;
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var DateFormatValueConverter = exports.DateFormatValueConverter = function () {
+    function DateFormatValueConverter() {
+      _classCallCheck(this, DateFormatValueConverter);
+    }
+
+    DateFormatValueConverter.prototype.toView = function toView(value, format) {
+      return (0, _moment2.default)(value).format(format);
+    };
+
+    return DateFormatValueConverter;
+  }();
+});
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./resources/converters/dateFormat\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>${ current.year.school } (${ current.year.year | dateFormat: 'YYYY' })</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
+define('text!admin/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/addYear\"></require>\n\n  <div class=\"col-md-2\">\n    <h4>Add</h4>\n    <ul class=\"nav nav-pills nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"category of addCats\"\n          class=\"${ category === categorySelected ? 'active' : ''}\">\n        <a href click.delegate=\"setCategory(category)\">${ category }</a>\n      </li>\n    </ul>\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <add-year if.bind=\"categorySelected === 'Years'\"></add-year>\n      <add-student if.bind=\"categorySelected === 'Students'\"></add-student>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n  <require from=\"./components/addAssignment\"></require>\n  <require from=\"./components/reportAssignment\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of current.subjectList\" role=\"presentation\"\n        class=\"${sub.id === current.subject.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"current.subject\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\" class=\"${editMode === 'add' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"addAssignment()\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores || editMode === 'edit'\" class=\"${editMode === 'edit' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"editAssignment()\"><i class=\"fa fa-pencil\"></i> Edit Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\">\n        <a href=\"#\" click.delegate=\"deleteAssignment()\"><i class=\"fa fa-eraser\"></i> Delete Assignment</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class=\"row\">\n    <div class=\"col-md-2\" if.bind=\"current.subject\">\n      <h5>Assignments</h5>\n      <assignment-list></assignment-list>\n    </div>\n\n    <!-- Scores List -->\n    <div class=\"col-md-4\" if.bind=\"current.scores && !editMode\">\n      <h5>Scores</h5>\n      <scores-list if.bind=\"!quickEntry\"></scores-list>\n      <quick-entry if.bind=\"quickEntry\"></quick-entry>\n    </div>\n\n    <!-- Reports -->\n    <div class=\"col-md-6\" if.bind=\"current.scores && !editMode\">\n      <h5>Assesment</h5>\n      <report-assignment></report-assignment>\n    </div>\n\n    <!-- Add Assignment -->\n    <div class=\"col-md-5\" if.bind=\"editMode\">\n      <add-assignment mode.two-way=\"editMode\"></add-assignment>\n    </div>\n  </div>\n</template>\n"; });
 define('text!resources/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
+define('text!admin/components/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submitYear()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.year\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submitAssignment()\"\n        autocomplete=\"off\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name\"\n               required>\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date\" required>\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type\" required>\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max\" required>\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
 define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
 define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../resources/autocomplete\"></require>\n  <require from=\"../converters/score-format\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\">\n        <div if.bind=\"isPoints\">\n          ${ score.value  | scoreFormat: current.assignment}\n        </div>\n        <div if.bind=\"!isPoints\">\n          <i class=\"fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </div>\n      </td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });

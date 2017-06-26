@@ -1,5 +1,6 @@
 <template>
   <require from="bootstrap/css/bootstrap.css"></require>
+  <require from="./resources/converters/dateFormat"></require>
 
   <!-- Navigation Bar -->
   <nav class="navbar navbar-default">
@@ -26,7 +27,7 @@
         </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href>School Name (2017)</a>
+          <li><a href>${ current.year.school } (${ current.year.year | dateFormat: 'YYYY' })</a>
           </li>
         </ul>
       </div>

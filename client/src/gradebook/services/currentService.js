@@ -8,6 +8,9 @@ export class CurrentService {
     // Injects
     this.api = api;
     this.ea = eventaggregator;
+
+    // Check for year
+    this.year = JSON.parse(localStorage.getItem('currentYear'));
   }
 
   // Subject Methods
@@ -60,5 +63,16 @@ export class CurrentService {
               this.scores = data.objects;
               this.ea.publish('scoreUpdate');
             });
+  }
+
+  // Years Methods
+  setYear(year) {
+    this.year = year;
+    localStorage.setItem('currentYear', JSON.stringify(year));
+
+    // Clear Data of old year
+    this.clearAssignment();
+    this.subjectList = false;
+    this.assignmentList = false;
   }
 }

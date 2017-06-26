@@ -151,6 +151,10 @@
             "name": "d3",
             "path": "../node_modules/d3/build",
             "main": "d3.min"
+          },
+          { "name": "moment",
+            "path": "../node_modules/moment",
+            "main": "moment"
           }
         ]
       }

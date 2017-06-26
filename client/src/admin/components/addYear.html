@@ -1,0 +1,73 @@
+<template>
+  <require from="../../resources/converters/dateFormat"></require>
+
+  <div class="col-md-6">
+    <h4>${ title }</h4>
+    <form class="form-horizontal" submit.delegate="submitYear()">
+
+      <!-- Name Form -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">School Name:</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control"
+                 value.bind="newYear.school" required>
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">First day of School:</label>
+        <div class="col-md-6">
+          <input type="date" value.bind="newYear.year" class="form-control"
+                 required>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-6 text-center">
+          <button type="submit" class="btn btn-primary">
+            ${ bttn }
+          </button>
+          <button click.delegate="cancel()" class="btn btn-danger">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Added Years -->
+  <div class="col-md-6">
+    <h4>Saved</h4>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Year</th>
+        <th>School</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tr repeat.for="year of years">
+        <td>${ year.year | dateFormat: 'YYYY' }</td>
+        <td>${ year.school }</td>
+        <td>
+          <div class="btn-group btn-group-xs" role="group">
+            <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
+                    click.delegate="setYear(year)">
+              <i class="fa fa-bolt"></i> Activate
+            </button>
+            <button type="button" class="btn btn-default ${ year.id === newYear.id ? 'active' : ''}"
+                    click.delegate="edit(year)">
+              <i class="fa fa-pencil"></i> Edit
+            </button>
+            <button type="button" class="btn btn-default"
+                    click.delegate="delete(year)">
+              <i class="fa fa-eraser"></i> </span> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</template>
