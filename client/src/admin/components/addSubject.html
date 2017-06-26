@@ -1,0 +1,47 @@
+<template>
+  <div class="col-md-6">
+    <h4>${ title }</h4>
+    <form submit.delegate="submit()" class="form-horizontal">
+
+      <div class="form-group">
+        <label class="col-md-4 control-label">Subject Name:</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" value.bind="newSubject.name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-6 text-center">
+          <button type="submit" class="btn btn-primary">
+            ${ bttn }
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <div class="col-md-6">
+    <h4>Saved</h4>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tr repeat.for="subject of current.subjectList">
+        <td>${ subject.name }</td>
+        <td>
+          <div class="btn-group btn-group-xs" role="group">
+            <button type="button" class="btn btn-default ${ subject.id === newSubject.id ? 'active' : ''}" click.delegate="edit(subject)">
+              <i class="fa fa-pencil"></i> Edit
+            </button>
+            <button type="button" class="btn btn-default" click.delegate="delete(subject)">
+              <i class="fa fa-eraser"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</template>

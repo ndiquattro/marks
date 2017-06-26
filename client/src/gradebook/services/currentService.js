@@ -9,13 +9,20 @@ export class CurrentService {
     this.api = api;
     this.ea = eventaggregator;
 
+    this.subjectList = [];
+
     // Check for year
     this.year = JSON.parse(localStorage.getItem('currentYear'));
   }
 
   // Subject Methods
   setSubjectList() {
-    this.api.find('subjects')
+    // Define Query
+    let query = {
+      filters: [{'name': 'yearid', 'op': 'eq', 'val': this.year.id}]
+    };
+
+    this.api.find('subjects', query)
             .then(data => this.subjectList = data.objects);
   }
 

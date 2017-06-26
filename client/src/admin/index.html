@@ -1,5 +1,7 @@
 <template>
   <require from="./components/addYear"></require>
+  <require from="./components/addStudent"></require>
+  <require from="./components/addSubject"></require>
 
   <div class="col-md-2">
     <h4>Add</h4>
@@ -16,6 +18,7 @@
     <div class="row">
       <add-year if.bind="categorySelected === 'Years'"></add-year>
       <add-student if.bind="categorySelected === 'Students'"></add-student>
+      <add-subject if.bind="categorySelected === 'Subjects'"></add-subject>
     </div>
   </div>
 </template>
