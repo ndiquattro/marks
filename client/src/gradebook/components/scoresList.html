@@ -1,5 +1,5 @@
 <template>
-  <require from="../converters/score-format"></require>
+  <require from="../../shared/converters/scoreFormat"></require>
 
   <table class="table table-hover">
     <thead>
@@ -14,14 +14,7 @@
         <td class="text-center">${ score.studref.first_name }</td>
         <td class="text-center" click.delegate="editScore(score)">
           <!-- View Mode -->
-          <div if.bind="score.id !== editScoreId">
-            <div if.bind="current.isPoints">
-              ${ score.value  | scoreFormat: current.assignment}
-            </div>
-            <div if.bind="!current.isPoints">
-              <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
-            </div>
-          </div>
+          <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assref"></div>
 
           <!-- Edit Mode -->
           <div if.bind="score.id === editScoreId">

@@ -1,6 +1,6 @@
 <template>
-  <require from="../../resources/autocomplete"></require>
-  <require from="../converters/score-format"></require>
+  <require from="../lib/autocomplete"></require>
+  <require from="../../shared/converters/scoreFormat"></require>
 
   <table class="table table-hover">
     <thead>
@@ -13,14 +13,7 @@
     </thead>
     <tr repeat.for="score of entered">
       <td class="text-center">${ score.studref.first_name }</td>
-      <td class="text-center">
-        <div if.bind="isPoints">
-          ${ score.value  | scoreFormat: current.assignment}
-        </div>
-        <div if.bind="!isPoints">
-          <i class="fa fa${ score.value === 1 ? '-check': ''}-circle-o fa-2x" aria-hidden="true"></i>
-        </div>
-      </td>
+      <td class="text-center" innerhtml.bind="score.value | scoreFormat: score.assref"></td>
     </tr>
 
     <!-- Input Row -->

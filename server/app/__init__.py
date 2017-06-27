@@ -39,6 +39,6 @@ manager.create_api(gbookdb.Students, methods=httpmeths, results_per_page=None)
 manager.create_api(gbookdb.Cycles, methods=httpmeths)
 manager.create_api(gbookdb.Subjects, methods=httpmeths, include_columns=['id', 'name'])
 manager.create_api(gbookdb.Assignments, methods=httpmeths,
-                   exclude_columns=['score'], postprocessors={'POST': [dummy_scores]})
+                   postprocessors={'POST': [dummy_scores]})
 
 manager.create_api(gbookdb.Scores, methods=httpmeths, results_per_page=None)

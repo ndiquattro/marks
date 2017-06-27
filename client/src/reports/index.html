@@ -1,0 +1,16 @@
+<template>
+  <require from="./components/studentReport"></require>
+
+  <!-- Reports Menu -->
+  <ul class="nav nav-tabs">
+    <li>
+      <h4>Reports</h4>
+    </li>
+    <li repeat.for="report of reports" role="presentation"
+        class="${report === selectedReport ? 'active' : ''}">
+      <a href="" click.delegate="setReport(report)">${ report }</a>
+    </li>
+  </ul>
+
+  <student-report if.bind="selectedReport === 'Student'"></student-report>
+</template>

@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {CurrentService} from './gradebook/services/currentService';
+import {CurrentService} from 'shared/services/currentService';
 
 @inject(CurrentService)
 export class App {
@@ -8,7 +8,8 @@ export class App {
     config.map([
       { route: '', redirect: 'gradebook' },
       { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook'},
-      { route: 'admin',  moduleId: './admin/index', nav: 2, title: 'Administration'}
+      { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports'},
+      { route: 'admin',  moduleId: './admin/index', nav: 3, title: 'Administration'}
     ]);
 
     this.router = router;

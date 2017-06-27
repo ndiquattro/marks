@@ -1,8 +1,8 @@
 import {inject} from 'aurelia-framework';
 import {bindable} from 'aurelia-templating';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {CurrentService} from '../services/currentService';
-import {ApiService} from '../services/apiService';
+import {CurrentService} from '../../shared/services/currentService';
+import {ApiService} from '../../shared/services/apiService';
 
 @inject(ApiService, CurrentService, EventAggregator)
 export class AddAssignment {

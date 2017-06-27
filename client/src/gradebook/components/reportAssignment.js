@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {CurrentService} from '../services/currentService';
+import {CurrentService} from '../../shared/services/currentService';
 import * as d3 from 'd3';
 
 @inject(CurrentService, EventAggregator)

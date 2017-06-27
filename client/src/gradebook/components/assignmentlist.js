@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {CurrentService} from '../services/currentService';
+import {CurrentService} from '../../shared/services/currentService';
 
 @inject(CurrentService, EventAggregator)
 export class AssignmentList {

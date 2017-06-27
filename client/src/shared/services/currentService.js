@@ -79,7 +79,7 @@ export class CurrentService {
 
     // Clear Data of old year
     this.clearAssignment();
-    this.subjectList = false;
-    this.assignmentList = false;
+    this.subjectList = [];
+    this.assignmentList = [];
   }
 }

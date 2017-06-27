@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
-import {CurrentService} from '../../gradebook/services/currentService';
-import {ApiService} from '../../gradebook/services/apiService';
+import {CurrentService} from '../../shared/services/currentService';
+import {ApiService} from '../../shared/services/apiService';
 
 @inject(CurrentService, ApiService)
 export class AddSubject {
