@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import {CurrentService} from '../../shared/services/currentService';
 import {ApiService} from '../../shared/services/apiService';
-import {d3} from 'd3';
+
 import moment from 'moment';
 
 @inject(CurrentService, ApiService)

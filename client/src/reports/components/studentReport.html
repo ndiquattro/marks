@@ -1,7 +1,16 @@
 <template>
   <require from="../converters/scoreFilter"></require>
-  <require from="../../shared/converters/dateFormat"></require>
-  <require from="../../shared/converters/scoreFormat"></require>
+  <require from="../attributes/timePlot"></require>
+  <require from="shared/converters/dateFormat"></require>
+  <require from="shared/converters/scoreFormat"></require>
+
+  <style> /* set the CSS */
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+</style>
 
   <!-- Selection Menu -->
   <div class="row">
@@ -37,15 +46,17 @@
 
   <!-- Subject Rows -->
   <div class="row" repeat.for="subject of current.subjectList">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h2>${ subject.name & oneTime}</h2>
       <table class="table">
-        <thead>
-          <th></th>
-          <th>Date</th>
-          <th>Max Score</th>
-          <th>Score</th>
-        </thead>
+        <div if.bind="$first">
+          <thead>
+            <th></th>
+            <th>Date</th>
+            <th>Max Score</th>
+            <th>Score</th>
+          </thead>
+        </div>
         <tbody>
           <tr repeat.for="score of scores | scoreFilter: subject.id">
             <td>${ score.assref.name & oneTime}</td>
@@ -55,6 +66,18 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Plots -->
+    <div class="col-md-6">
+      <div class="col-md-6">
+        <h2>Points</h2>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'"></div>
+      </div>
+      <div class="col-md-6">
+        <h2>Checks</h2>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'"></div>
+      </div>
     </div>
   </div>
 </div>
