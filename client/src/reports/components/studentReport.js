@@ -35,8 +35,11 @@ export class StudentReport {
                 {'name': 'assref', 'op': 'has', 'val': {
                   'name': 'date', 'op': 'ge', 'val': this.selected.start}},
                   {'name': 'assref', 'op': 'has', 'val': {
-                    'name': 'date', 'op': 'le', 'val': this.selected.end}}]
+                    'name': 'date', 'op': 'le', 'val': this.selected.end}}],
+      order_by: [{'field': 'assref__date', 'direction': 'asc'}]
     };
+
+    // Get data
     this.api.find('scores', query)
             .then(data => {
               this.scores = data.objects;

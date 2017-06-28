@@ -1318,8 +1318,10 @@ define('reports/components/studentReport',['exports', 'aurelia-framework', '../.
       var query = {
         filters: [{ 'name': 'stuid', 'op': 'eq', 'val': this.selected.student.id }, { 'name': 'assref', 'op': 'has', 'val': {
             'name': 'date', 'op': 'ge', 'val': this.selected.start } }, { 'name': 'assref', 'op': 'has', 'val': {
-            'name': 'date', 'op': 'le', 'val': this.selected.end } }]
+            'name': 'date', 'op': 'le', 'val': this.selected.end } }],
+        order_by: [{ 'field': 'assref__date', 'direction': 'asc' }]
       };
+
       this.api.find('scores', query).then(function (data) {
         _this2.scores = data.objects;
         _this2.reportGenerated = true;
@@ -1767,7 +1769,7 @@ define('reports/attributes/timePlot',['exports', 'aurelia-framework', 'd3'], fun
 
     TimePlotCustomAttribute.prototype.timePlot = function timePlot(data, type) {
       var margin = { top: 20, right: 20, bottom: 50, left: 50 };
-      var width = 200 - margin.left - margin.right;
+      var width = 320 - margin.left - margin.right;
       var height = 200 - margin.top - margin.bottom;
 
       var parseTime = d3.timeParse('%Y-%m-%d');

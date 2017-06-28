@@ -17,7 +17,7 @@ export class TimePlotCustomAttribute {
   timePlot(data, type) {
     // set the dimensions and margins of the graph
     let margin = {top: 20, right: 20, bottom: 50, left: 50};
-    let width = 200 - margin.left - margin.right;
+    let width = 320 - margin.left - margin.right;
     let height = 200 - margin.top - margin.bottom;
 
     // parse the date / time
