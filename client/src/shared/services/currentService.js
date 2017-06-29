@@ -19,7 +19,7 @@ export class CurrentService {
   setSubjectList() {
     // Define Query
     let query = {
-      filters: [{'name': 'yearid', 'op': 'eq', 'val': this.year.id}]
+      filters: [{'name': 'year_id', 'op': 'eq', 'val': this.year.id}]
     };
 
     this.api.find('subjects', query)
@@ -36,7 +36,7 @@ export class CurrentService {
   setAssignmentList() {
     // Define Query
     let query = {
-      filters: [{'name': 'subjid', 'op': 'eq', 'val': this.subject.id}],
+      filters: [{'name': 'subject_id', 'op': 'eq', 'val': this.subject.id}],
       order_by: [{'field': 'date', 'direction': 'desc'}]
     };
 
@@ -60,8 +60,8 @@ export class CurrentService {
   setScores(assignId) {
     // Filter Object
     let query = {
-      filters: [{'name': 'assignid', 'op': 'eq', 'val': assignId}],
-      order_by: [{'field': 'studref__first_name', 'direction': 'asc'}]
+      filters: [{'name': 'assignment_id', 'op': 'eq', 'val': assignId}],
+      order_by: [{'field': 'student__first_name', 'direction': 'asc'}]
     };
 
     // Get Data

@@ -43,7 +43,7 @@ export class AddSubject {
               .then(resp => this.reset());
     } else {
       // Add Current year
-      this.newSubject.yearid = this.current.year.id;
+      this.newSubject.year_id = this.current.year.id;
 
       this.api.add('subjects', this.newSubject)
               .then(resp => {

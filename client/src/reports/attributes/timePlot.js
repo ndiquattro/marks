@@ -28,10 +28,10 @@ export class TimePlotCustomAttribute {
     let y = d3.scaleLinear().range([height, 0]);
 
     // define the line
-    let valueline = d3.line().x(d => x(d.assref.date));
+    let valueline = d3.line().x(d => x(d.assignment.date));
 
     if (type === 'Points') {
-      valueline = valueline.y(d => y(Math.round((d.value / d.assref.max) * 100)));
+      valueline = valueline.y(d => y(Math.round((d.value / d.assignment.max) * 100)));
     } else if (type === 'Checks') {
       let _movingSum = 0;
       valueline = valueline.y((d, i) => {
@@ -49,11 +49,11 @@ export class TimePlotCustomAttribute {
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // Format the data
-    data = data.filter(d => d.assref.type === type);
-    data.forEach(d => d.assref.date = parseTime(d.assref.date));
+    data = data.filter(d => d.assignment.type === type);
+    data.forEach(d => d.assignment.date = parseTime(d.assignment.date));
 
     // Scale the range of the data
-    x.domain(d3.extent(data, d => d.assref.date));
+    x.domain(d3.extent(data, d => d.assignment.date));
     if (type === 'Points') {
       y.domain([0, 100]);
     } else {

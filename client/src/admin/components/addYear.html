@@ -18,7 +18,16 @@
       <div class="form-group">
         <label class="col-md-4 control-label">First day of School:</label>
         <div class="col-md-6">
-          <input type="date" value.bind="newYear.year" class="form-control"
+          <input type="date" value.bind="newYear.first_day" class="form-control"
+                 required>
+        </div>
+      </div>
+
+      <!-- End Date -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">Last day of School:</label>
+        <div class="col-md-6">
+          <input type="date" value.bind="newYear.last_day" class="form-control"
                  required>
         </div>
       </div>

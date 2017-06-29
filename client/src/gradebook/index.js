@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {CurrentService} from '../shared/services/currentService';
-import {ApiService} from '../shared/services/apiService';
+import {CurrentService} from 'shared/services/currentService';
+import {ApiService} from 'shared/services/apiService';
 
 @inject(CurrentService, ApiService, EventAggregator)
 export class GradeBook {
@@ -17,7 +17,9 @@ export class GradeBook {
   }
 
   created() {
-    this.current.setSubjectList();
+    if (this.current.year) {
+      this.current.setSubjectList();
+    }
   }
 
   addAssignment() {

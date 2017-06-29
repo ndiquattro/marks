@@ -38,12 +38,12 @@ export class QuickEntry {
       }
       value = value.toLowerCase();
       const suggestions = this.notEntered
-        .filter(x => x.studref.first_name.toLowerCase().indexOf(value) === 0)
+        .filter(x => x.student.first_name.toLowerCase().indexOf(value) === 0)
         .sort();
       return Promise.resolve(suggestions);
     },
 
-    getName: suggestion => suggestion.studref.first_name
+    getName: suggestion => suggestion.student.first_name
   };
 
   pushScore(score) {

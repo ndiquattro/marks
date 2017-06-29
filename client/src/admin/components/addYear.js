@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
-import {CurrentService} from '../../shared/services/currentService';
-import {ApiService} from '../../shared/services/apiService';
+import {CurrentService} from 'shared/services/currentService';
+import {ApiService} from 'shared/services/apiService';
 
 @inject(CurrentService, ApiService)
 export class AddYear {
@@ -24,7 +24,7 @@ export class AddYear {
 
   setYearList() {
     let query = {
-      order_by: [{'field': 'year', 'direction': 'desc'}]
+      order_by: [{'field': 'first_day', 'direction': 'desc'}]
     };
 
     this.api.find('years', query)
@@ -49,6 +49,7 @@ export class AddYear {
 
   submit() {
     if (this.mode === 'edit') {
+      // Update Server
       this.api.update('years', this.newYear.id, this.newYear)
               .then(resp => {
                 if (this.newYear.id === this.current.year.id) {
@@ -59,7 +60,7 @@ export class AddYear {
       this.api.add('years', this.newYear)
               .then(resp => {
                 this.setYearList();
-                this.setYear(resp);
+                this.current.setYear(resp);
               });
     }
 

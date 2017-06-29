@@ -62,7 +62,7 @@
             <td>${ score.assref.name & oneTime}</td>
             <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>
             <td>${ score.assref.max & oneTime}</td>
-            <td innerhtml.bind="score.value | scoreFormat: score.assref & oneTime"></td>
+            <td innerhtml.bind="score.value | scoreFormat: score.assignment & oneTime"></td>
           </tr>
         </tbody>
       </table>

@@ -26,7 +26,7 @@ export class AddStudent {
 
   setStudentList() {
     let query = {
-      filters: [{'name': 'yearid', 'op': 'eq', 'val': this.current.year.id}],
+      filters: [{'name': 'year_id', 'op': 'eq', 'val': this.current.year.id}],
       order_by: [{'field': 'first_name', 'direction': 'asc'}]
     };
 
@@ -57,7 +57,7 @@ export class AddStudent {
               .then(resp => this.reset());
     } else {
       // Add Current year
-      this.newStudent.yearid = this.current.year.id;
+      this.newStudent.year_id = this.current.year.id;
 
       this.api.add('students', this.newStudent)
               .then(resp => this.attached());

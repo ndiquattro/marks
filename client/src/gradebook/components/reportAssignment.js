@@ -83,7 +83,7 @@ export class ReportAssignment {
                     .duration(200)
                     .style('opacity', 0.9);
 
-                 div.html(d.map(item => item.studref.first_name + ': ' + item.value + '<br>').join(''))
+                 div.html(d.map(item => item.student.first_name + ': ' + item.value + '<br>').join(''))
                     .style('left', (d3.event.pageX) + 'px')
                     .style('top', (d3.event.pageY - 28) + 'px');
                })
@@ -125,7 +125,7 @@ export class ReportAssignment {
                      .key((d) => d.value)
                      .rollup((g) => {
                        return {'count': g.length,
-                               'names': g.map(item => item.studref.first_name)
+                               'names': g.map(item => item.student.first_name)
                              };
                      })
                      .entries(data)

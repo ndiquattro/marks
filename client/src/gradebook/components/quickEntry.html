@@ -12,8 +12,8 @@
       </tr>
     </thead>
     <tr repeat.for="score of entered">
-      <td class="text-center">${ score.studref.first_name }</td>
-      <td class="text-center" innerhtml.bind="score.value | scoreFormat: score.assref"></td>
+      <td class="text-center">${ score.student.first_name }</td>
+      <td class="text-center" innerhtml.bind="score.value | scoreFormat: score.assignment"></td>
     </tr>
 
     <!-- Input Row -->

@@ -11,10 +11,10 @@
     </tr>
     </thead>
       <tr repeat.for="score of current.scores">
-        <td class="text-center">${ score.studref.first_name }</td>
+        <td class="text-center">${ score.student.first_name }</td>
         <td class="text-center" click.delegate="editScore(score)">
           <!-- View Mode -->
-          <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assref"></div>
+          <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assignment"></div>
 
           <!-- Edit Mode -->
           <div if.bind="score.id === editScoreId">

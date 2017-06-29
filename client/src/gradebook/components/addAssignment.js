@@ -1,8 +1,9 @@
 import {inject} from 'aurelia-framework';
 import {bindable} from 'aurelia-templating';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {CurrentService} from '../../shared/services/currentService';
-import {ApiService} from '../../shared/services/apiService';
+import {CurrentService} from 'shared/services/currentService';
+import {ApiService} from 'shared/services/apiService';
+import moment from 'moment';
 
 @inject(ApiService, CurrentService, EventAggregator)
 export class AddAssignment {
@@ -15,7 +16,7 @@ export class AddAssignment {
   }
 
   created() {
-    this.newAssignment = {};
+    this.newAssignment = {date: moment().format('YYYY-MM-DD')};
   }
 
   bind() {
@@ -43,7 +44,7 @@ export class AddAssignment {
       this.mode = false;
     } else {
       // Fill in subject ID
-      this.newAssignment.subjid = this.current.subject.id;
+      this.newAssignment.subject_id = this.current.subject.id;
 
       // Add assignment information to database
       this.api.add('assignments', this.newAssignment)

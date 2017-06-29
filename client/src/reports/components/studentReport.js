@@ -13,13 +13,13 @@ export class StudentReport {
 
   attached() {
     this.setStudentList();
-    this.selected = {'start': this.current.year.year, 'end': moment().format('YYYY-MM-DD')};
+    this.selected = {'start': this.current.year.first_day, 'end': moment().format('YYYY-MM-DD')};
     this.reportGenerated = false;
   }
 
   setStudentList() {
     let query = {
-      filters: [{'name': 'yearid', 'op': 'eq', 'val': this.current.year.id}],
+      filters: [{'name': 'year_id', 'op': 'eq', 'val': this.current.year.id}],
       order_by: [{'field': 'first_name', 'direction': 'asc'}]
     };
 
@@ -31,12 +31,12 @@ export class StudentReport {
     this.reportGenerated = false;
 
     let query = {
-      filters: [{'name': 'stuid', 'op': 'eq', 'val': this.selected.student.id},
-                {'name': 'assref', 'op': 'has', 'val': {
+      filters: [{'name': 'student_id', 'op': 'eq', 'val': this.selected.student.id},
+                {'name': 'assignment', 'op': 'has', 'val': {
                   'name': 'date', 'op': 'ge', 'val': this.selected.start}},
-                  {'name': 'assref', 'op': 'has', 'val': {
+                  {'name': 'assignment', 'op': 'has', 'val': {
                     'name': 'date', 'op': 'le', 'val': this.selected.end}}],
-      order_by: [{'field': 'assref__date', 'direction': 'asc'}]
+      order_by: [{'field': 'assignment__date', 'direction': 'asc'}]
     };
 
     // Get data

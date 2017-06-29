@@ -102,7 +102,7 @@ define('admin/index',['exports'], function (exports) {
     return Admin;
   }();
 });
-define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../shared/services/currentService', '../shared/services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
+define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggregator', 'shared/services/currentService', 'shared/services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -131,7 +131,9 @@ define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggrega
     }
 
     GradeBook.prototype.created = function created() {
-      this.current.setSubjectList();
+      if (this.current.year) {
+        this.current.setSubjectList();
+      }
     };
 
     GradeBook.prototype.addAssignment = function addAssignment() {
@@ -241,7 +243,7 @@ define('admin/components/addStudent',['exports', 'aurelia-framework', '../../sha
       var _this = this;
 
       var query = {
-        filters: [{ 'name': 'yearid', 'op': 'eq', 'val': this.current.year.id }],
+        filters: [{ 'name': 'year_id', 'op': 'eq', 'val': this.current.year.id }],
         order_by: [{ 'field': 'first_name', 'direction': 'asc' }]
       };
 
@@ -278,7 +280,7 @@ define('admin/components/addStudent',['exports', 'aurelia-framework', '../../sha
           return _this3.reset();
         });
       } else {
-        this.newStudent.yearid = this.current.year.id;
+        this.newStudent.year_id = this.current.year.id;
 
         this.api.add('students', this.newStudent).then(function (resp) {
           return _this3.attached();
@@ -352,7 +354,7 @@ define('admin/components/addSubject',['exports', 'aurelia-framework', '../../sha
           return _this2.reset();
         });
       } else {
-        this.newSubject.yearid = this.current.year.id;
+        this.newSubject.year_id = this.current.year.id;
 
         this.api.add('subjects', this.newSubject).then(function (resp) {
           _this2.current.setSubjectList();
@@ -364,7 +366,7 @@ define('admin/components/addSubject',['exports', 'aurelia-framework', '../../sha
     return AddSubject;
   }()) || _class);
 });
-define('admin/components/addYear',['exports', 'aurelia-framework', '../../shared/services/currentService', '../../shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
+define('admin/components/addYear',['exports', 'aurelia-framework', 'shared/services/currentService', 'shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -405,7 +407,7 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../shared
       var _this = this;
 
       var query = {
-        order_by: [{ 'field': 'year', 'direction': 'desc' }]
+        order_by: [{ 'field': 'first_day', 'direction': 'desc' }]
       };
 
       this.api.find('years', query).then(function (data) {
@@ -444,7 +446,7 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../shared
       } else {
         this.api.add('years', this.newYear).then(function (resp) {
           _this3.setYearList();
-          _this3.setYear(resp);
+          _this3.current.setYear(resp);
         });
       }
 
@@ -454,13 +456,21 @@ define('admin/components/addYear',['exports', 'aurelia-framework', '../../shared
     return AddYear;
   }()) || _class);
 });
-define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-templating', 'aurelia-event-aggregator', '../../shared/services/currentService', '../../shared/services/apiService'], function (exports, _aureliaFramework, _aureliaTemplating, _aureliaEventAggregator, _currentService, _apiService) {
+define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-templating', 'aurelia-event-aggregator', 'shared/services/currentService', 'shared/services/apiService', 'moment'], function (exports, _aureliaFramework, _aureliaTemplating, _aureliaEventAggregator, _currentService, _apiService, _moment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
   exports.AddAssignment = undefined;
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
   function _initDefineProp(target, property, descriptor, context) {
     if (!descriptor) return;
@@ -525,7 +535,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
     }
 
     AddAssignment.prototype.created = function created() {
-      this.newAssignment = {};
+      this.newAssignment = { date: (0, _moment2.default)().format('YYYY-MM-DD') };
     };
 
     AddAssignment.prototype.bind = function bind() {
@@ -551,7 +561,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
 
         this.mode = false;
       } else {
-        this.newAssignment.subjid = this.current.subject.id;
+        this.newAssignment.subject_id = this.current.subject.id;
 
         this.api.add('assignments', this.newAssignment).then(function (data) {
           _this.ea.publish('reloadAssignments');
@@ -572,7 +582,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
     initializer: null
   })), _class2)) || _class);
 });
-define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../../shared/services/currentService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService) {
+define('gradebook/components/assignmentlist',['exports', 'aurelia-framework', 'aurelia-event-aggregator', 'shared/services/currentService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -646,13 +656,13 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
           }
           value = value.toLowerCase();
           var suggestions = _this.notEntered.filter(function (x) {
-            return x.studref.first_name.toLowerCase().indexOf(value) === 0;
+            return x.student.first_name.toLowerCase().indexOf(value) === 0;
           }).sort();
           return Promise.resolve(suggestions);
         },
 
         getName: function getName(suggestion) {
-          return suggestion.studref.first_name;
+          return suggestion.student.first_name;
         }
       };
 
@@ -820,7 +830,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
         div.transition().duration(200).style('opacity', 0.9);
 
         div.html(d.map(function (item) {
-          return item.studref.first_name + ': ' + item.value + '<br>';
+          return item.student.first_name + ': ' + item.value + '<br>';
         }).join('')).style('left', d3.event.pageX + 'px').style('top', d3.event.pageY - 28 + 'px');
       }).on('mouseout', function (d) {
         div.transition().duration(500).style('opacity', 0);
@@ -849,7 +859,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
       }).rollup(function (g) {
         return { 'count': g.length,
           'names': g.map(function (item) {
-            return item.studref.first_name;
+            return item.student.first_name;
           })
         };
       }).entries(data).map(function (group) {
@@ -1132,7 +1142,7 @@ define('gradebook/lib/autocomplete',['exports', 'aurelia-binding', 'aurelia-temp
 
         _this.index = -1;
         (_suggestions = _this.suggestions).splice.apply(_suggestions, [0, _this.suggestions.length].concat(suggestions));
-        if (suggestions.length === 1 && suggestions[0].studref.first_name !== _this.value) {
+        if (suggestions.length === 1 && suggestions[0].student.first_name !== _this.value) {
           _this.select(suggestions[0], true);
         } else if (suggestions.length === 0) {
           _this.collapse();
@@ -1259,6 +1269,159 @@ define('gradebook/lib/autocomplete',['exports', 'aurelia-binding', 'aurelia-temp
     }
   })), _class2)) || _class);
 });
+define('reports/attributes/timePlot',['exports', 'aurelia-framework', 'd3'], function (exports, _aureliaFramework, _d) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TimePlotCustomAttribute = undefined;
+
+  var d3 = _interopRequireWildcard(_d);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _class, _desc, _value, _class2, _descriptor, _descriptor2;
+
+  var TimePlotCustomAttribute = exports.TimePlotCustomAttribute = (_dec = (0, _aureliaFramework.inject)(Element), _dec(_class = (_class2 = function () {
+    function TimePlotCustomAttribute(element) {
+      _classCallCheck(this, TimePlotCustomAttribute);
+
+      _initDefineProp(this, 'scores', _descriptor, this);
+
+      _initDefineProp(this, 'type', _descriptor2, this);
+
+      this.element = element;
+    }
+
+    TimePlotCustomAttribute.prototype.bind = function bind() {
+      this.timePlot(this.scores, this.type);
+    };
+
+    TimePlotCustomAttribute.prototype.timePlot = function timePlot(data, type) {
+      var margin = { top: 20, right: 20, bottom: 50, left: 50 };
+      var width = 320 - margin.left - margin.right;
+      var height = 200 - margin.top - margin.bottom;
+
+      var parseTime = d3.timeParse('%Y-%m-%d');
+
+      var x = d3.scaleTime().range([0, width]);
+      var y = d3.scaleLinear().range([height, 0]);
+
+      var valueline = d3.line().x(function (d) {
+        return x(d.assignment.date);
+      });
+
+      if (type === 'Points') {
+        valueline = valueline.y(function (d) {
+          return y(Math.round(d.value / d.assignment.max * 100));
+        });
+      } else if (type === 'Checks') {
+        var _movingSum = 0;
+        valueline = valueline.y(function (d, i) {
+          _movingSum += d.value;
+          return y(_movingSum / (i + 1));
+        });
+      }
+
+      var svg = d3.select(this.element).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+      data = data.filter(function (d) {
+        return d.assignment.type === type;
+      });
+      data.forEach(function (d) {
+        return d.assignment.date = parseTime(d.assignment.date);
+      });
+
+      x.domain(d3.extent(data, function (d) {
+        return d.assignment.date;
+      }));
+      if (type === 'Points') {
+        y.domain([0, 100]);
+      } else {
+        y.domain([0, 1]);
+      }
+
+      svg.append('path').data([data]).attr('class', 'line').attr('d', valueline);
+
+      svg.append('g').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x).tickFormat(d3.timeFormat('%m/%d')).ticks(data.length));
+
+      svg.append('g').call(d3.axisLeft(y));
+    };
+
+    return TimePlotCustomAttribute;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'scores', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'type', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class);
+});
 define('reports/components/studentReport',['exports', 'aurelia-framework', '../../shared/services/currentService', '../../shared/services/apiService', 'moment'], function (exports, _aureliaFramework, _currentService, _apiService, _moment) {
   'use strict';
 
@@ -1293,7 +1456,7 @@ define('reports/components/studentReport',['exports', 'aurelia-framework', '../.
 
     StudentReport.prototype.attached = function attached() {
       this.setStudentList();
-      this.selected = { 'start': this.current.year.year, 'end': (0, _moment2.default)().format('YYYY-MM-DD') };
+      this.selected = { 'start': this.current.year.first_day, 'end': (0, _moment2.default)().format('YYYY-MM-DD') };
       this.reportGenerated = false;
     };
 
@@ -1301,7 +1464,7 @@ define('reports/components/studentReport',['exports', 'aurelia-framework', '../.
       var _this = this;
 
       var query = {
-        filters: [{ 'name': 'yearid', 'op': 'eq', 'val': this.current.year.id }],
+        filters: [{ 'name': 'year_id', 'op': 'eq', 'val': this.current.year.id }],
         order_by: [{ 'field': 'first_name', 'direction': 'asc' }]
       };
 
@@ -1316,10 +1479,10 @@ define('reports/components/studentReport',['exports', 'aurelia-framework', '../.
       this.reportGenerated = false;
 
       var query = {
-        filters: [{ 'name': 'stuid', 'op': 'eq', 'val': this.selected.student.id }, { 'name': 'assref', 'op': 'has', 'val': {
-            'name': 'date', 'op': 'ge', 'val': this.selected.start } }, { 'name': 'assref', 'op': 'has', 'val': {
+        filters: [{ 'name': 'student_id', 'op': 'eq', 'val': this.selected.student.id }, { 'name': 'assignment', 'op': 'has', 'val': {
+            'name': 'date', 'op': 'ge', 'val': this.selected.start } }, { 'name': 'assignment', 'op': 'has', 'val': {
             'name': 'date', 'op': 'le', 'val': this.selected.end } }],
-        order_by: [{ 'field': 'assref__date', 'direction': 'asc' }]
+        order_by: [{ 'field': 'assignment__date', 'direction': 'asc' }]
       };
 
       this.api.find('scores', query).then(function (data) {
@@ -1351,7 +1514,7 @@ define('reports/converters/scoreFilter',["exports"], function (exports) {
 
     scoreFilterValueConverter.prototype.toView = function toView(scores, subjectid) {
       return scores.filter(function (score) {
-        return score.assref.subjid === subjectid;
+        return score.assignment.subject_id === subjectid;
       });
     };
 
@@ -1525,7 +1688,7 @@ define('shared/services/currentService',['exports', 'aurelia-event-aggregator', 
       var _this = this;
 
       var query = {
-        filters: [{ 'name': 'yearid', 'op': 'eq', 'val': this.year.id }]
+        filters: [{ 'name': 'year_id', 'op': 'eq', 'val': this.year.id }]
       };
 
       this.api.find('subjects', query).then(function (data) {
@@ -1543,7 +1706,7 @@ define('shared/services/currentService',['exports', 'aurelia-event-aggregator', 
       var _this2 = this;
 
       var query = {
-        filters: [{ 'name': 'subjid', 'op': 'eq', 'val': this.subject.id }],
+        filters: [{ 'name': 'subject_id', 'op': 'eq', 'val': this.subject.id }],
         order_by: [{ 'field': 'date', 'direction': 'desc' }]
       };
 
@@ -1567,8 +1730,8 @@ define('shared/services/currentService',['exports', 'aurelia-event-aggregator', 
       var _this3 = this;
 
       var query = {
-        filters: [{ 'name': 'assignid', 'op': 'eq', 'val': assignId }],
-        order_by: [{ 'field': 'studref__first_name', 'direction': 'asc' }]
+        filters: [{ 'name': 'assignment_id', 'op': 'eq', 'val': assignId }],
+        order_by: [{ 'field': 'student__first_name', 'direction': 'asc' }]
       };
 
       this.api.find('scores', query).then(function (data) {
@@ -1589,257 +1752,19 @@ define('shared/services/currentService',['exports', 'aurelia-event-aggregator', 
     return CurrentService;
   }()) || _class);
 });
-define('reports/attributes/pointsPlot',['exports', 'aurelia-framework', 'd3'], function (exports, _aureliaFramework, _d) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.PointsPlotCustomAttribute = undefined;
-
-  var d3 = _interopRequireWildcard(_d);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var PointsPlotCustomAttribute = exports.PointsPlotCustomAttribute = (_dec = (0, _aureliaFramework.inject)(Element), _dec(_class = function () {
-    function PointsPlotCustomAttribute(element) {
-      _classCallCheck(this, PointsPlotCustomAttribute);
-
-      this.element = element;
-    }
-
-    PointsPlotCustomAttribute.prototype.bind = function bind() {
-      this.pointsPlot(this.value);
-    };
-
-    PointsPlotCustomAttribute.prototype.pointsPlot = function pointsPlot(data) {
-      var margin = { top: 20, right: 20, bottom: 50, left: 50 };
-      var width = 400 - margin.left - margin.right;
-      var height = 200 - margin.top - margin.bottom;
-
-      var parseTime = d3.timeParse('%Y-%m-%d');
-
-      var x = d3.scaleTime().range([0, width]);
-      var y = d3.scaleLinear().range([height, 0]);
-
-      var valueline = d3.line().x(function (d) {
-        return x(d.assref.date);
-      }).y(function (d) {
-        return y(d.value);
-      });
-
-      var svg = d3.select(this.element).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-      data.forEach(function (d) {
-        d.assref.date = parseTime(d.assref.date);
-      });
-
-      x.domain(d3.extent(data, function (d) {
-        return d.assref.date;
-      }));
-      y.domain([0, d3.max(data, function (d) {
-        return d.value;
-      })]);
-
-      svg.append('path').data([data]).attr('class', 'line').attr('d', valueline);
-
-      svg.append('g').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x));
-
-      svg.append('g').call(d3.axisLeft(y));
-    };
-
-    return PointsPlotCustomAttribute;
-  }()) || _class);
-});
-define('reports/attributes/timePlot',['exports', 'aurelia-framework', 'd3'], function (exports, _aureliaFramework, _d) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TimePlotCustomAttribute = undefined;
-
-  var d3 = _interopRequireWildcard(_d);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-    });
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
-
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
-
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
-  }
-
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
-
-  var _dec, _class, _desc, _value, _class2, _descriptor, _descriptor2;
-
-  var TimePlotCustomAttribute = exports.TimePlotCustomAttribute = (_dec = (0, _aureliaFramework.inject)(Element), _dec(_class = (_class2 = function () {
-    function TimePlotCustomAttribute(element) {
-      _classCallCheck(this, TimePlotCustomAttribute);
-
-      _initDefineProp(this, 'scores', _descriptor, this);
-
-      _initDefineProp(this, 'type', _descriptor2, this);
-
-      this.element = element;
-    }
-
-    TimePlotCustomAttribute.prototype.bind = function bind() {
-      this.timePlot(this.scores, this.type);
-    };
-
-    TimePlotCustomAttribute.prototype.timePlot = function timePlot(data, type) {
-      var margin = { top: 20, right: 20, bottom: 50, left: 50 };
-      var width = 320 - margin.left - margin.right;
-      var height = 200 - margin.top - margin.bottom;
-
-      var parseTime = d3.timeParse('%Y-%m-%d');
-
-      var x = d3.scaleTime().range([0, width]);
-      var y = d3.scaleLinear().range([height, 0]);
-
-      var valueline = d3.line().x(function (d) {
-        return x(d.assref.date);
-      });
-
-      if (type === 'Points') {
-        valueline = valueline.y(function (d) {
-          return y(Math.round(d.value / d.assref.max * 100));
-        });
-      } else if (type === 'Checks') {
-        var _movingSum = 0;
-        valueline = valueline.y(function (d, i) {
-          _movingSum += d.value;
-          return y(_movingSum / (i + 1));
-        });
-      }
-
-      var svg = d3.select(this.element).append('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom).append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-      data = data.filter(function (d) {
-        return d.assref.type === type;
-      });
-      data.forEach(function (d) {
-        return d.assref.date = parseTime(d.assref.date);
-      });
-
-      x.domain(d3.extent(data, function (d) {
-        return d.assref.date;
-      }));
-      if (type === 'Points') {
-        y.domain([0, 100]);
-      } else {
-        y.domain([0, 1]);
-      }
-
-      svg.append('path').data([data]).attr('class', 'line').attr('d', valueline);
-
-      svg.append('g').attr('transform', 'translate(0,' + height + ')').call(d3.axisBottom(x).tickFormat(d3.timeFormat('%m/%d')).ticks(data.length));
-
-      svg.append('g').call(d3.axisLeft(y));
-    };
-
-    return TimePlotCustomAttribute;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'scores', [_aureliaFramework.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'type', [_aureliaFramework.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class2)) || _class);
-});
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./shared/converters/dateFormat\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>${ current.year.school } (${ current.year.year | dateFormat: 'YYYY' })</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./shared/converters/dateFormat\"></require>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation\" class=\"${row.isActive ? 'active' : ''}\">\n          <a href.bind=\"row.href\">${row.title}</a>\n        </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li><a href>${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' })</a>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
 define('text!admin/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/addYear\"></require>\n  <require from=\"./components/addStudent\"></require>\n  <require from=\"./components/addSubject\"></require>\n\n  <div class=\"col-md-2\">\n    <h4>Add</h4>\n    <ul class=\"nav nav-pills nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"category of addCats\"\n          class=\"${ category === categorySelected ? 'active' : ''}\">\n        <a href click.delegate=\"setCategory(category)\">${ category }</a>\n      </li>\n    </ul>\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <add-year if.bind=\"categorySelected === 'Years'\"></add-year>\n      <add-student if.bind=\"categorySelected === 'Students'\"></add-student>\n      <add-subject if.bind=\"categorySelected === 'Subjects'\"></add-subject>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/assignmentlist\"></require>\n  <require from=\"./components/scoresList\"></require>\n  <require from=\"./components/quickEntry\"></require>\n  <require from=\"./components/addAssignment\"></require>\n  <require from=\"./components/reportAssignment\"></require>\n\n  <!-- Subjects Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Subjects</h4>\n    </li>\n    <li repeat.for=\"sub of current.subjectList\" role=\"presentation\"\n        class=\"${sub.id === current.subject.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setSubject(sub)\">${ sub.name }</a>\n    </li>\n  </ul>\n\n  <!-- Subject Menu Bar -->\n  <div class=\"row\" show.bind=\"current.subject\">\n    <ul class=\"nav nav-pills\">\n      <li role=\"presentation\" class=\"${editMode === 'add' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"addAssignment()\"><i class=\"fa fa-plus fa-lg\"></i> Add Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\" class=\"${quickEntry ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"toggleQuick()\"><i class=\"fa fa-fast-forward\"></i> Quick Entry</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores || editMode === 'edit'\" class=\"${editMode === 'edit' ? 'active' : ''}\">\n        <a href=\"#\" click.delegate=\"editAssignment()\"><i class=\"fa fa-pencil\"></i> Edit Assignment</a>\n      </li>\n      <li role=\"presentation\" show.bind=\"current.scores\">\n        <a href=\"#\" click.delegate=\"deleteAssignment()\"><i class=\"fa fa-eraser\"></i> Delete Assignment</a>\n      </li>\n    </ul>\n  </div>\n\n  <!-- Assignment List -->\n  <div class=\"row\">\n    <div class=\"col-md-2\" if.bind=\"current.subject\">\n      <h5>Assignments</h5>\n      <assignment-list></assignment-list>\n    </div>\n\n    <!-- Scores List -->\n    <div class=\"col-md-4\" if.bind=\"current.scores && !editMode\">\n      <h5>Scores</h5>\n      <scores-list if.bind=\"!quickEntry\"></scores-list>\n      <quick-entry if.bind=\"quickEntry\"></quick-entry>\n    </div>\n\n    <!-- Reports -->\n    <div class=\"col-md-6\" if.bind=\"current.scores && !editMode\">\n      <h5>Assesment</h5>\n      <report-assignment></report-assignment>\n    </div>\n\n    <!-- Add Assignment -->\n    <div class=\"col-md-5\" if.bind=\"editMode\">\n      <add-assignment mode.two-way=\"editMode\"></add-assignment>\n    </div>\n  </div>\n</template>\n"; });
 define('text!reports/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/studentReport\"></require>\n\n  <!-- Reports Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Reports</h4>\n    </li>\n    <li repeat.for=\"report of reports\" role=\"presentation\"\n        class=\"${report === selectedReport ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"setReport(report)\">${ report }</a>\n    </li>\n  </ul>\n\n  <student-report if.bind=\"selectedReport === 'Student'\"></student-report>\n</template>\n"; });
 define('text!admin/components/addStudent.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.first_name\" required>\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.last_name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name\n          <small>(Total: ${ students.length })</small>\n        </th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"student of students\">\n        <td>${ student.first_name } ${ student.last_name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ newStudent.id === student.id ? 'active' : '' }\"\n                    click.delegate=\"edit(student)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(student)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 define('text!admin/components/addSubject.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Subject Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newSubject.name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"subject of current.subjectList\">\n        <td>${ subject.name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ subject.id === newSubject.id ? 'active' : ''}\" click.delegate=\"edit(subject)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\" click.delegate=\"delete(subject)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
-define('text!admin/components/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submit()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.year\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"current.setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!admin/components/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submit()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.first_day\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- End Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.last_day\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"current.setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
 define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submitAssignment()\"\n        autocomplete=\"off\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name\"\n               required>\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date\" required>\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type\" required>\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max\" required>\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
 define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
-define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../lib/autocomplete\"></require>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.studref.first_name }</td>\n      <td class=\"text-center\" innerhtml.bind=\"score.value | scoreFormat: score.assref\"></td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
+define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../lib/autocomplete\"></require>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.student.first_name }</td>\n      <td class=\"text-center\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/reportAssignment.html', ['module'], function(module) { module.exports = "<template>\n<style>\n\n.bar rect {\nfill: steelblue;\n}\n\n.bar text {\nfill: #fff;\nfont: 10px sans-serif;\n}\n\ndiv.tooltip {\n    position: absolute;\n    text-align: center;\n    width: auto;\n    height: auto;\n    padding: 2px;\n    font: 16px sans-serif;\n    background: lightsteelblue;\n    border: 0px;\n    border-radius: 8px;\n    pointer-events: none;\n\n}\n\n.arc text {\n  font: 10px sans-serif;\n  text-anchor: middle;\n}\n\n.arc path {\n  stroke: #fff;\n}\n\n.legend {\n    font-size: 13px;\n  }\n  h1 {\n  font-size: 15px;\n  text-align: center;\n\t}\n  rect {\n    stroke-width: 2;\n  }\n\n  .tooltip2 {\n  box-shadow: 0 0 5px #999999;\n  display: none;\n  font-size: 12px;\n  left: 130px;\n  padding: 10px;\n  position: absolute;\n  text-align: center;\n  top: 95px;\n  width: 80px;\n  z-index: 10;\n  line-height: 140%; /*Interlineado*/\n  font-family: \"Open Sans\", sans-serif;\n  font-weight: 300;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n\t}\n\n  .label {\n   font-weight: 600;\n  }\n\n</style>\n  <div id=\"content\"></div>\n</template>\n"; });
-define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.studref.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\" innerhtml.bind=\"score.value | scoreFormat: score.assref\"></div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
+define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.student.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
+define('text!reports/components/studentReport.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/scoreFilter\"></require>\n  <require from=\"../attributes/timePlot\"></require>\n  <require from=\"shared/converters/dateFormat\"></require>\n  <require from=\"shared/converters/scoreFormat\"></require>\n\n  <style> /* set the CSS */\n.line {\n  fill: none;\n  stroke: steelblue;\n  stroke-width: 2px;\n}\n</style>\n\n  <!-- Selection Menu -->\n  <div class=\"row\">\n    <form class=\"form-inline\" submit.delegate=\"generate()\">\n      <div class=\"form-group\">\n        <label>Select Student:</label>\n        <select class=\"form-control\" value.bind=\"selected.student\" placeholder=\"Select Student\">\n          <option repeat.for=\"student of students\" model.bind=\"student\">\n            ${ student.first_name } ${ student.last_name }\n          </option>\n        </select>\n      </div>\n      <div class=\"form-group\">\n        <label>Start Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.start\">\n      </div>\n\n      <div class=\"form-group\">\n        <label>End Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.end\">\n      </div>\n\n      <button type=\"submit\" class=\"btn btn-default\">Generate Report</button>\n      <ul>\n    </form>\n  </div>\n\n  <!-- Report Header -->\n  <div if.bind=\"reportGenerated\">\n  <div class=\"row\">\n    <h1>${ selected.student.first_name & oneTime} ${ selected.student.last_name & oneTime}</h1>\n  </div>\n\n  <!-- Subject Rows -->\n  <div class=\"row\" repeat.for=\"subject of current.subjectList\">\n    <div class=\"col-md-4\">\n      <h2>${ subject.name & oneTime}</h2>\n      <table class=\"table\">\n        <div if.bind=\"$first\">\n          <thead>\n            <th></th>\n            <th>Date</th>\n            <th>Max Score</th>\n            <th>Score</th>\n          </thead>\n        </div>\n        <tbody>\n          <tr repeat.for=\"score of scores | scoreFilter: subject.id\">\n            <td>${ score.assref.name & oneTime}</td>\n            <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>\n            <td>${ score.assref.max & oneTime}</td>\n            <td innerhtml.bind=\"score.value | scoreFormat: score.assignment & oneTime\"></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <!-- Plots -->\n    <div class=\"col-md-6\">\n      <div class=\"col-md-6\">\n        <h2>Points</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'\"></div>\n      </div>\n      <div class=\"col-md-6\">\n        <h2>Checks</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'\"></div>\n      </div>\n    </div>\n  </div>\n</div>\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
-define('text!reports/components/studentReport.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/scoreFilter\"></require>\n  <require from=\"../attributes/timePlot\"></require>\n  <require from=\"shared/converters/dateFormat\"></require>\n  <require from=\"shared/converters/scoreFormat\"></require>\n\n  <style> /* set the CSS */\n.line {\n  fill: none;\n  stroke: steelblue;\n  stroke-width: 2px;\n}\n</style>\n\n  <!-- Selection Menu -->\n  <div class=\"row\">\n    <form class=\"form-inline\" submit.delegate=\"generate()\">\n      <div class=\"form-group\">\n        <label>Select Student:</label>\n        <select class=\"form-control\" value.bind=\"selected.student\" placeholder=\"Select Student\">\n          <option repeat.for=\"student of students\" model.bind=\"student\">\n            ${ student.first_name } ${ student.last_name }\n          </option>\n        </select>\n      </div>\n      <div class=\"form-group\">\n        <label>Start Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.start\">\n      </div>\n\n      <div class=\"form-group\">\n        <label>End Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.end\">\n      </div>\n\n      <button type=\"submit\" class=\"btn btn-default\">Generate Report</button>\n      <ul>\n    </form>\n  </div>\n\n  <!-- Report Header -->\n  <div if.bind=\"reportGenerated\">\n  <div class=\"row\">\n    <h1>${ selected.student.first_name & oneTime} ${ selected.student.last_name & oneTime}</h1>\n  </div>\n\n  <!-- Subject Rows -->\n  <div class=\"row\" repeat.for=\"subject of current.subjectList\">\n    <div class=\"col-md-4\">\n      <h2>${ subject.name & oneTime}</h2>\n      <table class=\"table\">\n        <div if.bind=\"$first\">\n          <thead>\n            <th></th>\n            <th>Date</th>\n            <th>Max Score</th>\n            <th>Score</th>\n          </thead>\n        </div>\n        <tbody>\n          <tr repeat.for=\"score of scores | scoreFilter: subject.id\">\n            <td>${ score.assref.name & oneTime}</td>\n            <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>\n            <td>${ score.assref.max & oneTime}</td>\n            <td innerhtml.bind=\"score.value | scoreFormat: score.assref & oneTime\"></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <!-- Plots -->\n    <div class=\"col-md-6\">\n      <div class=\"col-md-6\">\n        <h2>Points</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'\"></div>\n      </div>\n      <div class=\"col-md-6\">\n        <h2>Checks</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'\"></div>\n      </div>\n    </div>\n  </div>\n</div>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map
