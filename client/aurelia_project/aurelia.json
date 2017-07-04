@@ -119,6 +119,7 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
+          "aurelia-fetch-client",
           "text",
           "jquery",
           {
@@ -155,6 +156,11 @@
           { "name": "moment",
             "path": "../node_modules/moment",
             "main": "moment"
+          },
+          {
+            "name": "aurelia-auth",
+            "path": "../node_modules/aurelia-auth/dist/amd",
+            "main": "aurelia-auth"
           }
         ]
       }

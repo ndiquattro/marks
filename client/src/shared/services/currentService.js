@@ -10,9 +10,21 @@ export class CurrentService {
     this.ea = eventaggregator;
 
     this.subjectList = [];
+  }
 
-    // Check for year
-    this.year = JSON.parse(localStorage.getItem('currentYear'));
+  // User methods
+  setUser(user) {
+    this.user = user;
+  }
+
+  reviveUser(userId) {
+    this.api.findOne('users', userId)
+            .then(data => {
+              this.user = data;
+              if (data.active_year) {
+                this.reviveYear(data.active_year);
+              }
+            });
   }
 
   // Subject Methods
@@ -75,11 +87,18 @@ export class CurrentService {
   // Years Methods
   setYear(year) {
     this.year = year;
-    localStorage.setItem('currentYear', JSON.stringify(year));
+
+    // Save year in database
+    this.api.update('users', this.user.id, {'active_year': year.id});
 
     // Clear Data of old year
     this.clearAssignment();
     this.subjectList = [];
     this.assignmentList = [];
+  }
+
+  reviveYear(yearId) {
+    this.api.findOne('years', yearId)
+            .then(data => this.year = data);
   }
 }

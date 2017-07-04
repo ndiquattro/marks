@@ -1,8 +1,12 @@
 import environment from './environment';
+import config from './authConfig';
 
 export function configure(aurelia) {
   aurelia.use
-    .standardConfiguration();
+    .standardConfiguration()
+    .plugin('aurelia-auth', (baseConfig)=>{
+      baseConfig.configure(config);
+    });
 
   if (environment.debug) {
     aurelia.use.developmentLogging();

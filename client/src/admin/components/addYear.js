@@ -18,7 +18,7 @@ export class AddYear {
   reset() {
     this.newYear = {};
     this.mode = 'add';
-    this.title = 'Year';
+    this.title = 'Add Year';
     this.bttn = 'Add Year';
   }
 
