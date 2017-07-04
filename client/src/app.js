@@ -14,17 +14,16 @@ export class App {
       { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true},
 
       // User Managment
-      { route: 'password/:token?', moduleId: './home/user/password', title: 'Password Managment'},
+      { route: 'settings', moduleId: './admin/settings', title: 'Settings', name: 'settings', auth: true},
+      { route: 'password/:token', moduleId: './admin/components/password', title: 'Reset Password'},
 
       // Signup Routes
       { route: 'payment', moduleId: './home/signup/payment', title: 'Setup Payment', name: 'payment', auth: true },
-      { route: 'profile', moduleId: './home/signup/profile', title: 'Setup Profile', auth: true },
-      { route: 'admin',  moduleId: './admin/index', title: 'Administration', name: 'admin', auth: true},
 
       // Add Routes
-      { route: 'admin/addsubject',  moduleId: './admin/components/addSubject', title: 'Add Subject', name: 'addsubject', auth: true},
-      { route: 'admin/addstudent',  moduleId: './admin/components/addStudent', title: 'Add Student', name: 'addstudent', auth: true},
-      { route: 'admin/addyear',  moduleId: './admin/components/addYear', title: 'Add Year', name: 'addyear', auth: true}
+      { route: 'gradebook/addsubject',  moduleId: './gradebook/addSubject', title: 'Add Subject', name: 'addsubject', auth: true},
+      { route: 'gradebook/addstudent',  moduleId: './gradebook/addStudent', title: 'Add Student', name: 'addstudent', auth: true},
+      { route: 'gradebook/addyear',  moduleId: './gradebook/addYear', title: 'Add Year', name: 'addyear', auth: true}
 
     ]);
 

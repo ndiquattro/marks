@@ -18,7 +18,7 @@ define('app',['exports', 'aurelia-framework', 'shared/services/currentService', 
     App.prototype.configureRouter = function configureRouter(config, router) {
       config.title = 'Marks';
       config.addPipelineStep('authorize', _aureliaAuth.AuthorizeStep);
-      config.map([{ route: '/', moduleId: './home/index', nav: 0, title: 'Welcome', auth: false }, { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true }, { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true }, { route: 'password/:token?', moduleId: './home/user/password', title: 'Password Managment' }, { route: 'payment', moduleId: './home/signup/payment', title: 'Setup Payment', name: 'payment', auth: true }, { route: 'profile', moduleId: './home/signup/profile', title: 'Setup Profile', auth: true }, { route: 'admin', moduleId: './admin/index', title: 'Administration', name: 'admin', auth: true }, { route: 'admin/addsubject', moduleId: './admin/components/addSubject', title: 'Add Subject', name: 'addsubject', auth: true }, { route: 'admin/addstudent', moduleId: './admin/components/addStudent', title: 'Add Student', name: 'addstudent', auth: true }, { route: 'admin/addyear', moduleId: './admin/components/addYear', title: 'Add Year', name: 'addyear', auth: true }]);
+      config.map([{ route: '/', moduleId: './home/index', nav: 0, title: 'Welcome', auth: false }, { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true }, { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true }, { route: 'settings', moduleId: './admin/settings', title: 'Settings', name: 'settings', auth: true }, { route: 'password/:token', moduleId: './admin/components/password', title: 'Reset Password' }, { route: 'payment', moduleId: './home/signup/payment', title: 'Setup Payment', name: 'payment', auth: true }, { route: 'gradebook/addsubject', moduleId: './gradebook/addSubject', title: 'Add Subject', name: 'addsubject', auth: true }, { route: 'gradebook/addstudent', moduleId: './gradebook/addStudent', title: 'Add Student', name: 'addstudent', auth: true }, { route: 'gradebook/addyear', moduleId: './gradebook/addYear', title: 'Add Year', name: 'addyear', auth: true }]);
 
       this.router = router;
     };
@@ -2078,6 +2078,379 @@ define('home/user/password',['exports', 'aurelia-framework', 'shared/services/ht
     return Password;
   }()) || _class);
 });
+define('admin/settings',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var Settings = exports.Settings = function Settings() {
+    _classCallCheck(this, Settings);
+  };
+});
+define('gradebook/addStudent',['exports', 'aurelia-framework', 'shared/services/currentService', 'shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AddStudent = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var AddStudent = exports.AddStudent = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService), _dec(_class = function () {
+    function AddStudent(current, api) {
+      _classCallCheck(this, AddStudent);
+
+      this.current = current;
+      this.api = api;
+    }
+
+    AddStudent.prototype.attached = function attached() {
+      this.reset();
+      this.students = [];
+
+      this.setStudentList();
+    };
+
+    AddStudent.prototype.reset = function reset() {
+      this.mode = 'add';
+      this.title = 'Add Student';
+      this.bttn = 'Add Student';
+      this.newStudent = {};
+    };
+
+    AddStudent.prototype.setStudentList = function setStudentList() {
+      var _this = this;
+
+      var query = {
+        filters: [{ 'name': 'year_id', 'op': 'eq', 'val': this.current.year.id }],
+        order_by: [{ 'field': 'first_name', 'direction': 'asc' }]
+      };
+
+      this.api.find('students', query).then(function (data) {
+        return _this.students = data.objects;
+      });
+    };
+
+    AddStudent.prototype.edit = function edit(student) {
+      this.newStudent = student;
+      this.mode = 'edit';
+
+      this.title = 'Edit Student';
+      this.bttn = 'Save Changes';
+    };
+
+    AddStudent.prototype.delete = function _delete(student) {
+      var _this2 = this;
+
+      var confirmed = confirm('Are you sure you want to delete ' + student.first_name + ' ' + student.last_name + '?');
+
+      if (confirmed) {
+        this.api.delete('students', student.id).then(function (data) {
+          return _this2.setStudentList();
+        });
+      }
+    };
+
+    AddStudent.prototype.submit = function submit() {
+      var _this3 = this;
+
+      if (this.mode === 'edit') {
+        this.api.update('students', this.newStudent.id, this.newStudent).then(function (resp) {
+          return _this3.reset();
+        });
+      } else {
+        this.newStudent.year_id = this.current.year.id;
+
+        this.api.add('students', this.newStudent).then(function (resp) {
+          return _this3.attached();
+        });
+      }
+    };
+
+    return AddStudent;
+  }()) || _class);
+});
+define('gradebook/addSubject',['exports', 'aurelia-framework', 'shared/services/currentService', 'shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AddSubject = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var AddSubject = exports.AddSubject = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService), _dec(_class = function () {
+    function AddSubject(current, api) {
+      _classCallCheck(this, AddSubject);
+
+      this.current = current;
+      this.api = api;
+    }
+
+    AddSubject.prototype.attached = function attached() {
+      this.reset();
+    };
+
+    AddSubject.prototype.reset = function reset() {
+      this.mode = 'add';
+      this.title = 'Add Subject';
+      this.bttn = 'Add Subject';
+      this.newSubject = {};
+    };
+
+    AddSubject.prototype.edit = function edit(subject) {
+      this.mode = 'edit';
+      this.newSubject = subject;
+
+      this.title = 'Edit Subject';
+      this.bttn = 'Save Changes';
+    };
+
+    AddSubject.prototype.delete = function _delete(subject) {
+      var _this = this;
+
+      var confirmed = confirm('Are you sure you want to delete ' + subject.name + '?');
+
+      if (confirmed) {
+        this.api.delete('subjects', subject.id).then(function (data) {
+          return _this.current.setSubjectList();
+        });
+      }
+    };
+
+    AddSubject.prototype.submit = function submit() {
+      var _this2 = this;
+
+      if (this.mode === 'edit') {
+        this.api.update('subjects', this.newSubject.id, this.newSubject).then(function (resp) {
+          return _this2.reset();
+        });
+      } else {
+        this.newSubject.year_id = this.current.year.id;
+
+        this.api.add('subjects', this.newSubject).then(function (resp) {
+          _this2.current.setSubjectList();
+          _this2.reset();
+        });
+      }
+    };
+
+    return AddSubject;
+  }()) || _class);
+});
+define('gradebook/addYear',['exports', 'aurelia-framework', 'shared/services/currentService', 'shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AddYear = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var AddYear = exports.AddYear = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService), _dec(_class = function () {
+    function AddYear(current, api) {
+      _classCallCheck(this, AddYear);
+
+      this.current = current;
+      this.api = api;
+      this.mode = 'add';
+    }
+
+    AddYear.prototype.attached = function attached() {
+      this.reset();
+      this.setYearList();
+    };
+
+    AddYear.prototype.reset = function reset() {
+      this.newYear = {};
+      this.mode = 'add';
+      this.title = 'Add Year';
+      this.bttn = 'Add Year';
+    };
+
+    AddYear.prototype.setYearList = function setYearList() {
+      var _this = this;
+
+      var query = {
+        order_by: [{ 'field': 'first_day', 'direction': 'desc' }]
+      };
+
+      this.api.find('years', query).then(function (data) {
+        return _this.years = data.objects;
+      });
+    };
+
+    AddYear.prototype.edit = function edit(year) {
+      this.newYear = year;
+      this.mode = 'edit';
+      this.title = 'Edit Year';
+      this.bttn = 'Save Changes';
+    };
+
+    AddYear.prototype.delete = function _delete(year) {
+      var _this2 = this;
+
+      var confirmed = confirm('Are you sure you want to delete ' + year.school + ' (' + year.year + ')' + '?');
+
+      if (confirmed) {
+        this.api.delete('years', year.id).then(function (data) {
+          return _this2.setYearList();
+        });
+      }
+    };
+
+    AddYear.prototype.submit = function submit() {
+      var _this3 = this;
+
+      if (this.mode === 'edit') {
+        this.api.update('years', this.newYear.id, this.newYear).then(function (resp) {
+          if (_this3.newYear.id === _this3.current.year.id) {
+            _this3.current.setYear(_this3.newYear);
+          }
+        });
+      } else {
+        this.api.add('years', this.newYear).then(function (resp) {
+          _this3.setYearList();
+          _this3.current.setYear(resp);
+        });
+      }
+
+      this.reset();
+    };
+
+    return AddYear;
+  }()) || _class);
+});
+define('admin/components/profile',['exports', 'aurelia-framework', 'shared/services/apiService', 'shared/services/currentService', 'aurelia-router'], function (exports, _aureliaFramework, _apiService, _currentService, _aureliaRouter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Profile = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Profile = exports.Profile = (_dec = (0, _aureliaFramework.inject)(_currentService.CurrentService, _apiService.ApiService, _aureliaRouter.Router), _dec(_class = function () {
+    function Profile(current, api, router) {
+      _classCallCheck(this, Profile);
+
+      this.current = current;
+      this.api = api;
+      this.router = router;
+    }
+
+    Profile.prototype.attached = function attached() {
+      this.profile = this.current.user;
+    };
+
+    Profile.prototype.submit = function submit() {
+      var _this = this;
+
+      this.api.update('users', this.current.user.id, this.profile).then(function (resp) {
+        _this.router.navigateToRoute('admin');
+      });
+    };
+
+    return Profile;
+  }()) || _class);
+});
+define('admin/components/password',['exports', 'aurelia-framework', 'shared/services/httpService'], function (exports, _aureliaFramework, _httpService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Password = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Password = exports.Password = (_dec = (0, _aureliaFramework.inject)(_httpService.HttpService), _dec(_class = function () {
+    function Password(http) {
+      _classCallCheck(this, Password);
+
+      this.http = http;
+    }
+
+    Password.prototype.activate = function activate(params) {
+      if (params.token !== undefined) {
+        this.token = params.token;
+        this.reset = true;
+      } else {
+        this.reset = false;
+      }
+    };
+
+    Password.prototype.attached = function attached() {
+      this.password = {};
+    };
+
+    Password.prototype.resetPassword = function resetPassword() {
+      var _this = this;
+
+      this.password.token = this.token;
+
+      this.http.send('auth/reset_password', this.password).then(function (resp) {
+        if (resp.error) {
+          _this.feedback = 'Error: ' + resp.error;
+        } else {
+          _this.feedback = 'Password Changed!';
+        }
+      });
+    };
+
+    Password.prototype.changePassword = function changePassword() {
+      var _this2 = this;
+
+      this.http.send('auth/change_password', this.password, true).then(function (resp) {
+        return _this2.feedback = resp.message;
+      });
+    };
+
+    return Password;
+  }()) || _class);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"shared/components/navbar\"></require>\n\n  <!-- Navigation -->\n  <nav-bar></nav-bar>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
 define('text!admin/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/addYear\"></require>\n  <require from=\"./components/addStudent\"></require>\n  <require from=\"./components/addSubject\"></require>\n\n  <div class=\"col-md-2\">\n    <h4>Add</h4>\n    <ul class=\"nav nav-pills nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"category of addCats\"\n          class=\"${ category === categorySelected ? 'active' : ''}\">\n        <a href click.delegate=\"setCategory(category)\">${ category }</a>\n      </li>\n    </ul>\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <add-year if.bind=\"categorySelected === 'Years'\"></add-year>\n      <add-student if.bind=\"categorySelected === 'Students'\"></add-student>\n      <add-subject if.bind=\"categorySelected === 'Subjects'\"></add-subject>\n    </div>\n  </div>\n</template>\n"; });
@@ -2096,6 +2469,12 @@ define('text!gradebook/lib/autocomplete.html', ['module'], function(module) { mo
 define('text!home/signup/payment.html', ['module'], function(module) { module.exports = "<template>\n  <h1>Enter Payment Information</h1>\n  <a href=\"/#/profile\" class=\"btn\">Setup Profile</a>\n<template>\n"; });
 define('text!home/signup/profile.html', ['module'], function(module) { module.exports = "<template>\n  <h2>Setup Profile</h2>\n  <form submit.delegate=\"submit()\">\n    <div class=\"form-inline\">\n      <select class=\"form-control\" value.bind=\"profile.salutation\">\n        <option value=\"\">Select</option>\n        <option value=\"Ms.\">Ms.</option>\n        <option value=\"Mrs.\">Mrs.</option>\n        <option value=\"Mr.\">Mr.</option>\n        <option value=\"Dr.\">Dr.</option>\n      </select>\n      <div class=\"form-group\">\n        <label class=\"sr-only\" for=\"firstname\">First Name</label>\n        <input type=\"text\" class=\"form-control\" id=\"firstname\" placeholder=\"First Name\"\n               value.bind=\"profile.first_name\">\n      </div>\n      <div class=\"form-group\">\n        <label class=\"sr-only\" for=\"lastname\">Password</label>\n        <input type=\"text\" class=\"form-control\" id=\"lastname\" placeholder=\"Last Name\"\n               value.bind=\"profile.last_name\">\n      </div>\n    </div>\n    <button type=\"submit\" class=\"btn btn-default\">Save and Continue</button>\n  </form>\n</template>\n"; });
 define('text!reports/components/studentReport.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/scoreFilter\"></require>\n  <require from=\"../attributes/timePlot\"></require>\n  <require from=\"shared/converters/dateFormat\"></require>\n  <require from=\"shared/converters/scoreFormat\"></require>\n\n  <style> /* set the CSS */\n.line {\n  fill: none;\n  stroke: steelblue;\n  stroke-width: 2px;\n}\n</style>\n\n  <!-- Selection Menu -->\n  <div class=\"row\">\n    <form class=\"form-inline\" submit.delegate=\"generate()\">\n      <div class=\"form-group\">\n        <label>Select Student:</label>\n        <select class=\"form-control\" value.bind=\"selected.student\" placeholder=\"Select Student\">\n          <option repeat.for=\"student of students\" model.bind=\"student\">\n            ${ student.first_name } ${ student.last_name }\n          </option>\n        </select>\n      </div>\n      <div class=\"form-group\">\n        <label>Start Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.start\">\n      </div>\n\n      <div class=\"form-group\">\n        <label>End Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.end\">\n      </div>\n\n      <button type=\"submit\" class=\"btn btn-default\">Generate Report</button>\n      <ul>\n    </form>\n  </div>\n\n  <!-- Report Header -->\n  <div if.bind=\"reportGenerated\">\n  <div class=\"row\">\n    <h1>${ selected.student.first_name & oneTime} ${ selected.student.last_name & oneTime}</h1>\n  </div>\n\n  <!-- Subject Rows -->\n  <div class=\"row\" repeat.for=\"subject of current.subjectList\">\n    <div class=\"col-md-4\">\n      <h2>${ subject.name & oneTime}</h2>\n      <table class=\"table\">\n        <div if.bind=\"$first\">\n          <thead>\n            <th></th>\n            <th>Date</th>\n            <th>Max Score</th>\n            <th>Score</th>\n          </thead>\n        </div>\n        <tbody>\n          <tr repeat.for=\"score of scores | scoreFilter: subject.id\">\n            <td>${ score.assref.name & oneTime}</td>\n            <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>\n            <td>${ score.assref.max & oneTime}</td>\n            <td innerhtml.bind=\"score.value | scoreFormat: score.assignment & oneTime\"></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <!-- Plots -->\n    <div class=\"col-md-6\">\n      <div class=\"col-md-6\">\n        <h2>Points</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'\"></div>\n      </div>\n      <div class=\"col-md-6\">\n        <h2>Checks</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'\"></div>\n      </div>\n    </div>\n  </div>\n</div>\n</template>\n"; });
-define('text!shared/components/navbar.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"shared/converters/dateFormat\"></require>\n\n  <style>\n  #login-dp{\n    min-width: 250px;\n    padding: 14px 14px 0;\n    overflow:hidden;\n    background-color:rgba(255,255,255,.8);\n  }\n  #login-dp .help-block{\n    font-size:12px\n  }\n  #login-dp .bottom{\n    background-color:rgba(255,255,255,.8);\n    border-top:1px solid #ddd;\n    clear:both;\n    padding:14px;\n  }\n  #login-dp .social-buttons{\n    margin:12px 0\n  }\n  #login-dp .social-buttons a{\n    width: 49%;\n  }\n  #login-dp .form-group {\n    margin-bottom: 10px;\n  }\n  .btn-fb{\n    color: #fff;\n    background-color:#3b5998;\n  }\n  .btn-fb:hover{\n    color: #fff;\n    background-color:#496ebc\n  }\n  .btn-tw{\n    color: #fff;\n    background-color:#55acee;\n  }\n  .btn-tw:hover{\n    color: #fff;\n    background-color:#59b5fa;\n  }\n  @media(max-width:768px){\n    #login-dp{\n        background-color: inherit;\n        color: #fff;\n    }\n    #login-dp .bottom{\n        background-color: inherit;\n        border-top:0 none;\n    }\n  }\n  </style>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"/\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation | authFilter: auth.isAuthenticated()\" class=\"${row.isActive ? 'active' : ''}\">\n            <a href.bind=\"row.href\">${row.title}</a>\n          </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li class=\"dropdown\" if.bind=\"auth.isAuthenticated()\">\n            <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              ${ current.user.salutation} ${current.user.last_name}<span if.bind=\"current.year\"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' })</span><span class=\"caret\"></span>\n            </a>\n              <ul class=\"dropdown-menu\">\n                <li><a route-href=\"route: addsubject\">Add Subject</a></li>\n                <li><a route-href=\"route: addstudent\">Add Student</a></li>\n                <li><a route-href=\"route: addyear\">Add Year</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a href=\"#\">Settings</a></li>\n                <li><a href=\"#/profile\">Edit Profile</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a href=\"\" click.delegate=\"logout()\">Logout</a></li>\n              </ul>\n          </li>\n          <li class=\"dropdown\" if.bind=\"!auth.isAuthenticated()\">\n            <a href=\"#\" click.delegate=\"showReset = flase\"class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              Login<span class=\"caret\"></span>\n            </a>\n            <ul id=\"login-dp\" class=\"dropdown-menu\">\n              <li>\n                 <div class=\"row\">\n                    <div class=\"col-md-12\">\n                      <!-- <div class=\"social-buttons\">\n                        <a href=\"#\" class=\"btn btn-fb\"><i class=\"fa fa-facebook\"></i> Facebook</a>\n                        <a href=\"#\" class=\"btn btn-tw\"><i class=\"fa fa-twitter\"></i> Twitter</a>\n                      </div> -->\n                       <form if.bind=\"!showReset\" submit.delegate=\"login()\" class=\"form\" role=\"form\" id=\"login-nav\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"loginData.email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                            <label class=\"sr-only\" for=\"exampleInputPassword2\">Password</label>\n                            <input value.bind=\"loginData.password\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword2\" placeholder=\"Password\" required>\n                            <div class=\"help-block text-right\"><a href=\"#\" click.delegate=\"toggleReset()\">Forget your password?</a></div>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Sign in</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                       <form if.bind=\"showReset\" submit.delegate=\"sendReset()\" class=\"form\" role=\"form\" id=\"login-nav\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"loginData.email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Send Reset E-mail</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                    </div>\n                    <!-- <div class=\"bottom text-center\">\n                      New here ? <a href=\"#\"><b>Join Us</b></a>\n                    </div> -->\n                 </div>\n              </li>\n            </ul>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n</template>\n"; });
-define('text!home/user/password.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Reset Form -->\n  <div if.bind=\"reset\">\n    <h1>Reset Password</h1>\n    <form class=\"form-horizontal\" submit.delegate=\"resetPassword()\">\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Change Password Form -->\n  <div if.bind=\"!reset\">\n    <h1>Change Password</h1>\n    <form class=\"form-horizontal\" submit.delegate=\"changePassword()\">\n\n      <!-- Current Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Current Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.current\" required>\n        </div>\n      </div>\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
+define('text!shared/components/navbar.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"shared/converters/dateFormat\"></require>\n\n  <style>\n  #login-dp{\n    min-width: 250px;\n    padding: 14px 14px 0;\n    overflow:hidden;\n    background-color:rgba(255,255,255,.8);\n  }\n  #login-dp .help-block{\n    font-size:12px\n  }\n  #login-dp .bottom{\n    background-color:rgba(255,255,255,.8);\n    border-top:1px solid #ddd;\n    clear:both;\n    padding:14px;\n  }\n  #login-dp .social-buttons{\n    margin:12px 0\n  }\n  #login-dp .social-buttons a{\n    width: 49%;\n  }\n  #login-dp .form-group {\n    margin-bottom: 10px;\n  }\n  .btn-fb{\n    color: #fff;\n    background-color:#3b5998;\n  }\n  .btn-fb:hover{\n    color: #fff;\n    background-color:#496ebc\n  }\n  .btn-tw{\n    color: #fff;\n    background-color:#55acee;\n  }\n  .btn-tw:hover{\n    color: #fff;\n    background-color:#59b5fa;\n  }\n  @media(max-width:768px){\n    #login-dp{\n        background-color: inherit;\n        color: #fff;\n    }\n    #login-dp .bottom{\n        background-color: inherit;\n        border-top:0 none;\n    }\n  }\n  </style>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"#\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation | authFilter: auth.isAuthenticated()\" class=\"${row.isActive ? 'active' : ''}\">\n            <a href.bind=\"row.href\">${row.title}</a>\n          </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li class=\"dropdown\" if.bind=\"auth.isAuthenticated()\">\n            <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              ${ current.user.salutation} ${current.user.last_name}<span if.bind=\"current.year\"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' })</span><span class=\"caret\"></span>\n            </a>\n              <ul class=\"dropdown-menu\">\n                <li><a route-href=\"route: addsubject\">Add Subject</a></li>\n                <li><a route-href=\"route: addstudent\">Add Student</a></li>\n                <li><a route-href=\"route: addyear\">Add Year</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a route-href=\"route: settings\">Settings</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a href=\"\" click.delegate=\"logout()\">Logout</a></li>\n              </ul>\n          </li>\n          <li class=\"dropdown\" if.bind=\"!auth.isAuthenticated()\">\n            <a href=\"#\" click.delegate=\"showReset = flase\"class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              Login<span class=\"caret\"></span>\n            </a>\n            <ul id=\"login-dp\" class=\"dropdown-menu\">\n              <li>\n                 <div class=\"row\">\n                    <div class=\"col-md-12\">\n                      <!-- <div class=\"social-buttons\">\n                        <a href=\"#\" class=\"btn btn-fb\"><i class=\"fa fa-facebook\"></i> Facebook</a>\n                        <a href=\"#\" class=\"btn btn-tw\"><i class=\"fa fa-twitter\"></i> Twitter</a>\n                      </div> -->\n                       <form if.bind=\"!showReset\" submit.delegate=\"login()\" class=\"form\" role=\"form\" id=\"login-nav\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"loginData.email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                            <label class=\"sr-only\" for=\"exampleInputPassword2\">Password</label>\n                            <input value.bind=\"loginData.password\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword2\" placeholder=\"Password\" required>\n                            <div class=\"help-block text-right\"><a href=\"#\" click.delegate=\"toggleReset()\">Forget your password?</a></div>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Sign in</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                       <form if.bind=\"showReset\" submit.delegate=\"sendReset()\" class=\"form\" role=\"form\" id=\"login-nav\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"loginData.email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Send Reset E-mail</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                    </div>\n                    <!-- <div class=\"bottom text-center\">\n                      New here ? <a href=\"#\"><b>Join Us</b></a>\n                    </div> -->\n                 </div>\n              </li>\n            </ul>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n</template>\n"; });
+define('text!home/user/password.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Reset Form -->\n  <div if.bind=\"reset\">\n    <h2>Reset Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"resetPassword()\">\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Change Password Form -->\n  <div if.bind=\"!reset\">\n    <h2>Change Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"changePassword()\">\n\n      <!-- Current Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Current Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.current\" required>\n        </div>\n      </div>\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
+define('text!admin/settings.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"admin/components/profile\"></require>\n  <require from=\"admin/components/password\"></require>\n\n  <div class=\"col-md-7 col-md-offset-3\">\n    <h1>Settings</h1>\n    <hr>\n    <profile></profile>\n    <hr>\n    <password></password>\n  </div>\n</template>\n"; });
+define('text!gradebook/addStudent.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.first_name\" required>\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newStudent.last_name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name\n          <small>(Total: ${ students.length })</small>\n        </th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"student of students\">\n        <td>${ student.first_name } ${ student.last_name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ newStudent.id === student.id ? 'active' : '' }\"\n                    click.delegate=\"edit(student)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(student)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!gradebook/addSubject.html', ['module'], function(module) { module.exports = "<template>\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form submit.delegate=\"submit()\" class=\"form-horizontal\">\n\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Subject Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\" value.bind=\"newSubject.name\">\n        </div>\n      </div>\n\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n        </div>\n      </div>\n\n    </form>\n  </div>\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Name</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"subject of current.subjectList\">\n        <td>${ subject.name }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ subject.id === newSubject.id ? 'active' : ''}\" click.delegate=\"edit(subject)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\" click.delegate=\"delete(subject)\">\n              <i class=\"fa fa-eraser\"></i> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!gradebook/addYear.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"shared/converters/dateFormat\"></require>\n\n  <div class=\"col-md-6\">\n    <h4>${ title }</h4>\n    <form class=\"form-horizontal\" submit.delegate=\"submit()\">\n\n      <!-- Name Form -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">School Name:</label>\n        <div class=\"col-md-6\">\n          <input type=\"text\" class=\"form-control\"\n                 value.bind=\"newYear.school\" required>\n        </div>\n      </div>\n\n      <!-- Start Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">First day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.first_day\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- End Date -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Last day of School:</label>\n        <div class=\"col-md-6\">\n          <input type=\"date\" value.bind=\"newYear.last_day\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            ${ bttn }\n          </button>\n          <button click.delegate=\"reset()\" class=\"btn btn-danger\">\n            Cancel\n          </button>\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Added Years -->\n  <div class=\"col-md-6\">\n    <h4>Saved</h4>\n    <table class=\"table table-hover\">\n      <thead>\n      <tr>\n        <th>Year</th>\n        <th>School</th>\n        <th></th>\n      </tr>\n      </thead>\n      <tr repeat.for=\"year of years\">\n        <td>${ year.year | dateFormat: 'YYYY' }</td>\n        <td>${ year.school }</td>\n        <td>\n          <div class=\"btn-group btn-group-xs\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default ${ year.id === current.year.id ? 'active' : ''}\"\n                    click.delegate=\"current.setYear(year)\">\n              <i class=\"fa fa-bolt\"></i> Activate\n            </button>\n            <button type=\"button\" class=\"btn btn-default ${ year.id === newYear.id ? 'active' : ''}\"\n                    click.delegate=\"edit(year)\">\n              <i class=\"fa fa-pencil\"></i> Edit\n            </button>\n            <button type=\"button\" class=\"btn btn-default\"\n                    click.delegate=\"delete(year)\">\n              <i class=\"fa fa-eraser\"></i> </span> Delete\n            </button>\n          </div>\n        </td>\n      </tr>\n    </table>\n  </div>\n</template>\n"; });
+define('text!admin/components/profile.html', ['module'], function(module) { module.exports = "<template>\n  <h2>Setup Profile</h2>\n  <form submit.delegate=\"submit()\">\n    <div class=\"form-inline\">\n      <select class=\"form-control\" value.bind=\"profile.salutation\">\n        <option value=\"\">Select</option>\n        <option value=\"Ms.\">Ms.</option>\n        <option value=\"Mrs.\">Mrs.</option>\n        <option value=\"Mr.\">Mr.</option>\n        <option value=\"Dr.\">Dr.</option>\n      </select>\n      <div class=\"form-group\">\n        <label class=\"sr-only\" for=\"firstname\">First Name</label>\n        <input type=\"text\" class=\"form-control\" id=\"firstname\" placeholder=\"First Name\"\n               value.bind=\"profile.first_name\">\n      </div>\n      <div class=\"form-group\">\n        <label class=\"sr-only\" for=\"lastname\">Password</label>\n        <input type=\"text\" class=\"form-control\" id=\"lastname\" placeholder=\"Last Name\"\n               value.bind=\"profile.last_name\">\n      </div>\n    </div>\n    <button type=\"submit\" class=\"btn btn-default\">Save and Continue</button>\n  </form>\n</template>\n"; });
+define('text!admin/components/password.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Reset Form -->\n  <div if.bind=\"reset\">\n    <h2>Reset Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"resetPassword()\">\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Change Password Form -->\n  <div if.bind=\"!reset\">\n    <h2>Change Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"changePassword()\">\n\n      <!-- Current Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Current Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.current\" required>\n        </div>\n      </div>\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

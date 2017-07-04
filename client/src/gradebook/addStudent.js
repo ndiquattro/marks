@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
-import {CurrentService} from '../../shared/services/currentService';
-import {ApiService} from '../../shared/services/apiService';
+import {CurrentService} from 'shared/services/currentService';
+import {ApiService} from 'shared/services/apiService';
 
 @inject(CurrentService, ApiService)
 export class AddStudent {
