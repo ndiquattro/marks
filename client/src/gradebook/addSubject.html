@@ -1,12 +1,12 @@
 <template>
   <div class="col-md-6">
-    <h4>${ title }</h4>
-    <form submit.delegate="submit()" class="form-horizontal">
+    <h3>${ title }</h3>
+    <form submit.delegate="submit()" class="form-horizontal" validation-renderer="bootstrap-form">
 
       <div class="form-group">
         <label class="col-md-4 control-label">Subject Name:</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" value.bind="newSubject.name">
+          <input type="text" class="form-control" focus.bind="formStart" value.bind="newSubject.name & validate">
         </div>
       </div>
 
@@ -15,13 +15,16 @@
           <button type="submit" class="btn btn-primary">
             ${ bttn }
           </button>
+          <button click.delegate="reset()" class="btn btn-danger">
+            Cancel
+          </button>
         </div>
       </div>
 
     </form>
   </div>
   <div class="col-md-6">
-    <h4>Saved</h4>
+    <h3>Saved</h3>
     <table class="table table-hover">
       <thead>
       <tr>
@@ -30,7 +33,7 @@
       </tr>
       </thead>
       <tr repeat.for="subject of current.subjectList">
-        <td>${ subject.name }</td>
+        <td>${ subject.name & oneTime}</td>
         <td>
           <div class="btn-group btn-group-xs" role="group">
             <button type="button" class="btn btn-default ${ subject.id === newSubject.id ? 'active' : ''}" click.delegate="edit(subject)">

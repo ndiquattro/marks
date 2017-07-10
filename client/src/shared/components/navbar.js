@@ -1,16 +1,22 @@
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
+import {ValidationControllerFactory} from 'aurelia-validation';
+import {AuthService} from 'aurelia-auth';
 import {CurrentService} from 'shared/services/currentService';
 import {HttpService} from 'shared/services/httpService';
-import {AuthService} from 'aurelia-auth';
+import {User} from 'shared/models/user';
 
-@inject(CurrentService, AuthService, Router, HttpService)
+@inject(CurrentService, AuthService, Router, HttpService,
+        ValidationControllerFactory)
 export class NavBar {
-  constructor(current, auth, router, http) {
+  user = new User();
+
+  constructor(current, auth, router, http, controllerFactory) {
     this.current = current;
     this.auth = auth;
     this.router = router;
     this.http = http;
+    this.controller = controllerFactory.createForCurrentScope();
   }
 
   attached() {
@@ -18,7 +24,7 @@ export class NavBar {
   }
 
   login() {
-    this.auth.login(this.loginData).then(resp => location.reload());
+    this.auth.login(this.user).then(resp => location.reload());
   }
 
   logout() {

@@ -1,14 +1,14 @@
 import {inject} from 'aurelia-framework';
+import {ValidationControllerFactory} from 'aurelia-validation';
 import {ApiService} from 'shared/services/apiService';
 import {CurrentService} from 'shared/services/currentService';
-import {Router} from 'aurelia-router';
 
-@inject(CurrentService, ApiService, Router)
+@inject(CurrentService, ApiService, ValidationControllerFactory)
 export class Profile {
-  constructor(current, api, router) {
+  constructor(current, api, controllerFactory) {
     this.current = current;
     this.api = api;
-    this.router = router;
+    this.controller = controllerFactory.createForCurrentScope();
   }
 
   attached() {
@@ -16,10 +16,15 @@ export class Profile {
   }
 
   submit() {
-    this.api.update('users', this.current.user.id, this.profile)
-            .then(resp => {
-              // this.current.setUser(resp);
-              this.router.navigateToRoute('admin');
-            });
+    this.controller.validate().then(result => {
+      if (!result.valid) {
+        return;
+      }
+      this.isSaving = true;
+      this.api.save(this.profile).then(data => {
+        this.isSaving = false;
+        this.saved = true;
+      });
+    });
   }
 }

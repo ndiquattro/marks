@@ -1,0 +1,42 @@
+<template>
+  <require from="gradebook/addYear"></require>
+  <require from="gradebook/addStudent"></require>
+  <require from="gradebook/addSubject"></require>
+  <require from="admin/components/profile"></require>
+
+  <div class="col-md-2">
+    <h3>Setup</h3>
+    <ul class="nav nav-stacked">
+      <li role="presentation"
+          repeat.for="step of completed">
+        <a class="text-success"><i class="fa fa-check-circle-o text-success" aria-hidden="true"></i> ${ step }</a>
+      </li>
+      <li role="presentation"
+          repeat.for="step of todo"
+          class="${ step === activeStep ? 'active' : 'disabled'}">
+        <a href click.delegate="nextStep(step)"><i class="fa fa-circle-o" aria-hidden="true"></i> ${ step }</a>
+      </li>
+    </ul>
+
+  </div>
+
+  <div class="col-md-10">
+    <div class="row">
+      <div if.bind="activeStep === 'Introduction'">
+        <h3>Checklist</h3>
+        <p class="col-md-6">
+          Welcome to Marks! This guided setup will get you up and running fast.
+          After entering all the information for each step mark it done by click on the circle to the left!
+          You're done with the introduction so go ahead and "marks" it done!
+        </p>
+      </div>
+      <profile if.bind="activeStep === 'Profile'"></profile>
+      <add-year if.bind="activeStep === 'Years'"></add-year>
+      <add-student if.bind="activeStep === 'Students'"></add-student>
+      <add-subject if.bind="activeStep === 'Subjects'"></add-subject>
+      <div if.bind="todo.length === 0">
+        <h3>All done! Sending you to your gradebook!</h3>
+      </div>
+    </div>
+  </div>
+</template>

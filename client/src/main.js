@@ -4,6 +4,7 @@ import config from './authConfig';
 export function configure(aurelia) {
   aurelia.use
     .standardConfiguration()
+    .feature('validation')
     .plugin('aurelia-auth', (baseConfig)=>{
       baseConfig.configure(config);
     });

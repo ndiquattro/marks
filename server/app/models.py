@@ -8,12 +8,12 @@ roles_users = db.Table('roles_users',
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    salutation = db.Column(db.String(4))
+    title = db.Column(db.String(4))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     subscribed = db.Column(db.Boolean)
     email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+    password = db.Column(db.String(50))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     active_year = db.Column(db.Integer())

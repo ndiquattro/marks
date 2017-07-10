@@ -1,29 +1,38 @@
 import {inject} from 'aurelia-framework';
+import {ValidationControllerFactory} from 'aurelia-validation';
 import {CurrentService} from 'shared/services/currentService';
 import {ApiService} from 'shared/services/apiService';
+import {Subject} from 'gradebook/models/subject';
 
-@inject(CurrentService, ApiService)
+@inject(CurrentService, ApiService, ValidationControllerFactory)
 export class AddSubject {
-  constructor(current, api) {
+  newSubject = new Subject();
+
+  constructor(current, api, controllerFactory) {
     this.current = current;
     this.api = api;
+    this.controller = controllerFactory.createForCurrentScope();
   }
 
-  attached() {
-    this.reset();
+  created() {
+    this.title = 'Add Subject';
+    this.bttn = 'Add Subject';
+    this.current.setSubjectList();
+    this.formStart = true;
   }
 
   reset() {
-    this.mode = 'add';
     this.title = 'Add Subject';
     this.bttn = 'Add Subject';
-    this.newSubject = {};
+    this.formStart = true;
+    this.newSubject = new Subject();
+    this.controller.reset();
   }
 
   edit(subject) {
-    this.mode = 'edit';
+    this.controller.reset();
     this.newSubject = subject;
-
+    this.formStart = true;
     this.title = 'Edit Subject';
     this.bttn = 'Save Changes';
   }
@@ -32,24 +41,24 @@ export class AddSubject {
     let confirmed = confirm('Are you sure you want to delete ' + subject.name  + '?');
 
     if (confirmed) {
-      this.api.delete('subjects', subject.id)
-              .then(data => this.current.setSubjectList());
+      this.api.delete(subject).then(data => this.current.setSubjectList());
     }
   }
 
   submit() {
-    if (this.mode === 'edit') {
-      this.api.update('subjects', this.newSubject.id, this.newSubject)
-              .then(resp => this.reset());
-    } else {
-      // Add Current year
-      this.newSubject.year_id = this.current.year.id;
+    this.controller.validate().then(result => {
+      if (!result.valid) {
+        return;
+      }
 
-      this.api.add('subjects', this.newSubject)
-              .then(resp => {
-                this.current.setSubjectList();
-                this.reset();
-              });
-    }
+      if (!this.newSubject.year_id) {
+        this.newSubject.year_id = this.current.year.id;
+      }
+
+      this.api.save(this.newSubject).then(data => {
+        this.current.setSubjectList();
+        this.reset();
+      });
+    });
   }
 }

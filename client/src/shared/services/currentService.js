@@ -21,8 +21,8 @@ export class CurrentService {
     this.api.findOne('users', userId)
             .then(data => {
               this.user = data;
-              if (data.active_year) {
-                this.reviveYear(data.active_year);
+              if (this.user.active_year) {
+                this.reviveYear(this.user.active_year);
               }
             });
   }
@@ -89,7 +89,8 @@ export class CurrentService {
     this.year = year;
 
     // Save year in database
-    this.api.update('users', this.user.id, {'active_year': year.id});
+    this.user.active_year = year.id;
+    this.api.save(this.user);
 
     // Clear Data of old year
     this.clearAssignment();

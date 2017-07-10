@@ -19,6 +19,7 @@ export class App {
 
       // Signup Routes
       { route: 'payment', moduleId: './home/signup/payment', title: 'Setup Payment', name: 'payment', auth: true },
+      { route: 'first_time', moduleId: './home/signup/firstTime', title: 'Gradebook Setup', name: 'firsttime', auth: true },
 
       // Add Routes
       { route: 'gradebook/addsubject',  moduleId: './gradebook/addSubject', title: 'Add Subject', name: 'addsubject', auth: true},

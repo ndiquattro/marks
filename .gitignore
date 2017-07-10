@@ -1,5 +1,5 @@
 # Custom Ignores
-/instance
+server/instance/
 /.idea
 server/*.db
 # Byte-compiled / optimized / DLL files

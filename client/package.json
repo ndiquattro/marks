@@ -12,6 +12,7 @@
     "aurelia-auth": "^3.0.5",
     "aurelia-bootstrapper": "^2.1.0",
     "aurelia-http-client": "^1.1.1",
+    "aurelia-validation": "^1.1.1",
     "bluebird": "^3.4.1",
     "bootstrap": "^3.3.7",
     "d3": "^4.9.1",

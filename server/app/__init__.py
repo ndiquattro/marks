@@ -54,7 +54,6 @@ def dummy_scores(result):
     req_year = result['subject']['year_id']
     req_user = result['user_id']
     sinfo = models.Students.query.filter_by(year_id=req_year, user_id=req_user).all()
-    print(sinfo)
 
     # Loop through and add dummy scores
     for i, student in enumerate(sinfo):
@@ -84,9 +83,9 @@ uni_preprocs = dict(POST=[add_pre], GET=[auth_func], DELETE=[auth_func],
 manager = APIManager(app, flask_sqlalchemy_db=db, preprocessors=uni_preprocs)
 httpmeths = ['GET', 'POST', 'DELETE', 'PUT']
 
-manager.create_api(models.Users, methods=httpmeths, exclude_columns=['password'])
+manager.create_api(models.Users, methods=httpmeths, exclude_columns=['password', 'years', 'scores', 'students', 'subjects', 'assigments'])
 manager.create_api(models.Years, methods=httpmeths)
-manager.create_api(models.Students, methods=httpmeths)
+manager.create_api(models.Students, methods=httpmeths, results_per_page=-1)
 manager.create_api(models.Subjects, methods=httpmeths, include_columns=['id', 'name'])
 manager.create_api(models.Assignments, methods=httpmeths, postprocessors={'POST': [dummy_scores]})
 manager.create_api(models.Scores, methods=httpmeths)

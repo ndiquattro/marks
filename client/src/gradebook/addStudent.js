@@ -1,27 +1,34 @@
 import {inject} from 'aurelia-framework';
+import {ValidationControllerFactory} from 'aurelia-validation';
 import {CurrentService} from 'shared/services/currentService';
 import {ApiService} from 'shared/services/apiService';
+import {Student} from 'gradebook/models/student';
 
-@inject(CurrentService, ApiService)
+@inject(CurrentService, ApiService, ValidationControllerFactory)
 export class AddStudent {
-  constructor(current, api) {
+  newStudent = new Student();
+
+  constructor(current, api, controllerFactory) {
     this.current = current;
     this.api = api;
+    this.controller = controllerFactory.createForCurrentScope();
   }
 
-  attached() {
-    this.reset();
+  created() {
+    this.title = 'Add Student';
+    this.bttn = 'Add Student';
     this.students = [];
 
     // Get students
     this.setStudentList();
+    this.formStart = true;
   }
 
   reset() {
-    this.mode = 'add';
+    this.controller.reset();
+    this.newStudent = new Student();
     this.title = 'Add Student';
     this.bttn = 'Add Student';
-    this.newStudent = {};
   }
 
   setStudentList() {
@@ -31,36 +38,46 @@ export class AddStudent {
     };
 
     this.api.find('students', query)
-            .then(data => this.students = data.objects);
+            .then(data => this.students = data);
   }
 
   edit(student) {
     this.newStudent = student;
-    this.mode = 'edit';
-
+    this.controller.reset();
     this.title = 'Edit Student';
     this.bttn = 'Save Changes';
   }
 
   delete(student) {
-    let confirmed = confirm('Are you sure you want to delete ' + student.first_name + ' ' + student.last_name + '?');
+    let confirmed = confirm('Are you sure you want to delete ' + student.fullName + '?');
 
     if (confirmed) {
-      this.api.delete('students', student.id)
+      this.api.delete(student)
               .then(data => this.setStudentList());
     }
   }
 
   submit() {
-    if (this.mode === 'edit') {
-      this.api.update('students', this.newStudent.id, this.newStudent)
-              .then(resp => this.reset());
-    } else {
-      // Add Current year
-      this.newStudent.year_id = this.current.year.id;
+    this.controller.validate().then(result => {
+      if (!result.valid) {
+        return;
+      }
 
-      this.api.add('students', this.newStudent)
-              .then(resp => this.attached());
-    }
+      // Reset Focus
+      this.formStart = true;
+
+      // Add year_id if missing
+      if (!this.newStudent.year_id) {
+        this.newStudent.year_id = this.current.year.id;
+      }
+
+      // Save Changes
+      this.api.save(this.newStudent).then(resp => {
+        // Refresh Student list
+        this.setStudentList();
+        // Reset Form
+        this.reset();
+      });
+    });
   }
 }

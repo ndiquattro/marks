@@ -39,6 +39,7 @@ def signup():
 def login():
     # Get payload
     content = request.get_json()
+    print(content)
 
     # Find user
     user = user_datastore.find_user(email=content['email'])
@@ -48,7 +49,7 @@ def login():
         return jsonify(make_token(user)), 200
 
     # Default return
-    return 400
+    return "400"
 
 @auth.route('/forgot_password', methods=['POST'])
 def forgot_password():

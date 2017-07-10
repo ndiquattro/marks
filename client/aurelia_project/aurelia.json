@@ -149,6 +149,11 @@
             "env": "dev"
           },
           {
+            "name": "aurelia-validation",
+            "path": "../node_modules/aurelia-validation/dist/amd",
+            "main": "aurelia-validation"
+          },
+          {
             "name": "d3",
             "path": "../node_modules/d3/build",
             "main": "d3.min"

@@ -10,14 +10,13 @@
   </div>
   <div class="col-md-6">
     <h2>Sign up</h2>
-    <form class="form-horizontal" submit.delegate="submitSignUp()">
+    <form class="form-horizontal" submit.delegate="submitSignUp()" validation-renderer="bootstrap-form">
 
       <!-- E-mail -->
       <div class="form-group">
         <label class="col-md-4 control-label">E-mail:</label>
         <div class="col-md-6">
-          <input type="email" class="form-control"
-                 value.bind="newUser.email" required>
+          <input type="email" class="form-control" value.bind="newUser.email & validate">
         </div>
       </div>
 
@@ -25,8 +24,7 @@
       <div class="form-group">
         <label class="col-md-4 control-label">Password</label>
         <div class="col-md-6">
-          <input type="password" value.bind="newUser.password" class="form-control"
-                 required>
+          <input type="password" value.bind="newUser.password & validate" class="form-control">
         </div>
       </div>
 

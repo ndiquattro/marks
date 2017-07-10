@@ -2,15 +2,14 @@
   <require from="shared/converters/dateFormat"></require>
 
   <div class="col-md-6">
-    <h4>${ title }</h4>
-    <form class="form-horizontal" submit.delegate="submit()">
+    <h3>${ title }</h3>
+    <form class="form-horizontal" submit.delegate="submit()" validation-renderer="bootstrap-form">
 
       <!-- Name Form -->
       <div class="form-group">
         <label class="col-md-4 control-label">School Name:</label>
         <div class="col-md-6">
-          <input type="text" class="form-control"
-                 value.bind="newYear.school" required>
+          <input type="text" class="form-control" value.bind="newYear.school & validate" focus.bind="formStart">
         </div>
       </div>
 
@@ -18,8 +17,7 @@
       <div class="form-group">
         <label class="col-md-4 control-label">First day of School:</label>
         <div class="col-md-6">
-          <input type="date" value.bind="newYear.first_day" class="form-control"
-                 required>
+          <input type="date" value.bind="newYear.first_day & validate" class="form-control">
         </div>
       </div>
 
@@ -27,8 +25,7 @@
       <div class="form-group">
         <label class="col-md-4 control-label">Last day of School:</label>
         <div class="col-md-6">
-          <input type="date" value.bind="newYear.last_day" class="form-control"
-                 required>
+          <input type="date" value.bind="newYear.last_day & validate" class="form-control">
         </div>
       </div>
 
@@ -48,7 +45,7 @@
 
   <!-- Added Years -->
   <div class="col-md-6">
-    <h4>Saved</h4>
+    <h3>Saved</h3>
     <table class="table table-hover">
       <thead>
       <tr>
@@ -57,9 +54,9 @@
         <th></th>
       </tr>
       </thead>
-      <tr repeat.for="year of years">
-        <td>${ year.year | dateFormat: 'YYYY' }</td>
-        <td>${ year.school }</td>
+      <tr repeat.for="year of years.objects">
+        <td>${ year.first_day | dateFormat: 'YYYY' & oneTime}</td>
+        <td>${ year.school & oneTime }</td>
         <td>
           <div class="btn-group btn-group-xs" role="group">
             <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
@@ -72,7 +69,7 @@
             </button>
             <button type="button" class="btn btn-default"
                     click.delegate="delete(year)">
-              <i class="fa fa-eraser"></i> </span> Delete
+              <i class="fa fa-eraser"></i> Delete
             </button>
           </div>
         </td>
