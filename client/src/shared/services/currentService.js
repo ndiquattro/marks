@@ -59,7 +59,6 @@ export class CurrentService {
 
   setAssignment(assignment) {
     this.assignment = assignment;
-    this.isPoints = assignment.type === 'Points';
     this.setScores(assignment.id);
   }
 

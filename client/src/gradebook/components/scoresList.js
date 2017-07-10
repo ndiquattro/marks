@@ -1,22 +1,24 @@
 import {inject} from 'aurelia-framework';
+import {ValidationControllerFactory} from 'aurelia-validation';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {CurrentService} from '../../shared/services/currentService';
 import {ApiService} from '../../shared/services/apiService';
 
-@inject(ApiService, CurrentService, EventAggregator)
+@inject(ApiService, CurrentService, EventAggregator, ValidationControllerFactory)
 export class ScoresList {
-  constructor(api, current, eventaggregator) {
+  constructor(api, current, eventaggregator, controllerFactory) {
     // Initalize http client
     this.api = api;
     this.ea = eventaggregator;
     this.current = current;
+    this.controller = controllerFactory.createForCurrentScope();
 
     // Initalize variables
     this.editScoreId = null;
   }
 
   editScore(score) {
-    if (this.current.isPoints) {
+    if (this.current.assignment.isPoints) {
       this.editScoreId = score.id;
       this.editFocus = true;
     } else {
@@ -34,13 +36,18 @@ export class ScoresList {
   }
 
   updateScore(score) {
-    // Update Scores
-    this.api.update('scores', score.id, {'value': score.value});
+    this.controller.validate().then(result => {
+      if (!result.valid) {
+        return;
+      }
 
-    // Update Current Scores
-    this.ea.publish('scoreUpdate');
-
-    // Reset edit
-    this.editScoreId = null;
+      // Update Scores
+      this.api.save(score).then(resp => {
+        // Update Current Scores
+        this.ea.publish('scoreUpdate');
+        // Reset edit
+        this.editScoreId = null;
+      });
+    });
   }
 }

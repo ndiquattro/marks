@@ -1,14 +1,12 @@
 <template>
   <h5>${ title }</h5>
-  <form class="form-horizontal" submit.delegate="submitAssignment()"
-        autocomplete="off">
+  <form class="form-horizontal" submit.delegate="submit()" validation-renderer="bootstrap-form">
 
     <!-- Assignment Name -->
     <div class="form-group">
       <label class="col-md-4 control-label">Name:</label>
       <div class="col-md-6">
-        <input type="text" class="form-control" value.bind="newAssignment.name"
-               required>
+        <input type="text" class="form-control" value.bind="newAssignment.name & validate">
       </div>
     </div>
 
@@ -17,7 +15,7 @@
       <label class="col-md-4 control-label">Date Assigned:</label>
       <div class="col-md-6">
         <input type="date" name="date" class="form-control"
-               value.bind="newAssignment.date" required>
+               value.bind="newAssignment.date & validate">
       </div>
     </div>
 
@@ -25,7 +23,7 @@
     <div class="form-group" show.bind="mode !== 'edit'">
       <label class="col-md-4 control-label">Type:</label>
       <div class="col-md-6">
-        <select class="form-control" name="type" value.bind="newAssignment.type" required>
+        <select class="form-control" name="type" value.bind="newAssignment.type & validate">
           <option value="">Select Type</option>
           <option value="Points">Points</option>
           <option value="Checks">Checks</option>
@@ -37,7 +35,7 @@
     <div class="form-group" if.bind="newAssignment.type === 'Points'">
       <label class="col-md-4 control-label">Max Points:</label>
       <div class="col-md-6">
-        <input type="number" name="max" class="form-control" value.bind="newAssignment.max" required>
+        <input type="number" name="max" class="form-control" value.bind="newAssignment.max & validate">
       </div>
     </div>
 

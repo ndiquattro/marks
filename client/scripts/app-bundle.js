@@ -462,7 +462,7 @@ define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggrega
       var confirmed = confirm('Are you sure you want to delete ' + this.current.assignment.name + '?');
 
       if (confirmed) {
-        this.api.delete('assignments', this.current.assignment.id).then(function (data) {
+        this.api.delete(this.current.assignment).then(function (data) {
           return _this.ea.publish('reloadAssignments');
         });
 
@@ -821,7 +821,7 @@ define('admin/components/profile',['exports', 'aurelia-framework', 'aurelia-vali
     return Profile;
   }()) || _class);
 });
-define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-templating', 'aurelia-event-aggregator', 'shared/services/currentService', 'shared/services/apiService', 'moment'], function (exports, _aureliaFramework, _aureliaTemplating, _aureliaEventAggregator, _currentService, _apiService, _moment) {
+define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-validation', 'aurelia-event-aggregator', 'shared/services/currentService', 'shared/services/apiService', 'gradebook/models/assignment', 'moment'], function (exports, _aureliaFramework, _aureliaValidation, _aureliaEventAggregator, _currentService, _apiService, _assignment, _moment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -888,53 +888,49 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
 
   var _dec, _class, _desc, _value, _class2, _descriptor;
 
-  var AddAssignment = exports.AddAssignment = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = (_class2 = function () {
-    function AddAssignment(api, current, eventaggregator) {
+  var AddAssignment = exports.AddAssignment = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator, _aureliaValidation.ValidationControllerFactory), _dec(_class = (_class2 = function () {
+    function AddAssignment(api, current, eventaggregator, controllerFactory) {
       _classCallCheck(this, AddAssignment);
 
       _initDefineProp(this, 'mode', _descriptor, this);
 
+      this.newAssignment = new _assignment.Assignment({ date: (0, _moment2.default)().format('YYYY-MM-DD') });
+
       this.api = api;
       this.current = current;
       this.ea = eventaggregator;
+      this.controller = controllerFactory.createForCurrentScope();
     }
 
-    AddAssignment.prototype.created = function created() {
-      this.newAssignment = { date: (0, _moment2.default)().format('YYYY-MM-DD') };
-    };
-
-    AddAssignment.prototype.bind = function bind() {
+    AddAssignment.prototype.attached = function attached() {
       if (this.mode === 'edit') {
+        this.newAssignment = this.current.assignment;
         this.title = 'Edit Assignment';
         this.btn = 'Save Changes';
-        this.newAssignment = this.current.assignment;
       } else {
         this.title = 'Add Assignment';
         this.btn = this.title;
       }
     };
 
-    AddAssignment.prototype.detached = function detached() {
-      this.newAssignment = {};
-    };
-
-    AddAssignment.prototype.submitAssignment = function submitAssignment() {
+    AddAssignment.prototype.submit = function submit() {
       var _this = this;
 
-      if (this.mode === 'edit') {
-        this.api.update('assignments', this.current.assignment.id, this.current.assignment);
+      this.controller.validate().then(function (result) {
+        if (!result.valid) {
+          return;
+        }
 
-        this.mode = false;
-      } else {
-        this.newAssignment.subject_id = this.current.subject.id;
+        if (!_this.newAssignment.subject_id) {
+          _this.newAssignment.subject_id = _this.current.subject.id;
+        }
 
-        this.api.add('assignments', this.newAssignment).then(function (data) {
+        _this.api.save(_this.newAssignment).then(function (data) {
           _this.ea.publish('reloadAssignments');
-
           _this.current.setAssignment(data);
           _this.mode = false;
         });
-      }
+      });
     };
 
     AddAssignment.prototype.cancel = function cancel() {
@@ -942,7 +938,7 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
     };
 
     return AddAssignment;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'mode', [_aureliaTemplating.bindable], {
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'mode', [_aureliaFramework.bindable], {
     enumerable: true,
     initializer: null
   })), _class2)) || _class);
@@ -1040,7 +1036,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
       this.entered = [];
       this.notEntered = this.current.scores;
 
-      this.isPoints = this.current.isPoints;
+      this.isPoints = this.current.assignment.isPoints;
       this.nameFocus = true;
       this.scoreFocus = false;
     };
@@ -1082,7 +1078,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
     };
 
     QuickEntry.prototype.updateScore = function updateScore(score) {
-      this.api.update('scores', score.id, { 'value': score.value });
+      this.api.save(score);
 
       this.ea.publish('scoreUpdate');
     };
@@ -1149,7 +1145,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
     ReportAssignment.prototype.makePlot = function makePlot() {
       d3.select('svg').remove();
 
-      if (this.current.isPoints) {
+      if (this.current.assignment.isPoints) {
         this.renderHistogram(this.current.scores, '#content');
       } else {
         this.renderDonut(this.current.scores, '#content');
@@ -1303,7 +1299,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
     return ReportAssignment;
   }()) || _class);
 });
-define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../../shared/services/currentService', '../../shared/services/apiService'], function (exports, _aureliaFramework, _aureliaEventAggregator, _currentService, _apiService) {
+define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurelia-validation', 'aurelia-event-aggregator', '../../shared/services/currentService', '../../shared/services/apiService'], function (exports, _aureliaFramework, _aureliaValidation, _aureliaEventAggregator, _currentService, _apiService) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -1319,19 +1315,20 @@ define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurel
 
   var _dec, _class;
 
-  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function ScoresList(api, current, eventaggregator) {
+  var ScoresList = exports.ScoresList = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService, _currentService.CurrentService, _aureliaEventAggregator.EventAggregator, _aureliaValidation.ValidationControllerFactory), _dec(_class = function () {
+    function ScoresList(api, current, eventaggregator, controllerFactory) {
       _classCallCheck(this, ScoresList);
 
       this.api = api;
       this.ea = eventaggregator;
       this.current = current;
+      this.controller = controllerFactory.createForCurrentScope();
 
       this.editScoreId = null;
     }
 
     ScoresList.prototype.editScore = function editScore(score) {
-      if (this.current.isPoints) {
+      if (this.current.assignment.isPoints) {
         this.editScoreId = score.id;
         this.editFocus = true;
       } else {
@@ -1349,11 +1346,19 @@ define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurel
     };
 
     ScoresList.prototype.updateScore = function updateScore(score) {
-      this.api.update('scores', score.id, { 'value': score.value });
+      var _this = this;
 
-      this.ea.publish('scoreUpdate');
+      this.controller.validate().then(function (result) {
+        if (!result.valid) {
+          return;
+        }
 
-      this.editScoreId = null;
+        _this.api.save(score).then(function (resp) {
+          _this.ea.publish('scoreUpdate');
+
+          _this.editScoreId = null;
+        });
+      });
     };
 
     return ScoresList;
@@ -2305,7 +2310,7 @@ define('shared/models/user',['exports', 'aurelia-validation'], function (exports
 
   _aureliaValidation.ValidationRules.ensure('email').required().email().ensure('password').required().minLength(8).maxLength(50).ensure('first_name').displayName('First Name').maxLength(255).ensure('last_name').displayName('Last Name').required().maxLength(255).ensure('title').required().on(User);
 });
-define('shared/services/apiService',['exports', 'aurelia-http-client', 'aurelia-framework', 'aurelia-auth', 'shared/models/user', 'gradebook/models/year', 'gradebook/models/student', 'gradebook/models/subject'], function (exports, _aureliaHttpClient, _aureliaFramework, _aureliaAuth, _user, _year, _student, _subject) {
+define('shared/services/apiService',['exports', 'aurelia-http-client', 'aurelia-framework', 'aurelia-auth', 'shared/models/user', 'gradebook/models/year', 'gradebook/models/student', 'gradebook/models/subject', 'gradebook/models/assignment', 'gradebook/models/score'], function (exports, _aureliaHttpClient, _aureliaFramework, _aureliaAuth, _user, _year, _student, _subject, _assignment, _score) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -2375,7 +2380,9 @@ define('shared/services/apiService',['exports', 'aurelia-http-client', 'aurelia-
   var modelMap = { 'users': _user.User,
     'years': _year.Year,
     'students': _student.Student,
-    'subjects': _subject.Subject };
+    'subjects': _subject.Subject,
+    'assignments': _assignment.Assignment,
+    'scores': _score.Score };
 });
 define('shared/services/currentService',['exports', 'aurelia-event-aggregator', './apiService', 'aurelia-framework'], function (exports, _aureliaEventAggregator, _apiService, _aureliaFramework) {
   'use strict';
@@ -2451,7 +2458,6 @@ define('shared/services/currentService',['exports', 'aurelia-event-aggregator', 
 
     CurrentService.prototype.setAssignment = function setAssignment(assignment) {
       this.assignment = assignment;
-      this.isPoints = assignment.type === 'Points';
       this.setScores(assignment.id);
     };
 
@@ -2542,6 +2548,113 @@ define('shared/services/httpService',['exports', 'aurelia-framework', 'aurelia-h
     return HttpService;
   }()) || _class);
 });
+define('gradebook/models/assignment',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Assignment = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Assignment = exports.Assignment = function () {
+    function Assignment(data) {
+      _classCallCheck(this, Assignment);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Assignment, [{
+      key: 'source',
+      get: function get() {
+        return 'assignments';
+      }
+    }, {
+      key: 'isPoints',
+      get: function get() {
+        return this.type === 'Points';
+      }
+    }]);
+
+    return Assignment;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('name').displayName('Name').required().maxLength(255).ensure('date').displayName('Date').required().satisfiesRule('date').ensure('type').displayName('Type').required().ensure('max').displayName('Max Score').required().on(Assignment);
+});
+define('gradebook/models/score',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Score = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Score = exports.Score = function () {
+    function Score(data) {
+      _classCallCheck(this, Score);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Score, [{
+      key: 'source',
+      get: function get() {
+        return 'scores';
+      }
+    }]);
+
+    return Score;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('value').displayName('Score').required().on(Score);
+});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"shared/components/navbar\"></require>\n\n  <!-- Navigation -->\n  <nav-bar></nav-bar>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
 define('text!admin/settings.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"admin/components/profile\"></require>\n  <require from=\"admin/components/password\"></require>\n\n  <div class=\"col-md-7 col-md-offset-3\">\n    <h1>Settings</h1>\n    <hr>\n    <profile></profile>\n    <hr>\n    <password></password>\n  </div>\n</template>\n"; });
@@ -2553,11 +2666,11 @@ define('text!home/index.html', ['module'], function(module) { module.exports = "
 define('text!reports/index.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./components/studentReport\"></require>\n\n  <!-- Reports Menu -->\n  <ul class=\"nav nav-tabs\">\n    <li>\n      <h4>Reports</h4>\n    </li>\n    <li repeat.for=\"report of reports\" role=\"presentation\"\n        class=\"${report === selectedReport ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"setReport(report)\">${ report }</a>\n    </li>\n  </ul>\n\n  <student-report if.bind=\"selectedReport === 'Student'\"></student-report>\n</template>\n"; });
 define('text!admin/components/password.html', ['module'], function(module) { module.exports = "<template>\n  <!-- Reset Form -->\n  <div if.bind=\"reset\">\n    <h2>Reset Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"resetPassword()\">\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n\n  <!-- Change Password Form -->\n  <div if.bind=\"!reset\">\n    <h2>Change Password</h2>\n    <form class=\"form-horizontal\" submit.delegate=\"changePassword()\">\n\n      <!-- Current Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Current Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.current\" required>\n        </div>\n      </div>\n\n      <!-- New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" class=\"form-control\"\n                 value.bind=\"password.new\" required>\n        </div>\n      </div>\n\n      <!-- Confirm New Password -->\n      <div class=\"form-group\">\n        <label class=\"col-md-4 control-label\">Confirm New Password:</label>\n        <div class=\"col-md-6\">\n          <input type=\"password\" value.bind=\"password.confirm\" class=\"form-control\"\n                 required>\n        </div>\n      </div>\n\n      <!-- Submit Button -->\n      <div class=\"form-group\">\n        <div class=\"col-md-offset-4 col-md-6 text-center\">\n          <button type=\"submit\" class=\"btn btn-primary\">\n            Change Password\n          </button>\n          ${ feedback }\n        </div>\n      </div>\n    </form>\n  </div>\n</template>\n"; });
 define('text!admin/components/profile.html', ['module'], function(module) { module.exports = "<template>\n  <h3>Profile</h3>\n  <form submit.delegate=\"submit()\" class=\"form-horizontal\" validation-renderer=\"bootstrap-form\">\n    <!-- Title -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Title:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" value.bind=\"profile.title & validate\">\n          <option value=\"\">Select</option>\n          <option value=\"Ms.\">Ms.</option>\n          <option value=\"Mrs.\">Mrs.</option>\n          <option value=\"Mr.\">Mr.</option>\n          <option value=\"Dr.\">Dr.</option>\n        </select>\n      </div>\n    </div>\n    <!-- First Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\" for=\"firstname\">First Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" id=\"firstname\" placeholder=\"First Name\"\n               value.bind=\"profile.first_name & validate\">\n      </div>\n    </div>\n\n    <!-- Last Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\" for=\"lastname\">Last Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" id=\"lastname\" placeholder=\"Last Name\"\n               value.bind=\"profile.last_name & validate\">\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-offset-4 col-md-6 text-center\">\n        <button type=\"submit\" class=\"btn btn-primary\">Save Changes</button>\n        <i if.bind=\"isSaving\" class=\"fa fa-circle-o-notch fa-spin fa-2x\" aria-hidden=\"true\"></i>\n        <i if.bind=\"saved\" class=\"fa fa-check text-success fa-2x\" aria-hidden=\"true\"></i>\n      </div>\n    </div>\n  </form>\n</template>\n"; });
-define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submitAssignment()\"\n        autocomplete=\"off\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name\"\n               required>\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date\" required>\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type\" required>\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max\" required>\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
-define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name }</a>\n    </li>\n  </ul>\n</template>\n"; });
+define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submit()\" validation-renderer=\"bootstrap-form\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name & validate\">\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date & validate\">\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type & validate\">\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max & validate\">\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
+define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name & oneTime }</a>\n    </li>\n  </ul>\n</template>\n"; });
 define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../lib/autocomplete\"></require>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.student.first_name }</td>\n      <td class=\"text-center\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/reportAssignment.html', ['module'], function(module) { module.exports = "<template>\n<style>\n\n.bar rect {\nfill: steelblue;\n}\n\n.bar text {\nfill: #fff;\nfont: 10px sans-serif;\n}\n\ndiv.tooltip {\n    position: absolute;\n    text-align: center;\n    width: auto;\n    height: auto;\n    padding: 2px;\n    font: 16px sans-serif;\n    background: lightsteelblue;\n    border: 0px;\n    border-radius: 8px;\n    pointer-events: none;\n\n}\n\n.arc text {\n  font: 10px sans-serif;\n  text-anchor: middle;\n}\n\n.arc path {\n  stroke: #fff;\n}\n\n.legend {\n    font-size: 13px;\n  }\n  h1 {\n  font-size: 15px;\n  text-align: center;\n\t}\n  rect {\n    stroke-width: 2;\n  }\n\n  .tooltip2 {\n  box-shadow: 0 0 5px #999999;\n  display: none;\n  font-size: 12px;\n  left: 130px;\n  padding: 10px;\n  position: absolute;\n  text-align: center;\n  top: 95px;\n  width: 80px;\n  z-index: 10;\n  line-height: 140%; /*Interlineado*/\n  font-family: \"Open Sans\", sans-serif;\n  font-weight: 300;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n\t}\n\n  .label {\n   font-weight: 600;\n  }\n\n</style>\n  <div id=\"content\"></div>\n</template>\n"; });
-define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.student.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
+define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.assignment.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.student.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value & validate\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
 define('text!home/signup/firstTime.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"gradebook/addYear\"></require>\n  <require from=\"gradebook/addStudent\"></require>\n  <require from=\"gradebook/addSubject\"></require>\n  <require from=\"admin/components/profile\"></require>\n\n  <div class=\"col-md-2\">\n    <h3>Setup</h3>\n    <ul class=\"nav nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"step of completed\">\n        <a class=\"text-success\"><i class=\"fa fa-check-circle-o text-success\" aria-hidden=\"true\"></i> ${ step }</a>\n      </li>\n      <li role=\"presentation\"\n          repeat.for=\"step of todo\"\n          class=\"${ step === activeStep ? 'active' : 'disabled'}\">\n        <a href click.delegate=\"nextStep(step)\"><i class=\"fa fa-circle-o\" aria-hidden=\"true\"></i> ${ step }</a>\n      </li>\n    </ul>\n\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <div if.bind=\"activeStep === 'Introduction'\">\n        <h3>Checklist</h3>\n        <p class=\"col-md-6\">\n          Welcome to Marks! This guided setup will get you up and running fast.\n          After entering all the information for each step mark it done by click on the circle to the left!\n          You're done with the introduction so go ahead and \"marks\" it done!\n        </p>\n      </div>\n      <profile if.bind=\"activeStep === 'Profile'\"></profile>\n      <add-year if.bind=\"activeStep === 'Years'\"></add-year>\n      <add-student if.bind=\"activeStep === 'Students'\"></add-student>\n      <add-subject if.bind=\"activeStep === 'Subjects'\"></add-subject>\n      <div if.bind=\"todo.length === 0\">\n        <h3>All done! Sending you to your gradebook!</h3>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!home/signup/payment.html', ['module'], function(module) { module.exports = "<template>\n  <h1>Enter Payment Information</h1>\n  <a href=\"/#/first_time\" class=\"btn\">Setup Gradebook</a>\n<template>\n"; });

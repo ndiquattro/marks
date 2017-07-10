@@ -84,8 +84,8 @@ manager = APIManager(app, flask_sqlalchemy_db=db, preprocessors=uni_preprocs)
 httpmeths = ['GET', 'POST', 'DELETE', 'PUT']
 
 manager.create_api(models.Users, methods=httpmeths, exclude_columns=['password', 'years', 'scores', 'students', 'subjects', 'assigments'])
-manager.create_api(models.Years, methods=httpmeths)
-manager.create_api(models.Students, methods=httpmeths, results_per_page=-1)
+manager.create_api(models.Years, methods=httpmeths, exclude_columns=['user'])
+manager.create_api(models.Students, methods=httpmeths, results_per_page=-1, exclude_columns=['user'])
 manager.create_api(models.Subjects, methods=httpmeths, include_columns=['id', 'name'])
-manager.create_api(models.Assignments, methods=httpmeths, postprocessors={'POST': [dummy_scores]})
-manager.create_api(models.Scores, methods=httpmeths)
+manager.create_api(models.Assignments, methods=httpmeths, postprocessors={'POST': [dummy_scores]}, exclude_columns=['user', 'scores'])
+manager.create_api(models.Scores, methods=httpmeths, exclude_columns=['user'])

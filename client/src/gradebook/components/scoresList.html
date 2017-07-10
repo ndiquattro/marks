@@ -6,7 +6,7 @@
     <tr>
       <th></th>
       <th class="text-center">${ current.assignment.type }
-        <small show.bind="current.isPoints && current.assignment.max !== 0">
+        <small show.bind="current.assignment.isPoints && current.assignment.max !== 0">
           (max: ${current.assignment.max})</small></th>
     </tr>
     </thead>
@@ -21,7 +21,7 @@
               <input keypress.delegate="deFocus($event.which)"
                      focus.bind="editFocus"
                      blur.trigger="updateScore(score, $index)"
-                     value.bind="score.value"
+                     value.bind="score.value & validate"
                      type="number"
                      style="width: 3.5em">
           </div>

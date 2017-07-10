@@ -37,7 +37,7 @@ export class GradeBook {
     let confirmed = confirm('Are you sure you want to delete ' + this.current.assignment.name + '?');
 
     if (confirmed) {
-      this.api.delete('assignments', this.current.assignment.id)
+      this.api.delete(this.current.assignment)
               .then(data => this.ea.publish('reloadAssignments'));
 
       this.current.clearAssignment();

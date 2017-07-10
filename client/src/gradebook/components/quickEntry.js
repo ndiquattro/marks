@@ -19,7 +19,7 @@ export class QuickEntry {
     this.notEntered = this.current.scores;
 
     // Set Flags
-    this.isPoints = this.current.isPoints;
+    this.isPoints = this.current.assignment.isPoints;
     this.nameFocus = true;
     this.scoreFocus = false;
   }
@@ -82,7 +82,7 @@ export class QuickEntry {
 
   updateScore(score) {
     // Update Scores
-    this.api.update('scores', score.id, {'value': score.value});
+    this.api.save(score);
 
     // Tell the app a score has been updated
     this.ea.publish('scoreUpdate');

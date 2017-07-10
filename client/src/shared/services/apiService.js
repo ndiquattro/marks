@@ -5,6 +5,8 @@ import {User} from 'shared/models/user';
 import {Year} from 'gradebook/models/year';
 import {Student} from 'gradebook/models/student';
 import {Subject} from 'gradebook/models/subject';
+import {Assignment} from 'gradebook/models/assignment';
+import {Score} from 'gradebook/models/score';
 
 @inject(HttpClient, AuthService)
 export class ApiService {
@@ -78,4 +80,6 @@ export class ApiService {
 const modelMap = {'users': User,
                   'years': Year,
                   'students': Student,
-                  'subjects': Subject};
+                  'subjects': Subject,
+                  'assignments': Assignment,
+                  'scores': Score};

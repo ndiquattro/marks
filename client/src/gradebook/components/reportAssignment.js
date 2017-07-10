@@ -25,7 +25,7 @@ export class ReportAssignment {
     d3.select('svg').remove();
 
     // Render proper Plot
-    if (this.current.isPoints) {
+    if (this.current.assignment.isPoints) {
       this.renderHistogram(this.current.scores, '#content');
     } else {
       this.renderDonut(this.current.scores, '#content');
