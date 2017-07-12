@@ -122,7 +122,7 @@ export class ReportAssignment {
   renderDonut(data, divElement) {
     // Set Up Data
     let nestdata = d3.nest()
-                     .key((d) => d.value)
+                     .key((d) => d.value).sortKeys(d3.descending)
                      .rollup((g) => {
                        return {'count': g.length,
                                'names': g.map(item => item.student.first_name)

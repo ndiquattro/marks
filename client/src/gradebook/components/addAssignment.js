@@ -29,6 +29,10 @@ export class AddAssignment {
     }
   }
 
+  detached() {
+    this.newAssignment = new Assignment({date: moment().format('YYYY-MM-DD')});
+  }
+
   submit() {
     this.controller.validate().then(result => {
       if (!result.valid) {

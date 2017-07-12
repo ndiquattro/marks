@@ -19,7 +19,6 @@ export class QuickEntry {
     this.notEntered = this.current.scores;
 
     // Set Flags
-    this.isPoints = this.current.assignment.isPoints;
     this.nameFocus = true;
     this.scoreFocus = false;
   }
@@ -63,7 +62,7 @@ export class QuickEntry {
   parseKey(key) {
     if (key === 13) {
       // If Checks type
-      if (!this.isPoints && key === 13) {
+      if (!this.current.assignment.isPoints && key === 13) {
         this.score.value = 1;
         this.updateScore(this.score);
         this.pushScore(this.score);

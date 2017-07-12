@@ -26,7 +26,7 @@
                           placeholder="Name"
                           name-focus.bind="nameFocus"
                           score-focus.bind="scoreFocus"
-                          is-points.bind="isPoints"
+                          is-points.bind="current.assignment.isPoints"
                           checks.call="parseKey(key)">
             <template replace-part="suggestion">
               <span style="font-style: italic">${suggestion}</span>
@@ -38,16 +38,16 @@
 <!-- Value Input -->
 <td class="text-center">
   <div class="form-group">
-    <div if.bind="isPoints" class="form-group">
+    <div if.bind="current.assignment.isPoints" class="form-group">
       <input value.bind="quickPoints"
              type="number"
              class="form-control"
-             style="width: 5em;"
+             style="width: 5.5em;"
              placeholder="Score"
              focus.bind="scoreFocus"
              keypress.delegate="parseKey($event.which)" />
     </div>
-    <div if.bind="!isPoints">
+    <div if.bind="!current.assignment.isPoints">
       <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
     </div>
   </div>

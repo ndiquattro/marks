@@ -130,6 +130,54 @@ define('admin/settings',["exports"], function (exports) {
     _classCallCheck(this, Settings);
   };
 });
+define('home/index',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-auth', 'aurelia-validation', 'shared/services/currentService', 'shared/models/user'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaAuth, _aureliaValidation, _currentService, _user) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Home = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaAuth.AuthService, _currentService.CurrentService, _aureliaValidation.ValidationControllerFactory), _dec(_class = function () {
+    function Home(router, auth, current, controllerFactory) {
+      _classCallCheck(this, Home);
+
+      this.newUser = new _user.User();
+
+      this.router = router;
+      this.auth = auth;
+      this.current = current;
+      this.controller = controllerFactory.createForCurrentScope();
+    }
+
+    Home.prototype.submitSignUp = function submitSignUp() {
+      var _this = this;
+
+      this.controller.validate().then(function (result) {
+        if (!result.valid) {
+          return;
+        }
+
+        _this.auth.signup(_this.newUser).then(function (resp) {
+          _this.current.setUser(new _user.User(resp.user));
+
+          _this.router.navigateToRoute('payment');
+          location.reload();
+        });
+      });
+    };
+
+    return Home;
+  }()) || _class);
+});
 define('gradebook/addStudent',['exports', 'aurelia-framework', 'aurelia-validation', 'shared/services/currentService', 'shared/services/apiService', 'gradebook/models/student'], function (exports, _aureliaFramework, _aureliaValidation, _currentService, _apiService, _student) {
   'use strict';
 
@@ -477,54 +525,6 @@ define('gradebook/index',['exports', 'aurelia-framework', 'aurelia-event-aggrega
     return GradeBook;
   }()) || _class);
 });
-define('home/index',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-auth', 'aurelia-validation', 'shared/services/currentService', 'shared/models/user'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaAuth, _aureliaValidation, _currentService, _user) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Home = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Home = exports.Home = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router, _aureliaAuth.AuthService, _currentService.CurrentService, _aureliaValidation.ValidationControllerFactory), _dec(_class = function () {
-    function Home(router, auth, current, controllerFactory) {
-      _classCallCheck(this, Home);
-
-      this.newUser = new _user.User();
-
-      this.router = router;
-      this.auth = auth;
-      this.current = current;
-      this.controller = controllerFactory.createForCurrentScope();
-    }
-
-    Home.prototype.submitSignUp = function submitSignUp() {
-      var _this = this;
-
-      this.controller.validate().then(function (result) {
-        if (!result.valid) {
-          return;
-        }
-
-        _this.auth.signup(_this.newUser).then(function (resp) {
-          _this.current.setUser(new _user.User(resp.user));
-
-          _this.router.navigateToRoute('payment');
-          location.reload();
-        });
-      });
-    };
-
-    return Home;
-  }()) || _class);
-});
 define('reports/index',['exports', 'aurelia-framework', '../shared/services/currentService', '../shared/services/apiService'], function (exports, _aureliaFramework, _currentService, _apiService) {
   'use strict';
 
@@ -821,6 +821,78 @@ define('admin/components/profile',['exports', 'aurelia-framework', 'aurelia-vali
     return Profile;
   }()) || _class);
 });
+define('home/signup/firstTime',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.FirstTime = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var FirstTime = exports.FirstTime = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
+    function FirstTime(router) {
+      _classCallCheck(this, FirstTime);
+
+      this.router = router;
+    }
+
+    FirstTime.prototype.created = function created() {
+      this.completed = [];
+      this.todo = ['Introduction', 'Profile', 'Years', 'Students', 'Subjects'];
+
+      this.activeStep = 'Introduction';
+    };
+
+    FirstTime.prototype.nextStep = function nextStep(step) {
+      var _this = this;
+
+      if (step !== this.activeStep) {
+        return;
+      }
+
+      this.completed.push(this.todo.shift());
+      this.activeStep = this.todo[0];
+
+      if (this.todo.length === 0) {
+        setTimeout(function () {
+          _this.router.navigate('gradebook');
+        }, 800);
+      }
+    };
+
+    return FirstTime;
+  }()) || _class);
+});
+define('home/signup/payment',['exports', 'aurelia-framework', 'shared/services/apiService'], function (exports, _aureliaFramework, _apiService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.PaymentSetup = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var PaymentSetup = exports.PaymentSetup = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService), _dec(_class = function PaymentSetup(api) {
+    _classCallCheck(this, PaymentSetup);
+
+    this.api = api;
+  }) || _class);
+});
 define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'aurelia-validation', 'aurelia-event-aggregator', 'shared/services/currentService', 'shared/services/apiService', 'gradebook/models/assignment', 'moment'], function (exports, _aureliaFramework, _aureliaValidation, _aureliaEventAggregator, _currentService, _apiService, _assignment, _moment) {
   'use strict';
 
@@ -911,6 +983,10 @@ define('gradebook/components/addAssignment',['exports', 'aurelia-framework', 'au
         this.title = 'Add Assignment';
         this.btn = this.title;
       }
+    };
+
+    AddAssignment.prototype.detached = function detached() {
+      this.newAssignment = new _assignment.Assignment({ date: (0, _moment2.default)().format('YYYY-MM-DD') });
     };
 
     AddAssignment.prototype.submit = function submit() {
@@ -1036,7 +1112,6 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
       this.entered = [];
       this.notEntered = this.current.scores;
 
-      this.isPoints = this.current.assignment.isPoints;
       this.nameFocus = true;
       this.scoreFocus = false;
     };
@@ -1061,7 +1136,7 @@ define('gradebook/components/quickEntry',['exports', 'aurelia-framework', 'aurel
 
     QuickEntry.prototype.parseKey = function parseKey(key) {
       if (key === 13) {
-        if (!this.isPoints && key === 13) {
+        if (!this.current.assignment.isPoints && key === 13) {
           this.score.value = 1;
           this.updateScore(this.score);
           this.pushScore(this.score);
@@ -1217,7 +1292,7 @@ define('gradebook/components/reportAssignment',['exports', 'aurelia-framework', 
     ReportAssignment.prototype.renderDonut = function renderDonut(data, divElement) {
       var nestdata = d3.nest().key(function (d) {
         return d.value;
-      }).rollup(function (g) {
+      }).sortKeys(d3.descending).rollup(function (g) {
         return { 'count': g.length,
           'names': g.map(function (item) {
             return item.student.first_name;
@@ -1363,6 +1438,271 @@ define('gradebook/components/scoresList',['exports', 'aurelia-framework', 'aurel
 
     return ScoresList;
   }()) || _class);
+});
+define('gradebook/models/assignment',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Assignment = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Assignment = exports.Assignment = function () {
+    function Assignment(data) {
+      _classCallCheck(this, Assignment);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Assignment, [{
+      key: 'source',
+      get: function get() {
+        return 'assignments';
+      }
+    }, {
+      key: 'isPoints',
+      get: function get() {
+        return this.type === 'Points';
+      }
+    }]);
+
+    return Assignment;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('name').displayName('Name').required().maxLength(255).ensure('date').displayName('Date').required().satisfiesRule('date').ensure('type').displayName('Type').required().ensure('max').displayName('Max Score').required().on(Assignment);
+});
+define('gradebook/models/score',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Score = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Score = exports.Score = function () {
+    function Score(data) {
+      _classCallCheck(this, Score);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Score, [{
+      key: 'source',
+      get: function get() {
+        return 'scores';
+      }
+    }]);
+
+    return Score;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('value').displayName('Score').required().on(Score);
+});
+define('gradebook/models/student',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Student = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Student = exports.Student = function () {
+    function Student(data) {
+      _classCallCheck(this, Student);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Student, [{
+      key: 'source',
+      get: function get() {
+        return 'students';
+      }
+    }, {
+      key: 'fullName',
+      get: function get() {
+        return this.first_name + ' ' + this.last_name;
+      }
+    }]);
+
+    return Student;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('first_name').displayName('First Name').required().maxLength(255).ensure('last_name').displayName('Last Name').required().maxLength(255).on(Student);
+});
+define('gradebook/models/subject',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Subject = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Subject = exports.Subject = function () {
+    function Subject(data) {
+      _classCallCheck(this, Subject);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Subject, [{
+      key: 'source',
+      get: function get() {
+        return 'subjects';
+      }
+    }]);
+
+    return Subject;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('name').displayName('Name').required().maxLength(255).on(Subject);
+});
+define('gradebook/models/year',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Year = undefined;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var Year = exports.Year = function () {
+    function Year(data) {
+      _classCallCheck(this, Year);
+
+      Object.assign(this, data);
+    }
+
+    _createClass(Year, [{
+      key: 'source',
+      get: function get() {
+        return 'years';
+      }
+    }]);
+
+    return Year;
+  }();
+
+  _aureliaValidation.ValidationRules.ensure('school').displayName('School Name').required().maxLength(255).ensure('first_day').displayName('First Day').required().satisfiesRule('date').ensure('last_day').displayName('Last Day').required().satisfiesRule('date').on(Year);
 });
 define('gradebook/lib/autocomplete',['exports', 'aurelia-binding', 'aurelia-templating', 'aurelia-dependency-injection', 'aurelia-pal'], function (exports, _aureliaBinding, _aureliaTemplating, _aureliaDependencyInjection, _aureliaPal) {
   'use strict';
@@ -1639,236 +1979,6 @@ define('gradebook/lib/autocomplete',['exports', 'aurelia-binding', 'aurelia-temp
     }
   })), _class2)) || _class);
 });
-define('gradebook/models/student',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Student = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var Student = exports.Student = function () {
-    function Student(data) {
-      _classCallCheck(this, Student);
-
-      Object.assign(this, data);
-    }
-
-    _createClass(Student, [{
-      key: 'source',
-      get: function get() {
-        return 'students';
-      }
-    }, {
-      key: 'fullName',
-      get: function get() {
-        return this.first_name + ' ' + this.last_name;
-      }
-    }]);
-
-    return Student;
-  }();
-
-  _aureliaValidation.ValidationRules.ensure('first_name').displayName('First Name').required().maxLength(255).ensure('last_name').displayName('Last Name').required().maxLength(255).on(Student);
-});
-define('gradebook/models/subject',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Subject = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var Subject = exports.Subject = function () {
-    function Subject(data) {
-      _classCallCheck(this, Subject);
-
-      Object.assign(this, data);
-    }
-
-    _createClass(Subject, [{
-      key: 'source',
-      get: function get() {
-        return 'subjects';
-      }
-    }]);
-
-    return Subject;
-  }();
-
-  _aureliaValidation.ValidationRules.ensure('name').displayName('Name').required().maxLength(255).on(Subject);
-});
-define('gradebook/models/year',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Year = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var Year = exports.Year = function () {
-    function Year(data) {
-      _classCallCheck(this, Year);
-
-      Object.assign(this, data);
-    }
-
-    _createClass(Year, [{
-      key: 'source',
-      get: function get() {
-        return 'years';
-      }
-    }]);
-
-    return Year;
-  }();
-
-  _aureliaValidation.ValidationRules.ensure('school').displayName('School Name').required().maxLength(255).ensure('first_day').displayName('First Day').required().satisfiesRule('date').ensure('last_day').displayName('Last Day').required().satisfiesRule('date').on(Year);
-});
-define('home/signup/firstTime',['exports', 'aurelia-framework', 'aurelia-router'], function (exports, _aureliaFramework, _aureliaRouter) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.FirstTime = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var FirstTime = exports.FirstTime = (_dec = (0, _aureliaFramework.inject)(_aureliaRouter.Router), _dec(_class = function () {
-    function FirstTime(router) {
-      _classCallCheck(this, FirstTime);
-
-      this.router = router;
-    }
-
-    FirstTime.prototype.created = function created() {
-      this.completed = [];
-      this.todo = ['Introduction', 'Profile', 'Years', 'Students', 'Subjects'];
-
-      this.activeStep = 'Introduction';
-    };
-
-    FirstTime.prototype.nextStep = function nextStep(step) {
-      var _this = this;
-
-      if (step !== this.activeStep) {
-        return;
-      }
-
-      this.completed.push(this.todo.shift());
-      this.activeStep = this.todo[0];
-
-      if (this.todo.length === 0) {
-        setTimeout(function () {
-          _this.router.navigate('gradebook');
-        }, 800);
-      }
-    };
-
-    return FirstTime;
-  }()) || _class);
-});
-define('home/signup/payment',['exports', 'aurelia-framework', 'shared/services/apiService'], function (exports, _aureliaFramework, _apiService) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.PaymentSetup = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var PaymentSetup = exports.PaymentSetup = (_dec = (0, _aureliaFramework.inject)(_apiService.ApiService), _dec(_class = function PaymentSetup(api) {
-    _classCallCheck(this, PaymentSetup);
-
-    this.api = api;
-  }) || _class);
-});
 define('reports/attributes/timePlot',['exports', 'aurelia-framework', 'd3'], function (exports, _aureliaFramework, _d) {
   'use strict';
 
@@ -2022,6 +2132,33 @@ define('reports/attributes/timePlot',['exports', 'aurelia-framework', 'd3'], fun
     initializer: null
   })), _class2)) || _class);
 });
+define('reports/converters/scoreFilter',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var scoreFilterValueConverter = exports.scoreFilterValueConverter = function () {
+    function scoreFilterValueConverter() {
+      _classCallCheck(this, scoreFilterValueConverter);
+    }
+
+    scoreFilterValueConverter.prototype.toView = function toView(scores, subjectid) {
+      return scores.filter(function (score) {
+        return score.assignment.subject_id === subjectid;
+      });
+    };
+
+    return scoreFilterValueConverter;
+  }();
+});
 define('reports/components/studentReport',['exports', 'aurelia-framework', '../../shared/services/currentService', '../../shared/services/apiService', 'moment'], function (exports, _aureliaFramework, _currentService, _apiService, _moment) {
   'use strict';
 
@@ -2093,33 +2230,6 @@ define('reports/components/studentReport',['exports', 'aurelia-framework', '../.
 
     return StudentReport;
   }()) || _class);
-});
-define('reports/converters/scoreFilter',["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var scoreFilterValueConverter = exports.scoreFilterValueConverter = function () {
-    function scoreFilterValueConverter() {
-      _classCallCheck(this, scoreFilterValueConverter);
-    }
-
-    scoreFilterValueConverter.prototype.toView = function toView(scores, subjectid) {
-      return scores.filter(function (score) {
-        return score.assignment.subject_id === subjectid;
-      });
-    };
-
-    return scoreFilterValueConverter;
-  }();
 });
 define('shared/components/navbar',['exports', 'aurelia-framework', 'aurelia-router', 'aurelia-validation', 'aurelia-auth', 'shared/services/currentService', 'shared/services/httpService', 'shared/models/user'], function (exports, _aureliaFramework, _aureliaRouter, _aureliaValidation, _aureliaAuth, _currentService, _httpService, _user) {
   'use strict';
@@ -2548,113 +2658,6 @@ define('shared/services/httpService',['exports', 'aurelia-framework', 'aurelia-h
     return HttpService;
   }()) || _class);
 });
-define('gradebook/models/assignment',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Assignment = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var Assignment = exports.Assignment = function () {
-    function Assignment(data) {
-      _classCallCheck(this, Assignment);
-
-      Object.assign(this, data);
-    }
-
-    _createClass(Assignment, [{
-      key: 'source',
-      get: function get() {
-        return 'assignments';
-      }
-    }, {
-      key: 'isPoints',
-      get: function get() {
-        return this.type === 'Points';
-      }
-    }]);
-
-    return Assignment;
-  }();
-
-  _aureliaValidation.ValidationRules.ensure('name').displayName('Name').required().maxLength(255).ensure('date').displayName('Date').required().satisfiesRule('date').ensure('type').displayName('Type').required().ensure('max').displayName('Max Score').required().on(Assignment);
-});
-define('gradebook/models/score',['exports', 'aurelia-validation'], function (exports, _aureliaValidation) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Score = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var Score = exports.Score = function () {
-    function Score(data) {
-      _classCallCheck(this, Score);
-
-      Object.assign(this, data);
-    }
-
-    _createClass(Score, [{
-      key: 'source',
-      get: function get() {
-        return 'scores';
-      }
-    }]);
-
-    return Score;
-  }();
-
-  _aureliaValidation.ValidationRules.ensure('value').displayName('Score').required().on(Score);
-});
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"shared/components/navbar\"></require>\n\n  <!-- Navigation -->\n  <nav-bar></nav-bar>\n\n  <!-- Viewport -->\n  <div class=\"container\">\n    <div class=\"row\">\n      <router-view></router-view>\n    </div>\n  </div>\n</template>\n"; });
 define('text!gradebook/lib/autocomplete.css', ['module'], function(module) { module.exports = "autocomplete {\n  display: inline-block;\n}\n\nautocomplete .suggestions {\n  list-style-type: none;\n  cursor: default;\n  padding: 0;\n  margin: 0;\n  border: 1px solid #ccc;\n  background: #fff;\n  box-shadow: -1px 1px 3px rgba(0,0,0,.1);\n\n  position: absolute;\n  z-index: 9999;\n  max-height: 15rem;\n  overflow: hidden;\n  overflow-y: auto;\n  box-sizing: border-box;\n}\n\nautocomplete .suggestion {\n  padding: 0 .3rem;\n  line-height: 1.5rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  color: #333;\n}\n\nautocomplete .suggestion:hover,\nautocomplete .suggestion.selected {\n  background: #f0f0f0;\n}\n"; });
 define('text!admin/settings.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"admin/components/profile\"></require>\n  <require from=\"admin/components/password\"></require>\n\n  <div class=\"col-md-7 col-md-offset-3\">\n    <h1>Settings</h1>\n    <hr>\n    <profile></profile>\n    <hr>\n    <password></password>\n  </div>\n</template>\n"; });
@@ -2668,12 +2671,12 @@ define('text!admin/components/password.html', ['module'], function(module) { mod
 define('text!admin/components/profile.html', ['module'], function(module) { module.exports = "<template>\n  <h3>Profile</h3>\n  <form submit.delegate=\"submit()\" class=\"form-horizontal\" validation-renderer=\"bootstrap-form\">\n    <!-- Title -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Title:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" value.bind=\"profile.title & validate\">\n          <option value=\"\">Select</option>\n          <option value=\"Ms.\">Ms.</option>\n          <option value=\"Mrs.\">Mrs.</option>\n          <option value=\"Mr.\">Mr.</option>\n          <option value=\"Dr.\">Dr.</option>\n        </select>\n      </div>\n    </div>\n    <!-- First Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\" for=\"firstname\">First Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" id=\"firstname\" placeholder=\"First Name\"\n               value.bind=\"profile.first_name & validate\">\n      </div>\n    </div>\n\n    <!-- Last Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\" for=\"lastname\">Last Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" id=\"lastname\" placeholder=\"Last Name\"\n               value.bind=\"profile.last_name & validate\">\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-offset-4 col-md-6 text-center\">\n        <button type=\"submit\" class=\"btn btn-primary\">Save Changes</button>\n        <i if.bind=\"isSaving\" class=\"fa fa-circle-o-notch fa-spin fa-2x\" aria-hidden=\"true\"></i>\n        <i if.bind=\"saved\" class=\"fa fa-check text-success fa-2x\" aria-hidden=\"true\"></i>\n      </div>\n    </div>\n  </form>\n</template>\n"; });
 define('text!gradebook/components/addAssignment.html', ['module'], function(module) { module.exports = "<template>\n  <h5>${ title }</h5>\n  <form class=\"form-horizontal\" submit.delegate=\"submit()\" validation-renderer=\"bootstrap-form\">\n\n    <!-- Assignment Name -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Name:</label>\n      <div class=\"col-md-6\">\n        <input type=\"text\" class=\"form-control\" value.bind=\"newAssignment.name & validate\">\n      </div>\n    </div>\n\n    <!-- Date of Assignment -->\n    <div class=\"form-group\">\n      <label class=\"col-md-4 control-label\">Date Assigned:</label>\n      <div class=\"col-md-6\">\n        <input type=\"date\" name=\"date\" class=\"form-control\"\n               value.bind=\"newAssignment.date & validate\">\n      </div>\n    </div>\n\n    <!-- Assignment Type -->\n    <div class=\"form-group\" show.bind=\"mode !== 'edit'\">\n      <label class=\"col-md-4 control-label\">Type:</label>\n      <div class=\"col-md-6\">\n        <select class=\"form-control\" name=\"type\" value.bind=\"newAssignment.type & validate\">\n          <option value=\"\">Select Type</option>\n          <option value=\"Points\">Points</option>\n          <option value=\"Checks\">Checks</option>\n        </select>\n      </div>\n    </div>\n\n    <!-- Max Points -->\n    <div class=\"form-group\" if.bind=\"newAssignment.type === 'Points'\">\n      <label class=\"col-md-4 control-label\">Max Points:</label>\n      <div class=\"col-md-6\">\n        <input type=\"number\" name=\"max\" class=\"form-control\" value.bind=\"newAssignment.max & validate\">\n      </div>\n    </div>\n\n    <!-- Submit Button -->\n    <div class=\"form-group\">\n      <div class=\"col-md-6 col-md-offset-5\">\n        <button type=\"submit\" class=\"btn btn-primary\">\n          ${ btn }\n        </button>\n        <button click.delegate=\"cancel()\" class=\"btn btn-danger\">\n          Cancel\n        </button>\n      </div>\n    </div>\n\n  </form>\n</template>\n"; });
 define('text!gradebook/components/assignmentlist.html', ['module'], function(module) { module.exports = "<template>\n  <ul class=\"nav nav-pills nav-stacked\">\n    <li repeat.for=\"assignment of current.assignmentList\"\n        role=\"presentation\"\n        class=\"${assignment.id === current.assignment.id ? 'active' : ''}\">\n      <a href=\"\" click.delegate=\"current.setAssignment(assignment)\">${ assignment.name & oneTime }</a>\n    </li>\n  </ul>\n</template>\n"; });
-define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../lib/autocomplete\"></require>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.student.first_name }</td>\n      <td class=\"text-center\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
+define('text!gradebook/components/quickEntry.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../lib/autocomplete\"></require>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n      <tr>\n        <th></th>\n        <th class=\"text-center\">${ current.assignment.type }\n          <small show.bind=\"isPoints\">\n            (max: ${ current.assignment.max })</small></th>\n      </tr>\n    </thead>\n    <tr repeat.for=\"score of entered\">\n      <td class=\"text-center\">${ score.student.first_name }</td>\n      <td class=\"text-center\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></td>\n    </tr>\n\n    <!-- Input Row -->\n    <tr>\n      <td class=\"text-center\">\n        <!-- Name Input -->\n          <div class=\"form-group\">\n            <autocomplete service.bind=\"suggestionService\"\n                          value.bind=\"score\"\n                          placeholder=\"Name\"\n                          name-focus.bind=\"nameFocus\"\n                          score-focus.bind=\"scoreFocus\"\n                          is-points.bind=\"current.assignment.isPoints\"\n                          checks.call=\"parseKey(key)\">\n            <template replace-part=\"suggestion\">\n              <span style=\"font-style: italic\">${suggestion}</span>\n            </template>\n</autocomplete>\n</div>\n</td>\n\n<!-- Value Input -->\n<td class=\"text-center\">\n  <div class=\"form-group\">\n    <div if.bind=\"current.assignment.isPoints\" class=\"form-group\">\n      <input value.bind=\"quickPoints\"\n             type=\"number\"\n             class=\"form-control\"\n             style=\"width: 5.5em;\"\n             placeholder=\"Score\"\n             focus.bind=\"scoreFocus\"\n             keypress.delegate=\"parseKey($event.which)\" />\n    </div>\n    <div if.bind=\"!current.assignment.isPoints\">\n      <i class=\"fa fa-check-circle-o fa-2x\" aria-hidden=\"true\"></i>\n    </div>\n  </div>\n</td>\n</tr>\n</table>\n</template>\n"; });
 define('text!gradebook/components/reportAssignment.html', ['module'], function(module) { module.exports = "<template>\n<style>\n\n.bar rect {\nfill: steelblue;\n}\n\n.bar text {\nfill: #fff;\nfont: 10px sans-serif;\n}\n\ndiv.tooltip {\n    position: absolute;\n    text-align: center;\n    width: auto;\n    height: auto;\n    padding: 2px;\n    font: 16px sans-serif;\n    background: lightsteelblue;\n    border: 0px;\n    border-radius: 8px;\n    pointer-events: none;\n\n}\n\n.arc text {\n  font: 10px sans-serif;\n  text-anchor: middle;\n}\n\n.arc path {\n  stroke: #fff;\n}\n\n.legend {\n    font-size: 13px;\n  }\n  h1 {\n  font-size: 15px;\n  text-align: center;\n\t}\n  rect {\n    stroke-width: 2;\n  }\n\n  .tooltip2 {\n  box-shadow: 0 0 5px #999999;\n  display: none;\n  font-size: 12px;\n  left: 130px;\n  padding: 10px;\n  position: absolute;\n  text-align: center;\n  top: 95px;\n  width: 80px;\n  z-index: 10;\n  line-height: 140%; /*Interlineado*/\n  font-family: \"Open Sans\", sans-serif;\n  font-weight: 300;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n\t}\n\n  .label {\n   font-weight: 600;\n  }\n\n</style>\n  <div id=\"content\"></div>\n</template>\n"; });
 define('text!gradebook/components/scoresList.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../../shared/converters/scoreFormat\"></require>\n\n  <table class=\"table table-hover\">\n    <thead>\n    <tr>\n      <th></th>\n      <th class=\"text-center\">${ current.assignment.type }\n        <small show.bind=\"current.assignment.isPoints && current.assignment.max !== 0\">\n          (max: ${current.assignment.max})</small></th>\n    </tr>\n    </thead>\n      <tr repeat.for=\"score of current.scores\">\n        <td class=\"text-center\">${ score.student.first_name }</td>\n        <td class=\"text-center\" click.delegate=\"editScore(score)\">\n          <!-- View Mode -->\n          <div if.bind=\"score.id !== editScoreId\" innerhtml.bind=\"score.value | scoreFormat: score.assignment\"></div>\n\n          <!-- Edit Mode -->\n          <div if.bind=\"score.id === editScoreId\">\n              <input keypress.delegate=\"deFocus($event.which)\"\n                     focus.bind=\"editFocus\"\n                     blur.trigger=\"updateScore(score, $index)\"\n                     value.bind=\"score.value & validate\"\n                     type=\"number\"\n                     style=\"width: 3.5em\">\n          </div>\n        </td>\n      </tr>\n  </table>\n\n</template>\n"; });
-define('text!gradebook/lib/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
 define('text!home/signup/firstTime.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"gradebook/addYear\"></require>\n  <require from=\"gradebook/addStudent\"></require>\n  <require from=\"gradebook/addSubject\"></require>\n  <require from=\"admin/components/profile\"></require>\n\n  <div class=\"col-md-2\">\n    <h3>Setup</h3>\n    <ul class=\"nav nav-stacked\">\n      <li role=\"presentation\"\n          repeat.for=\"step of completed\">\n        <a class=\"text-success\"><i class=\"fa fa-check-circle-o text-success\" aria-hidden=\"true\"></i> ${ step }</a>\n      </li>\n      <li role=\"presentation\"\n          repeat.for=\"step of todo\"\n          class=\"${ step === activeStep ? 'active' : 'disabled'}\">\n        <a href click.delegate=\"nextStep(step)\"><i class=\"fa fa-circle-o\" aria-hidden=\"true\"></i> ${ step }</a>\n      </li>\n    </ul>\n\n  </div>\n\n  <div class=\"col-md-10\">\n    <div class=\"row\">\n      <div if.bind=\"activeStep === 'Introduction'\">\n        <h3>Checklist</h3>\n        <p class=\"col-md-6\">\n          Welcome to Marks! This guided setup will get you up and running fast.\n          After entering all the information for each step mark it done by click on the circle to the left!\n          You're done with the introduction so go ahead and \"marks\" it done!\n        </p>\n      </div>\n      <profile if.bind=\"activeStep === 'Profile'\"></profile>\n      <add-year if.bind=\"activeStep === 'Years'\"></add-year>\n      <add-student if.bind=\"activeStep === 'Students'\"></add-student>\n      <add-subject if.bind=\"activeStep === 'Subjects'\"></add-subject>\n      <div if.bind=\"todo.length === 0\">\n        <h3>All done! Sending you to your gradebook!</h3>\n      </div>\n    </div>\n  </div>\n</template>\n"; });
 define('text!home/signup/payment.html', ['module'], function(module) { module.exports = "<template>\n  <h1>Enter Payment Information</h1>\n  <a href=\"/#/first_time\" class=\"btn\">Setup Gradebook</a>\n<template>\n"; });
 define('text!reports/components/studentReport.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"../converters/scoreFilter\"></require>\n  <require from=\"../attributes/timePlot\"></require>\n  <require from=\"shared/converters/dateFormat\"></require>\n  <require from=\"shared/converters/scoreFormat\"></require>\n\n  <style> /* set the CSS */\n.line {\n  fill: none;\n  stroke: steelblue;\n  stroke-width: 2px;\n}\n</style>\n\n  <!-- Selection Menu -->\n  <div class=\"row\">\n    <form class=\"form-inline\" submit.delegate=\"generate()\">\n      <div class=\"form-group\">\n        <label>Select Student:</label>\n        <select class=\"form-control\" value.bind=\"selected.student\" placeholder=\"Select Student\">\n          <option repeat.for=\"student of students\" model.bind=\"student\">\n            ${ student.first_name } ${ student.last_name }\n          </option>\n        </select>\n      </div>\n      <div class=\"form-group\">\n        <label>Start Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.start\">\n      </div>\n\n      <div class=\"form-group\">\n        <label>End Date:</label>\n          <input type=\"date\" class=\"form-control\" value.bind=\"selected.end\">\n      </div>\n\n      <button type=\"submit\" class=\"btn btn-default\">Generate Report</button>\n      <ul>\n    </form>\n  </div>\n\n  <!-- Report Header -->\n  <div if.bind=\"reportGenerated\">\n  <div class=\"row\">\n    <h1>${ selected.student.first_name & oneTime} ${ selected.student.last_name & oneTime}</h1>\n  </div>\n\n  <!-- Subject Rows -->\n  <div class=\"row\" repeat.for=\"subject of current.subjectList\">\n    <div class=\"col-md-4\">\n      <h2>${ subject.name & oneTime}</h2>\n      <table class=\"table\">\n        <div if.bind=\"$first\">\n          <thead>\n            <th></th>\n            <th>Date</th>\n            <th>Max Score</th>\n            <th>Score</th>\n          </thead>\n        </div>\n        <tbody>\n          <tr repeat.for=\"score of scores | scoreFilter: subject.id\">\n            <td>${ score.assref.name & oneTime}</td>\n            <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>\n            <td>${ score.assref.max & oneTime}</td>\n            <td innerhtml.bind=\"score.value | scoreFormat: score.assignment & oneTime\"></td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n\n    <!-- Plots -->\n    <div class=\"col-md-6\">\n      <div class=\"col-md-6\">\n        <h2>Points</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'\"></div>\n      </div>\n      <div class=\"col-md-6\">\n        <h2>Checks</h2>\n        <div time-plot=\"scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'\"></div>\n      </div>\n    </div>\n  </div>\n</div>\n</template>\n"; });
 define('text!shared/components/navbar.html', ['module'], function(module) { module.exports = "<template>\n<require from=\"shared/converters/dateFormat\"></require>\n\n  <style>\n  #login-dp{\n    min-width: 250px;\n    padding: 14px 14px 0;\n    overflow:hidden;\n    background-color:rgba(255,255,255,.8);\n  }\n  #login-dp .help-block{\n    font-size:12px\n  }\n  #login-dp .bottom{\n    background-color:rgba(255,255,255,.8);\n    border-top:1px solid #ddd;\n    clear:both;\n    padding:14px;\n  }\n  #login-dp .social-buttons{\n    margin:12px 0\n  }\n  #login-dp .social-buttons a{\n    width: 49%;\n  }\n  #login-dp .form-group {\n    margin-bottom: 10px;\n  }\n  .btn-fb{\n    color: #fff;\n    background-color:#3b5998;\n  }\n  .btn-fb:hover{\n    color: #fff;\n    background-color:#496ebc\n  }\n  .btn-tw{\n    color: #fff;\n    background-color:#55acee;\n  }\n  .btn-tw:hover{\n    color: #fff;\n    background-color:#59b5fa;\n  }\n  @media(max-width:768px){\n    #login-dp{\n        background-color: inherit;\n        color: #fff;\n    }\n    #login-dp .bottom{\n        background-color: inherit;\n        border-top:0 none;\n    }\n  }\n  </style>\n\n  <!-- Navigation Bar -->\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\"\n                data-toggle=\"collapse\"\n                data-target=\"#bs-example-navbar-collapse-1\"\n                aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"#\" }>Marks</a>\n      </div>\n\n      <!-- Collect the nav links, forms, and other content for toggling -->\n      <div class=\"collapse navbar-collapse\" id=\"bs-example-navbar-collapse-1\">\n        <ul class=\"nav navbar-nav\">\n          <li repeat.for=\"row of router.navigation | authFilter: auth.isAuthenticated()\" class=\"${row.isActive ? 'active' : ''}\">\n            <a href.bind=\"row.href\">${row.title}</a>\n          </li>\n        </ul>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li class=\"dropdown\" if.bind=\"auth.isAuthenticated()\">\n            <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              ${ current.user.teacherName }<span if.bind=\"current.year\"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' })</span><span class=\"caret\"></span>\n            </a>\n              <ul class=\"dropdown-menu\">\n                <li><a route-href=\"route: addsubject\">Add Subject</a></li>\n                <li><a route-href=\"route: addstudent\">Add Student</a></li>\n                <li><a route-href=\"route: addyear\">Add Year</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a route-href=\"route: settings\">Settings</a></li>\n                <li role=\"separator\" class=\"divider\"></li>\n                <li><a href=\"\" click.delegate=\"logout()\">Logout</a></li>\n              </ul>\n          </li>\n          <li class=\"dropdown\" if.bind=\"!auth.isAuthenticated()\">\n            <a href=\"#\" click.delegate=\"showReset = flase\"class=\"dropdown-toggle\" data-toggle=\"dropdown\" role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n              Login<span class=\"caret\"></span>\n            </a>\n            <ul id=\"login-dp\" class=\"dropdown-menu\">\n              <li>\n                 <div class=\"row\">\n                    <div class=\"col-md-12\">\n                      <!-- <div class=\"social-buttons\">\n                        <a href=\"#\" class=\"btn btn-fb\"><i class=\"fa fa-facebook\"></i> Facebook</a>\n                        <a href=\"#\" class=\"btn btn-tw\"><i class=\"fa fa-twitter\"></i> Twitter</a>\n                      </div> -->\n                       <form if.bind=\"!showReset\" submit.delegate=\"login()\" class=\"form\" role=\"form\" id=\"login-nav\" validation-renderer=\"bootstrap-form\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"user.email & validate\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                            <label class=\"sr-only\" for=\"exampleInputPassword2\">Password</label>\n                            <input value.bind=\"user.password & validate\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword2\" placeholder=\"Password\" required>\n                            <div class=\"help-block text-right\"><a href=\"#\" click.delegate=\"toggleReset()\">Forget your password?</a></div>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Sign in</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                       <form if.bind=\"showReset\" submit.delegate=\"sendReset()\" class=\"form\" role=\"form\" id=\"login-nav\">\n                          <div class=\"form-group\">\n                             <label class=\"sr-only\" for=\"exampleInputEmail2\">Email address</label>\n                             <input value.bind=\"loginData.email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail2\" placeholder=\"Email address\" required>\n                          </div>\n                          <div class=\"form-group\">\n                             <button type=\"submit\" class=\"btn btn-primary btn-block\">Send Reset E-mail</button>\n                          </div>\n                          <!-- <div class=\"checkbox\">\n                             <label>\n                             <input type=\"checkbox\"> keep me logged-in\n                             </label>\n                          </div> -->\n                       </form>\n                    </div>\n                    <!-- <div class=\"bottom text-center\">\n                      New here ? <a href=\"#\"><b>Join Us</b></a>\n                    </div> -->\n                 </div>\n              </li>\n            </ul>\n          </li>\n        </ul>\n      </div>\n    </div>\n  </nav>\n</template>\n"; });
+define('text!gradebook/lib/autocomplete.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./autocomplete.css\"></require>\n\n  <input type=\"text\" autocomplete=\"off\" class=form-control\n         aria-autocomplete=\"list\"\n         aria-expanded.bind=\"expanded\"\n         aria-owns.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n         aria-activedescendant.bind=\"index >= 0 ? 'au-autocomplate-' + id + '-suggestion-' + index : ''\"\n         id.one-time=\"'au-autocomplete-' + id\"\n         placeholder.bind=\"placeholder\"\n         value.bind=\"inputValue & debounce:delay\"\n         keydown.delegate=\"keydown($event.which)\"\n         blur.trigger=\"blur()\"\n         focus.bind=\"nameFocus\">\n  <ul class=\"suggestions\" role=\"listbox\"\n      if.bind=\"expanded\"\n      id.one-time=\"'au-autocomplate-' + id + '-suggestions'\"\n      ref=\"suggestionsUL\">\n    <li repeat.for=\"suggestion of suggestions\"\n        id.one-time=\"'au-autocomplate-' + id + '-suggestion-' + $index\"\n        role=\"option\"\n        class-name.bind=\"($index === index ? 'selected' : '') + ' suggestion'\"\n        mousedown.delegate=\"suggestionClicked(suggestion)\">\n        ${ suggestion.studref.first_name }\n      <!-- <template replaceable-part=\"suggestion\">\n        ${ suggestion }\n      </template> -->\n    </li>\n  </ul>\n</template>\n"; });
 //# sourceMappingURL=app-bundle.js.map

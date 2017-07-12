@@ -12,7 +12,7 @@ from flask_cors import CORS
 app = Flask(__name__,
             instance_relative_config=True,
             static_folder="../../client/",
-            static_url_path="/client")
+            static_url_path="")
 
 # Load config
 app.config.from_pyfile('config.py')
@@ -22,7 +22,8 @@ app.config.from_pyfile('config.py')
 # Setup main route
 @app.route('/')
 def index():
-    return current_app.send_static_file('app/layout/index.html')
+    print(app.root_path)
+    return current_app.send_static_file('index.html')
 
 # Apply Cors
 CORS(app)
