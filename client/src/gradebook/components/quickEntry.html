@@ -1,0 +1,57 @@
+<template>
+  <require from="../lib/autocomplete"></require>
+  <require from="../../shared/converters/scoreFormat"></require>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="text-center">${ current.assignment.type }
+          <small show.bind="isPoints">
+            (max: ${ current.assignment.max })</small></th>
+      </tr>
+    </thead>
+    <tr repeat.for="score of entered">
+      <td class="text-center">${ score.student.first_name }</td>
+      <td class="text-center" innerhtml.bind="score.value | scoreFormat: score.assignment"></td>
+    </tr>
+
+    <!-- Input Row -->
+    <tr>
+      <td class="text-center">
+        <!-- Name Input -->
+          <div class="form-group">
+            <autocomplete service.bind="suggestionService"
+                          value.bind="score"
+                          placeholder="Name"
+                          name-focus.bind="nameFocus"
+                          score-focus.bind="scoreFocus"
+                          is-points.bind="current.assignment.isPoints"
+                          checks.call="parseKey(key)">
+            <template replace-part="suggestion">
+              <span style="font-style: italic">${suggestion}</span>
+            </template>
+</autocomplete>
+</div>
+</td>
+
+<!-- Value Input -->
+<td class="text-center">
+  <div class="form-group">
+    <div if.bind="current.assignment.isPoints" class="form-group">
+      <input value.bind="quickPoints"
+             type="number"
+             class="form-control"
+             style="width: 5.5em;"
+             placeholder="Score"
+             focus.bind="scoreFocus"
+             keypress.delegate="parseKey($event.which)" />
+    </div>
+    <div if.bind="!current.assignment.isPoints">
+      <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+    </div>
+  </div>
+</td>
+</tr>
+</table>
+</template>

@@ -1,0 +1,44 @@
+<template>
+  <h3>Profile</h3>
+  <form submit.delegate="submit()" class="form-horizontal" validation-renderer="bootstrap-form">
+    <!-- Title -->
+    <div class="form-group">
+      <label class="col-md-4 control-label">Title:</label>
+      <div class="col-md-6">
+        <select class="form-control" value.bind="profile.title & validate">
+          <option value="">Select</option>
+          <option value="Ms.">Ms.</option>
+          <option value="Mrs.">Mrs.</option>
+          <option value="Mr.">Mr.</option>
+          <option value="Dr.">Dr.</option>
+        </select>
+      </div>
+    </div>
+    <!-- First Name -->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="firstname">First Name:</label>
+      <div class="col-md-6">
+        <input type="text" class="form-control" id="firstname" placeholder="First Name"
+               value.bind="profile.first_name & validate">
+      </div>
+    </div>
+
+    <!-- Last Name -->
+    <div class="form-group">
+      <label class="col-md-4 control-label" for="lastname">Last Name:</label>
+      <div class="col-md-6">
+        <input type="text" class="form-control" id="lastname" placeholder="Last Name"
+               value.bind="profile.last_name & validate">
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group">
+      <div class="col-md-offset-4 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <i if.bind="isSaving" class="fa fa-circle-o-notch fa-spin fa-2x" aria-hidden="true"></i>
+        <i if.bind="saved" class="fa fa-check text-success fa-2x" aria-hidden="true"></i>
+      </div>
+    </div>
+  </form>
+</template>

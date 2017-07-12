@@ -1,0 +1,72 @@
+<template>
+<style>
+
+.bar rect {
+fill: steelblue;
+}
+
+.bar text {
+fill: #fff;
+font: 10px sans-serif;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    height: auto;
+    padding: 2px;
+    font: 16px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+
+}
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+.legend {
+    font-size: 13px;
+  }
+  h1 {
+  font-size: 15px;
+  text-align: center;
+	}
+  rect {
+    stroke-width: 2;
+  }
+
+  .tooltip2 {
+  box-shadow: 0 0 5px #999999;
+  display: none;
+  font-size: 12px;
+  left: 130px;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  top: 95px;
+  width: 80px;
+  z-index: 10;
+  line-height: 140%; /*Interlineado*/
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+	}
+
+  .label {
+   font-weight: 600;
+  }
+
+</style>
+  <div id="content"></div>
+</template>

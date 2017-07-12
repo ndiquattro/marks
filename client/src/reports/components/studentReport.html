@@ -1,0 +1,84 @@
+<template>
+  <require from="../converters/scoreFilter"></require>
+  <require from="../attributes/timePlot"></require>
+  <require from="shared/converters/dateFormat"></require>
+  <require from="shared/converters/scoreFormat"></require>
+
+  <style> /* set the CSS */
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+</style>
+
+  <!-- Selection Menu -->
+  <div class="row">
+    <form class="form-inline" submit.delegate="generate()">
+      <div class="form-group">
+        <label>Select Student:</label>
+        <select class="form-control" value.bind="selected.student" placeholder="Select Student">
+          <option repeat.for="student of students" model.bind="student">
+            ${ student.first_name } ${ student.last_name }
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Start Date:</label>
+          <input type="date" class="form-control" value.bind="selected.start">
+      </div>
+
+      <div class="form-group">
+        <label>End Date:</label>
+          <input type="date" class="form-control" value.bind="selected.end">
+      </div>
+
+      <button type="submit" class="btn btn-default">Generate Report</button>
+      <ul>
+    </form>
+  </div>
+
+  <!-- Report Header -->
+  <div if.bind="reportGenerated">
+  <div class="row">
+    <h1>${ selected.student.first_name & oneTime} ${ selected.student.last_name & oneTime}</h1>
+  </div>
+
+  <!-- Subject Rows -->
+  <div class="row" repeat.for="subject of current.subjectList">
+    <div class="col-md-4">
+      <h2>${ subject.name & oneTime}</h2>
+      <table class="table">
+        <div if.bind="$first">
+          <thead>
+            <th></th>
+            <th>Date</th>
+            <th>Max Score</th>
+            <th>Score</th>
+          </thead>
+        </div>
+        <tbody>
+          <tr repeat.for="score of scores | scoreFilter: subject.id">
+            <td>${ score.assref.name & oneTime}</td>
+            <td>${ score.assref.date | dateFormat: 'MMMM Do' & oneTime}</td>
+            <td>${ score.assref.max & oneTime}</td>
+            <td innerhtml.bind="score.value | scoreFormat: score.assignment & oneTime"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Plots -->
+    <div class="col-md-6">
+      <div class="col-md-6">
+        <h2>Points</h2>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'"></div>
+      </div>
+      <div class="col-md-6">
+        <h2>Checks</h2>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>

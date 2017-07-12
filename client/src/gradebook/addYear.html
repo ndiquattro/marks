@@ -1,0 +1,79 @@
+<template>
+  <require from="shared/converters/dateFormat"></require>
+
+  <div class="col-md-6">
+    <h3>${ title }</h3>
+    <form class="form-horizontal" submit.delegate="submit()" validation-renderer="bootstrap-form">
+
+      <!-- Name Form -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">School Name:</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" value.bind="newYear.school & validate" focus.bind="formStart">
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">First day of School:</label>
+        <div class="col-md-6">
+          <input type="date" value.bind="newYear.first_day & validate" class="form-control">
+        </div>
+      </div>
+
+      <!-- End Date -->
+      <div class="form-group">
+        <label class="col-md-4 control-label">Last day of School:</label>
+        <div class="col-md-6">
+          <input type="date" value.bind="newYear.last_day & validate" class="form-control">
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-group">
+        <div class="col-md-offset-4 col-md-6 text-center">
+          <button type="submit" class="btn btn-primary">
+            ${ bttn }
+          </button>
+          <button click.delegate="reset()" class="btn btn-danger">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Added Years -->
+  <div class="col-md-6">
+    <h3>Saved</h3>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Year</th>
+        <th>School</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tr repeat.for="year of years.objects">
+        <td>${ year.first_day | dateFormat: 'YYYY' & oneTime}</td>
+        <td>${ year.school & oneTime }</td>
+        <td>
+          <div class="btn-group btn-group-xs" role="group">
+            <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
+                    click.delegate="current.setYear(year)">
+              <i class="fa fa-bolt"></i> Activate
+            </button>
+            <button type="button" class="btn btn-default ${ year.id === newYear.id ? 'active' : ''}"
+                    click.delegate="edit(year)">
+              <i class="fa fa-pencil"></i> Edit
+            </button>
+            <button type="button" class="btn btn-default"
+                    click.delegate="delete(year)">
+              <i class="fa fa-eraser"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</template>
