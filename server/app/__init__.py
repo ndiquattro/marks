@@ -20,10 +20,10 @@ app.config.from_pyfile('config.py')
 
 
 # Setup main route
-@app.route('/')
-def index():
-    print(app.root_path)
-    return current_app.send_static_file('index.html')
+if app.config['LOCATION'] is 'local':
+    @app.route('/')
+    def index():
+        return current_app.send_static_file('index.html')
 
 # Apply Cors
 CORS(app)

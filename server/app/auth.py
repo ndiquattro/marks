@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_security.recoverable import send_reset_password_instructions, reset_password_token_status, update_password
 from flask_security.changeable import change_user_password
+from flask_security.confirmable import send_confirmation_instructions, confirm_email_token_status, confirm_user
 from sqlalchemy import inspect
 from app import user_datastore, db
 
@@ -27,13 +28,49 @@ def signup():
     user = user_datastore.create_user(email=content['email'],
                                       password=content['password'])
 
+
     # Add new user to the database
     db.session.commit()
 
     # Create JWT token and return user info
     ret = make_token(user)
 
+    # Send Confirmation email
+    send_confirmation_instructions(user)
+
     return jsonify(ret), 200
+
+@auth.route('/confirm_email/<string:token>', methods=['POST'])
+def confirm_email(token):
+    print(token)
+    expired, invalid, user = confirm_email_token_status(token)
+
+    if not user or invalid:
+        invalid = True
+
+    already_confirmed = user is not None and user.confirmed_at is not None
+
+    if expired and not already_confirmed:
+        send_confirmation_instructions(user)
+
+    if invalid or (expired and not already_confirmed):
+        return redirect(get_url(_security.confirm_error_view) or
+                        url_for('send_confirmation'))
+
+    if user != current_user:
+        logout_user()
+        login_user(user)
+
+    if confirm_user(user):
+        db.session.commit()
+        msg = 'EMAIL_CONFIRMED'
+    else:
+        msg = 'ALREADY_CONFIRMED'
+
+    do_flash(*get_message(msg))
+
+    return redirect(get_url(_security.post_confirm_view) or
+                    get_url(_security.post_login_view))
 
 @auth.route('/login', methods=['POST'])
 def login():
