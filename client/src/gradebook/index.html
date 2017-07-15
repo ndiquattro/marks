@@ -4,59 +4,133 @@
   <require from="./components/quickEntry"></require>
   <require from="./components/addAssignment"></require>
   <require from="./components/reportAssignment"></require>
+  <require from="shared/components/scriptInjector"></require>
+  <require from="shared/attributes/bootstrap-select"></require>
 
-  <!-- Subjects Menu -->
-  <ul class="nav nav-tabs">
-    <li>
-      <h4>Subjects</h4>
-    </li>
-    <li repeat.for="sub of current.subjectList" role="presentation"
-        class="${sub.id === current.subject.id ? 'active' : ''}">
-      <a href="" click.delegate="current.setSubject(sub)">${ sub.name }</a>
-    </li>
-  </ul>
+  <style>
+  .center-pills {
+    display: flex;
+    justify-content: center;
+  }
 
-  <!-- Subject Menu Bar -->
-  <div class="row" show.bind="current.subject">
-    <ul class="nav nav-pills">
-      <li role="presentation" class="${editMode === 'add' ? 'active' : ''}">
-        <a href="#" click.delegate="addAssignment()"><i class="fa fa-plus fa-lg"></i> Add Assignment</a>
-      </li>
-      <li role="presentation" show.bind="current.scores" class="${quickEntry ? 'active' : ''}">
-        <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i> Quick Entry</a>
-      </li>
-      <li role="presentation" show.bind="current.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
-        <a href="#" click.delegate="editAssignment()"><i class="fa fa-pencil"></i> Edit Assignment</a>
-      </li>
-      <li role="presentation" show.bind="current.scores">
-        <a href="#" click.delegate="deleteAssignment()"><i class="fa fa-eraser"></i> Delete Assignment</a>
-      </li>
-    </ul>
+  .assignment-spacer {
+    width: 100%;
+    min-height: 1px;
+    margin-top: 150px;
+    margin-bottom: 150px;
+    display:inline-block;
+    position:relative;
+  }
+
+  .score-spacer {
+    width: 100%;
+    min-height: 1px;
+    margin-top: 250px;
+    margin-bottom: 250px;
+    display:inline-block;
+    position:relative;
+  }
+  </style>
+
+  <!-- Subject Selection Section -->
+  <div class="row">
+    <div class="col-md-12 text-right">
+      <span class="dropdown">
+        <button class="dropdown-toggle btn btn-simple btn-block" style="font-size: 4em; padding: 0.4em;" data-toggle="dropdown"><span class="pull-right">${ !current.subject.name ? 'Subjects' : current.subject.name } <b class="caret"></b></span></button>
+      <!-- You can add classes for different colours on the next element -->
+        <ul class="dropdown-menu dropdown-primary dropdown-menu-right">
+          <li repeat.for="subject of current.subjectList" class="text-right">
+            <a route-href="route: gradebook; params.bind: { subject: subject.id }"  style="font-size: 4em">${ subject.name }</a>
+          </li>
+        </ul>
+      </span>
+    </div>
   </div>
 
-  <!-- Assignment List -->
+  <!-- Assignment List and Control -->
   <div class="row">
-    <div class="col-md-2" if.bind="current.subject">
-      <h5>Assignments</h5>
-      <assignment-list></assignment-list>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="content">
+           <div if.bind="current.subject">
+            <ul class="nav nav-pills center-pills">
+              <li role="presentation" class="${ editMode === 'add' ? 'active' : '' }">
+                <a href="#" click.delegate="addAssignment()" data-toggle="modal" data-target="#assignmentModal"><i class="fa fa-plus"></i></a>
+              </li>
+              <li role="presentation" show.bind="current.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
+                <a href="#" click.delegate="editAssignment()" data-toggle="modal" data-target="#assignmentModal"><i class="fa fa-pencil"></i></a>
+              </li>
+              <li role="presentation" show.bind="current.scores">
+                <a href="#" click.delegate="deleteAssignment()"><i class="fa fa-eraser"></i></a>
+              </li>
+              <li role="presentation" show.bind="current.scores" class="${quickEntry ? 'active' : ''}">
+                <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward"></i></a>
+              </li>
+            </ul>
+            <br>
+            <assignment-list></assignment-list>
+          </div>
+
+          <!-- Content placeholder -->
+          <div class="text-muted text-center assignment-spacer" if.bind="!current.subject">
+            <h3>Assignments</h3>
+          </div>
+
+        </div>
+      </div>
     </div>
 
-    <!-- Scores List -->
-    <div class="col-md-4" if.bind="current.scores && !editMode">
-      <h5>Scores</h5>
-      <scores-list if.bind="!quickEntry"></scores-list>
-      <quick-entry if.bind="quickEntry"></quick-entry>
-    </div>
+  <!-- Scores List -->
+  <div class="col-md-4" >
+    <div class="card">
+      <div class="content">
+        <div if.bind="current.scores && !editMode">
+          <scores-list if.bind="!quickEntry"></scores-list>
+          <quick-entry if.bind="quickEntry"></quick-entry>
+        </div>
 
-    <!-- Reports -->
-    <div class="col-md-6" if.bind="current.scores && !editMode">
-      <h5>Assesment</h5>
-      <report-assignment></report-assignment>
-    </div>
+        <!-- Content placeholder -->
+        <div if.bind="!current.scores && !editMode">
+          <div class="text-muted text-center score-spacer">
+            <h3>Scores</h3>
+          </div>
+        </div>
 
-    <!-- Add Assignment -->
-    <div class="col-md-5" if.bind="editMode">
+      </div>
+    </div>
+  </div>
+
+  <!-- Reports -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="content">
+        <div if.bind="current.scores && !editMode">
+          <report-assignment></report-assignment>
+        </div>
+
+        <!-- Content placheolder -->
+        <div if.bind="!current.scores && !editMode">
+          <div class="text-muted text-center assignment-spacer">
+            <h3>Plot</h3>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Assignment -->
+  <div class="modal fade" id="assignmentModal" tabindex="-1" role="dialog" aria-labelledby="assignmentModal" aria-hidden="true">
+    <div class="modal-dialog">
       <add-assignment mode.two-way="editMode"></add-assignment>
     </div>
   </div>
+
+  <scriptinjector url="src/assets/js/ct-paper-checkbox.js"></scriptinjector>
+  <!-- <scriptinjector url="src/assets/js/ct-paper-radio.js"></scriptinjector> -->
+  <!-- <scriptinjector url="src/assets/js/bootstrap-select.js"></scriptinjector> -->
+  <!-- <scriptinjector url="src/assets/js/bootstrap-datepicker.js"></scriptinjector> -->
+  <scriptinjector url="src/assets/js/ct-paper-bootstrapswitch.js"></scriptinjector>
+  <!-- <scriptinjector url="src/assets/js/jquery.tagsinput.js"></scriptinjector> -->
+  <scriptinjector url="src/assets/js/ct-paper.js"></scriptinjector>
 </template>

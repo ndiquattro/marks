@@ -34,7 +34,7 @@ export class CurrentService {
       filters: [{'name': 'year_id', 'op': 'eq', 'val': this.year.id}]
     };
 
-    this.api.find('subjects', query)
+    return this.api.find('subjects', query)
             .then(data => this.subjectList = data.objects);
   }
 
@@ -42,6 +42,11 @@ export class CurrentService {
     this.subject = subject;
     this.clearAssignment();
     this.ea.publish('subjectSet');
+  }
+
+  clearSubject() {
+    this.subject = false;
+    this.clearAssignment();
   }
 
   // Assignment Methods

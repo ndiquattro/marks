@@ -1,16 +1,20 @@
 import {inject} from 'aurelia-framework';
 import {CurrentService} from 'shared/services/currentService';
 import {AuthService, AuthorizeStep} from 'aurelia-auth';
+// import 'bootstrap';
 
 @inject(CurrentService, AuthService)
 export class App {
   configureRouter(config, router) {
     config.title = 'Marks';
+    config.options.pushState = true;
+    config.options.root = '/';
     config.addPipelineStep('authorize', AuthorizeStep);
     config.map([
       // Main Nav routes
       { route: '/', moduleId: './home/index', nav: 0, title: 'Welcome', auth: false },
-      { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true},
+      // { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true},
+      { route: 'gradebook/:subject?/:assignment?', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true, href: 'gradebook'},
       { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true},
 
       // User Managment

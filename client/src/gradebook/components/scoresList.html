@@ -1,32 +1,37 @@
 <template>
-  <require from="../../shared/converters/scoreFormat"></require>
+  <require from="shared/converters/scoreFormat"></require>
+  <require from="shared/converters/dateFormat"></require>
 
-  <table class="table table-hover">
-    <thead>
-    <tr>
-      <th></th>
-      <th class="text-center">${ current.assignment.type }
-        <small show.bind="current.assignment.isPoints && current.assignment.max !== 0">
-          (max: ${current.assignment.max})</small></th>
-    </tr>
-    </thead>
-      <tr repeat.for="score of current.scores">
-        <td class="text-center">${ score.student.first_name }</td>
-        <td class="text-center" click.delegate="editScore(score)">
-          <!-- View Mode -->
-          <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assignment"></div>
+  <style>
+  .scores tr {
+   height: 70px;
+}
+</style>
+<p>
+  <span if.bind="current.assignment.isPoints">Max Score: ${ current.assignment.max }</span>
+  <span if.bind="!current.assignment.isPoints">Checks</span>
+  <span class="pull-right small text-muted">${ current.assignment.date | dateFormat: 'dddd, MMMM Do'}</span>
+  <!-- Percent View <input type="checkbox" checked data-toggle="switch" class="ct-green"/> -->
+</p>
 
-          <!-- Edit Mode -->
-          <div if.bind="score.id === editScoreId">
-              <input keypress.delegate="deFocus($event.which)"
-                     focus.bind="editFocus"
-                     blur.trigger="updateScore(score, $index)"
-                     value.bind="score.value & validate"
-                     type="number"
-                     style="width: 3.5em">
-          </div>
-        </td>
-      </tr>
-  </table>
+<table class="table table-hover scores">
+  <tr repeat.for="score of current.scores">
+    <td class="text-center col-md-6">${ score.student.first_name }</td>
+    <td class="text-center col-md-6" click.delegate="editScore(score)">
+      <!-- View Mode -->
+      <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assignment"><i></i></div>
+
+      <!-- Edit Mode -->
+      <div if.bind="score.id === editScoreId">
+          <input keypress.delegate="deFocus($event.which)"
+                 focus.bind="editFocus"
+                 blur.trigger="updateScore(score, $index)"
+                 value.bind="score.value & validate"
+                 type="number"
+                 style="width: 3.5em">
+      </div>
+    </td>
+  </tr>
+</table>
 
 </template>

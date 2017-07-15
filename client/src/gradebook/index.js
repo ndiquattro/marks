@@ -3,6 +3,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {CurrentService} from 'shared/services/currentService';
 import {ApiService} from 'shared/services/apiService';
 
+
 @inject(CurrentService, ApiService, EventAggregator)
 export class GradeBook {
   constructor(current, api, eventaggregator) {
@@ -14,6 +15,35 @@ export class GradeBook {
     // Initalize Selection Indicators
     this.quickEntry = false;
     this.editMode = false;
+  }
+
+  activate(params) {
+    // Check if we are changing subjects
+    let changeSubject = false;
+    if (this.current.subject) {
+      if (this.current.subject.id !== Number(params.subject)) {
+        changeSubject = true;
+      }
+    } else {
+      changeSubject = true;
+    }
+
+    // If there is a subject and we are changing, get new info
+    if (params.subject && changeSubject) {
+      this.api.findOne('subjects', params.subject).then(data => {
+        this.current.setSubject(data);
+      });
+    }
+
+    if (!params.subject && this.current.subject) {
+      this.current.clearSubject();
+    }
+
+    if (params.assignment) {
+      this.api.findOne('assignments', params.assignment).then(data => {
+        this.current.setAssignment(data);
+      });
+    }
   }
 
   created() {

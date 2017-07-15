@@ -29,6 +29,10 @@ export class AddAssignment {
     }
   }
 
+  modeChanged() {
+    this.attached();
+  }
+
   detached() {
     this.newAssignment = new Assignment({date: moment().format('YYYY-MM-DD')});
   }

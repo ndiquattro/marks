@@ -37,7 +37,7 @@ export class ReportAssignment {
 
     // Height and width
     let margin = {top: 20, right: 20, bottom: 30, left: 50};
-    let width = 500 - margin.left - margin.right;
+    let width = 450 - margin.left - margin.right;
     let height = 300 - margin.top - margin.bottom;
 
     // Define Plot
@@ -138,7 +138,7 @@ export class ReportAssignment {
                      });
 
     // Dimensions
-    let width = 500;
+    let width = 450;
     let height = 300;
     let radius = Math.min(width, height) / 2;
 
@@ -153,9 +153,11 @@ export class ReportAssignment {
     tooltip.append('div').attr('class', 'percent');
 
     // Color Scale
-    let color = d3.scaleOrdinal(d3.schemeCategory10.slice(2, 4));
+    let themeColors = ['#7AC29A', '#EB5E28']
+    // let color = d3.scaleOrdinal(d3.schemeCategory10.slice(2, 4));
+    let color = d3.scaleOrdinal(themeColors);
     if (nestdata.length === 1 && nestdata[0].group === 'Missing') {
-      color = d3.scaleOrdinal(d3.schemeCategory10.slice(3, 4));
+      color = d3.scaleOrdinal(themeColors.slice(1, 2));
     }
 
     let svg = d3.select(divElement)

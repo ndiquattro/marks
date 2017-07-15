@@ -1,9 +1,10 @@
 <template>
-  <ul class="nav nav-pills nav-stacked">
-    <li repeat.for="assignment of current.assignmentList"
-        role="presentation"
-        class="${assignment.id === current.assignment.id ? 'active' : ''}">
-      <a href="" click.delegate="current.setAssignment(assignment)">${ assignment.name & oneTime }</a>
+  <ul class="nav">
+    <li repeat.for="assignment of current.assignmentList">
+      <a class="btn btn-simple btn-primary bt-lg ${assignment.id === current.assignment.id ? 'active' : ''}"
+         route-href="route: gradebook; params.bind: { subject: current.subject.id, assignment: assignment.id }">
+      ${ assignment.name & oneTime }
+      </a>
     </li>
   </ul>
 </template>

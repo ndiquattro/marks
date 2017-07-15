@@ -1,44 +1,108 @@
 <template>
-  <div class="col-md-6">
-    <h1>Welcome to Marks!</h1>
-    <p>
-      The primary goal of marks was to create a tool that enables data-driven teaching in primary schools. Primary education provides a unique opportunity for data-driven methods as there typically is one person in charge of a classroom for a long duration. This means many opportunities to track a student's progress and make interventions based on data, given the proper tool.
-    </p>
-    <p>
-      However, in order for a data-driven method to be successful, you need data (duh) and ability to quickly draw insights from that data (less duh). The largest impediments to these requirements are data entry and useful reporting. Marks attempts to remove these obstacles by focusing on easy data entry and reporting that reduces teacher workload. Essentially, it tries to make the teacher want to use the application to make their life easier, while providing a data infrastructure as a bonus. To incentivize teacher adoption, each feature is designed to reduce teacher workload in some aspect. For example, the quick entry mode in Marks allows for an unsorted stack of papers to have their grades entered and calculated quickly. This lowers the barrier for gathering data while making the essential act of keeping grades less onerous. To close the loop, being able to generate easily interpretable reports on the assignment, subject, and student level provides a useful resource for student/parent conferences, individual student plans, and report card generation. Together, making data entry and data interpretation as painless as possible provides a foundation for a data-driven classroom to be built upon.
-    </p>
-  </div>
-  <div class="col-md-6">
-    <h2>Sign up</h2>
-    <form class="form-horizontal" submit.delegate="submitSignUp()" validation-renderer="bootstrap-form">
-
-      <!-- E-mail -->
-      <div class="form-group">
-        <label class="col-md-4 control-label">E-mail:</label>
-        <div class="col-md-6">
-          <input type="email" class="form-control" value.bind="newUser.email & validate">
+    <div class="wrapper">
+        <div class="landing-header" style="background-image: url('src/images/notebook.jpg');">
+            <div class="container">
+                <div class="motto">
+                    <h1 class="title-uppercase">Marks</h1>
+                    <h3>A modern gradebook and teaching assistant designed<br>for elementary school teachers.</h3>
+                    <br />
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="btn"><i class="fa fa-play"></i>Watch video</a>
+                    <a class="btn">Download</a>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="main">
+            <div class="section text-center landing-section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <h2>Become a data driven teacher</h2>
+                            <h5>This is the paragraph where you can write more details about your product. Keep you user engaged by providing meaningful information. Remember that by this time, the user is curious, otherwise he wouldn't scroll to get here. Add a button if you want the user to see more.</h5>
+                            <br />
+                            <a href="#" class="btn btn-danger btn-fill">See Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Password -->
-      <div class="form-group">
-        <label class="col-md-4 control-label">Password</label>
-        <div class="col-md-6">
-          <input type="password" value.bind="newUser.password & validate" class="form-control">
-        </div>
-      </div>
+            <div class="section section-light-brown landing-section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-4 column">
+                            <h4>First Attribute</h4>
+                            <p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing a feature will be enough.</p>
+                            <a class="btn btn-danger btn-simple" href="#">See more <i class="fa fa-chevron-right"></i></a>
+                        </div>
+                        <div class="col-md-4 column">
+                            <h4>Second Attribute</h4>
+                            <p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing a feature will be enough.</p>
+                            <a class="btn btn-danger btn-simple" href="#">See more <i class="fa fa-chevron-right"></i></a>
+                        </div>
+                        <div class="col-md-4 column">
+                            <h4>Third Attribute</h4>
+                            <p>Divide details about your product or agency work into parts. Write a few lines about each one. A paragraph describing a feature will be enough.</p>
+                            <a class="btn btn-danger btn-simple" href="#">See more <i class="fa fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Submit Button -->
-      <div class="form-group">
-        <div class="col-md-offset-4 col-md-6 text-center">
-          <button type="submit" class="btn btn-primary">
-            Sign Up
-          </button>
-          <button class="btn btn-danger">
-            Sign in with Google
-          </button>
+            <div class="section section-dark text-center landing-section">
+                <div class="container">
+                    <h2>Let's talk about us</h2>
+                    <div class="col-md-4">
+                        <div class="team-player">
+                            <img src="../assets/img/chet_faker_2.jpg" alt="Thumbnail Image" class="img-circle img-responsive">
+                            <h5>Chet Faker <br /><small class="text-muted">Music</small></h5>
+                            <p>You can write here details about one of your team members. You can give more details about what they do. Feel free to add some <a href="#">links</a> for people to be able to follow them outside the site.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="team-player">
+                            <img src="../assets/img/flume.jpg" alt="Thumbnail Image" class="img-circle img-responsive">
+                            <h5>Flume <br /><small class="text-muted">Production</small></h5>
+                            <p>You can write here details about one of your team members. You can give more details about what they do. Feel free to add some <a href="#">links</a> for people to be able to follow them outside the site.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="team-player">
+                            <img src="../assets/img/banks.jpg" alt="Thumbnail Image" class="img-circle img-circle img-responsive">
+                            <h5>Banks <br /><small class="text-muted">Music</small></h5>
+                            <p>You can write here details about one of your team members. You can give more details about what they do. Feel free to add some <a href="#">links</a> for people to be able to follow them outside the site.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section landing-section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <h2 class="text-center">Keep in touch?</h2>
+                            <form class="contact-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Name</label>
+                                        <input class="form-control" placeholder="Name">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Email</label>
+                                        <input class="form-control" placeholder="Email">
+                                    </div>
+                                </div>
+                                <label>Message</label>
+                                <textarea class="form-control" rows="4" placeholder="Tell us your thoughts and feelings..."></textarea>
+                                <div class="row">
+                                    <div class="col-md-4 col-md-offset-4">
+                                        <button class="btn btn-danger btn-block btn-lg btn-fill">Send Message</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
-      </div>
-    </form>
-  </div>
+    </div>
 </template>
