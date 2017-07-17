@@ -5,7 +5,6 @@
   <require from="./components/addAssignment"></require>
   <require from="./components/reportAssignment"></require>
   <require from="shared/components/scriptInjector"></require>
-  <require from="shared/attributes/bootstrap-select"></require>
 
   <style>
   .center-pills {
@@ -50,7 +49,7 @@
   <!-- Assignment List and Control -->
   <div class="row">
     <div class="col-md-3">
-      <div class="card">
+      <div class="card card-with-shadow">
         <div class="content">
            <div if.bind="current.subject">
             <ul class="nav nav-pills center-pills">
@@ -82,7 +81,7 @@
 
   <!-- Scores List -->
   <div class="col-md-4" >
-    <div class="card">
+    <div class="card card-with-shadow">
       <div class="content">
         <div if.bind="current.scores && !editMode">
           <scores-list if.bind="!quickEntry"></scores-list>
@@ -102,7 +101,7 @@
 
   <!-- Reports -->
   <div class="col-md-5">
-    <div class="card">
+    <div class="card card-with-shadow">
       <div class="content">
         <div if.bind="current.scores && !editMode">
           <report-assignment></report-assignment>
@@ -126,11 +125,11 @@
     </div>
   </div>
 
-  <scriptinjector url="src/assets/js/ct-paper-checkbox.js"></scriptinjector>
+  <!-- <scriptinjector url="src/assets/js/ct-paper-checkbox.js"></scriptinjector> -->
   <!-- <scriptinjector url="src/assets/js/ct-paper-radio.js"></scriptinjector> -->
   <!-- <scriptinjector url="src/assets/js/bootstrap-select.js"></scriptinjector> -->
   <!-- <scriptinjector url="src/assets/js/bootstrap-datepicker.js"></scriptinjector> -->
-  <scriptinjector url="src/assets/js/ct-paper-bootstrapswitch.js"></scriptinjector>
+  <!-- <scriptinjector url="src/assets/js/ct-paper-bootstrapswitch.js"></scriptinjector> -->
   <!-- <scriptinjector url="src/assets/js/jquery.tagsinput.js"></scriptinjector> -->
-  <scriptinjector url="src/assets/js/ct-paper.js"></scriptinjector>
+  <!-- <scriptinjector url="src/assets/js/ct-paper.js"></scriptinjector> -->
 </template>

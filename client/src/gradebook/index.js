@@ -42,6 +42,7 @@ export class GradeBook {
     if (params.assignment) {
       this.api.findOne('assignments', params.assignment).then(data => {
         this.current.setAssignment(data);
+        this.current.setAssignmentList(data.date);
       });
     }
   }

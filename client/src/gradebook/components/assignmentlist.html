@@ -1,10 +1,27 @@
 <template>
+  <require from="shared/converters/dateFormat"></require>
+  <require from="shared/converters/weekFormat"></require>
+  <require from="shared/attributes/bootstrap-datepicker"></require>
+  <require from="shared/attributes/tooltip"></require>
+
+  <input type="text" value.bind="listWeek | weekFormat" style="text-align: center;"
+         change.delegate="jumpWeek()" class="datepicker form-control"
+         bootstrap-datepicker>
+  <br>
   <ul class="nav">
     <li repeat.for="assignment of current.assignmentList">
-      <a class="btn btn-simple btn-primary bt-lg ${assignment.id === current.assignment.id ? 'active' : ''}"
-         route-href="route: gradebook; params.bind: { subject: current.subject.id, assignment: assignment.id }">
-      ${ assignment.name & oneTime }
-      </a>
+      <div class="text-left">
+        <a class="btn btn-simple btn-primary bt-lg ${assignment.id === current.assignment.id ? 'active' : ''}"
+           route-href="route: gradebook; params.bind: { subject: current.subject.id, assignment: assignment.id }">
+          ${ assignment.name & oneTime }
+        </a>
+        <span class="pull-right">
+          <a class="btn btn-simple btn-sm" data-toggle="tooltip" data-placement="left" title="${ assignment.date | dateFormat: 'MMMM Do'}" tooltip>
+            ${ assignment.date | dateFormat: 'ddd' }
+          </a>
+        </span>
+      </div>
     </li>
   </ul>
+  <br>
 </template>

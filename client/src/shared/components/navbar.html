@@ -4,7 +4,7 @@
 
 
 <div id="navbar">
-        <nav class="navbar navbar-ct-danger" role="navigation">
+        <nav class="navbar navbar-ct-primary" role="navigation">
           <div class="container-fluid">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -13,19 +13,19 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">Marks</a>
+              <a class="navbar-brand" href="/">Marks</a>
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav">
                 <li repeat.for="row of router.navigation | authFilter: auth.isAuthenticated()" class="${row.isActive ? 'active' : ''}">
-                  <a href.bind="row.href">${row.title}</a>
+                  <a class="btn btn-simple btn-neutral" href.bind="row.href">${row.title}</a>
                 </li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" if.bind="auth.isAuthenticated()">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    ${ current.user.teacherName }<span if.bind="current.year"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' })</span><span class="caret"></span>
+                  <a href="#" class="dropdown-toggle btn btn-simple btn-neutral btn-rotate" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    ${ current.user.teacherName }<span if.bind="current.year"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' }) <i class="fa fa-cog"></i>
                   </a>
                     <ul class="dropdown-menu">
                       <li><a route-href="route: addsubject">Add Subject</a></li>
@@ -61,7 +61,7 @@
                                   <div class="help-block text-right"><a href="#" click.delegate="toggleReset()">Forget your password?</a></div>
                                 </div>
                                 <div class="form-group">
-                                   <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                                   <button type="submit" class="btn btn-primary">Sign in</button>
                                 </div>
                                 <!-- <div class="checkbox">
                                    <label>

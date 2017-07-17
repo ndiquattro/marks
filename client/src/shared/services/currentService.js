@@ -1,6 +1,7 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {ApiService} from './apiService';
 import {inject} from 'aurelia-framework';
+import moment from 'moment';
 
 @inject(ApiService, EventAggregator)
 export class CurrentService {
@@ -50,16 +51,26 @@ export class CurrentService {
   }
 
   // Assignment Methods
-  setAssignmentList() {
+  setAssignmentList(date) {
+    console.log("assignment list set")
+    // Get Week edges
+    date = moment(date);
+    let weekStart = date.startOf('isoweek').format('YYYY-MM-DD');
+    let weekEnd = date.endOf('isoweek').format('YYYY-MM-DD');
+
     // Define Query
     let query = {
-      filters: [{'name': 'subject_id', 'op': 'eq', 'val': this.subject.id}],
+      filters: [{'name': 'subject_id', 'op': 'eq', 'val': this.subject.id},
+                {'name': 'date', 'op': 'ge', 'val': weekStart},
+                {'name': 'date', 'op': 'le', 'val': weekEnd}],
       order_by: [{'field': 'date', 'direction': 'desc'}]
     };
 
     // Request
-    this.api.find('assignments', query)
-            .then(data => this.assignmentList = data.objects);
+    return this.api.find('assignments', query).then(data => {
+      this.assignmentList = data.objects;
+      return date;
+    });
   }
 
   setAssignment(assignment) {

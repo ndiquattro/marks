@@ -81,7 +81,8 @@ export class ReportAssignment {
                .on('mouseover', (d) => {
                  div.transition()
                     .duration(200)
-                    .style('opacity', 0.9);
+                    .style('tooltip3')
+                    .style('opacity', 1);
 
                  div.html(d.map(item => item.student.first_name + ': ' + item.value + '<br>').join(''))
                     .style('left', (d3.event.pageX) + 'px')
@@ -145,12 +146,13 @@ export class ReportAssignment {
     // Set up Tool tip
     let tooltip = d3.select(divElement)
                     .append('div')
-                    .attr('class', 'tooltip2');
+                    .attr('class', 'tooltip3');
 
-    tooltip.append('div').attr('class', 'label');
-    tooltip.append('div').attr('class', 'count');
-    tooltip.append('div').attr('class', 'students');
     tooltip.append('div').attr('class', 'percent');
+    // tooltip.append('div').attr('class', 'label text-primary');
+    // tooltip.append('div').attr('class', 'count');
+    tooltip.append('div').attr('class', 'students');
+
 
     // Color Scale
     let themeColors = ['#7AC29A', '#EB5E28']
@@ -191,8 +193,8 @@ export class ReportAssignment {
 
     path.on('mouseover', function(d) {
       let percent = Math.round(1000 * d.data.count / data.length) / 10;
-      tooltip.select('.label').html(d.data.group);
-      tooltip.select('.count').html(d.data.count);
+      // tooltip.select('.label').html(d.data.group);
+      // tooltip.select('.count').html(d.data.count);
       tooltip.select('.students').html(d.data.names.map(name => name + '<br>').join(''));
       tooltip.select('.percent').html(percent + '%');
       tooltip.style('display', 'block');

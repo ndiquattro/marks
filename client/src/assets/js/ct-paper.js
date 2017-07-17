@@ -73,20 +73,7 @@ $(document).ready(function(){
         $(this).parent(".input-group").removeClass("input-group-focus");
     });
 
-     // Make the images from the card fill the hole space
-    ct_paper.fitBackgroundForCards();
 
-    // Init icon search action for the navbar
-    ct_paper.initNavbarSearch();
-
-    // Init popovers
-    ct_paper.initPopovers();
-
-    // Init Sliders
-    ct_paper.initSliders();
-
-    // Init Video Background
-    ct_paper.initVideoBackground();
 
     $('.dropdown-sharing .switch').click(function (e) {
         // custom handling here
@@ -285,7 +272,20 @@ ct_paper = {
         });
     }
 }
+// Make the images from the card fill the hole space
+ct_paper.fitBackgroundForCards();
 
+// Init icon search action for the navbar
+ct_paper.initNavbarSearch();
+
+// Init popovers
+ct_paper.initPopovers();
+
+// Init Sliders
+ct_paper.initSliders();
+
+// Init Video Background
+ct_paper.initVideoBackground();
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for
 // N milliseconds. If `immediate` is passed, trigger the function on the
