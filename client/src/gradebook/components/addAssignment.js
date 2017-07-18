@@ -18,7 +18,7 @@ export class AddAssignment {
     this.controller = controllerFactory.createForCurrentScope();
   }
 
-  attached() {
+  created() {
     if (this.mode === 'edit') {
       this.newAssignment = this.current.assignment;
       this.title = 'Edit Assignment';
@@ -30,7 +30,7 @@ export class AddAssignment {
   }
 
   modeChanged() {
-    this.attached();
+    this.created();
   }
 
   detached() {
@@ -60,5 +60,6 @@ export class AddAssignment {
 
   cancel() {
     this.mode = false;
+    this.detached();
   }
 }
