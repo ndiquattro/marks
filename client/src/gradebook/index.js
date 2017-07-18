@@ -64,15 +64,10 @@ export class GradeBook {
   }
 
   deleteAssignment() {
-    // Confirm with User
-    let confirmed = confirm('Are you sure you want to delete ' + this.current.assignment.name + '?');
+    this.api.delete(this.current.assignment)
+            .then(data => this.ea.publish('reloadAssignments'));
 
-    if (confirmed) {
-      this.api.delete(this.current.assignment)
-              .then(data => this.ea.publish('reloadAssignments'));
-
-      this.current.clearAssignment();
-    }
+    this.current.clearAssignment();
   }
 
   toggleQuick() {

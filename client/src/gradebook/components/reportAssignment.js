@@ -66,33 +66,26 @@ export class ReportAssignment {
               .domain([0, d3.max(bins, (d) => d.length)])
               .range([height, 0]);
 
-    let div = d3.select('body')
-                .append('div')
-                .attr('class', 'tooltip')
-                .style('opacity', 0);
-
+    // Set up Tool tip
+    let tooltip = d3.select(divElement)
+                    .append('div')
+                    .attr('class', 'chart-tooltip');
+    tooltip.append('div').attr('class', 'students');
 
     let bar = g.selectAll('.bar')
                .data(bins)
                .enter()
                .append('g')
                .attr('class', 'bar')
-               .attr('transform', (d) => 'translate(' + x(d.x0) + ',' + y(d.length) + ')')
-               .on('mouseover', (d) => {
-                 div.transition()
-                    .duration(200)
-                    .style('tooltip3')
-                    .style('opacity', 1);
+               .attr('transform', (d) => 'translate(' + x(d.x0) + ',' + y(d.length) + ')');
 
-                 div.html(d.map(item => item.student.first_name + ': ' + item.value + '<br>').join(''))
-                    .style('left', (d3.event.pageX) + 'px')
-                    .style('top', (d3.event.pageY - 28) + 'px');
-               })
-               .on('mouseout', function(d) {
-                 div.transition()
-                    .duration(500)
-                    .style('opacity', 0);
-               });
+    bar.on('mouseover', (d) => {
+      tooltip.select('.students')
+             .html(d.map(score => score.student.first_name + ': ' + Math.round((score.value / score.assignment.max) * 100) + '%<br>').join(''));
+      tooltip.style('display', 'block');
+    });
+
+    bar.on('mouseout', () => tooltip.style('display', 'none'));
 
     bar.append('rect')
         .attr('x', 1)
@@ -146,7 +139,7 @@ export class ReportAssignment {
     // Set up Tool tip
     let tooltip = d3.select(divElement)
                     .append('div')
-                    .attr('class', 'tooltip3');
+                    .attr('class', 'chart-tooltip');
 
     tooltip.append('div').attr('class', 'percent');
     // tooltip.append('div').attr('class', 'label text-primary');
@@ -155,7 +148,7 @@ export class ReportAssignment {
 
 
     // Color Scale
-    let themeColors = ['#7AC29A', '#EB5E28']
+    let themeColors = ['#7AC29A', '#EB5E28'];
     // let color = d3.scaleOrdinal(d3.schemeCategory10.slice(2, 4));
     let color = d3.scaleOrdinal(themeColors);
     if (nestdata.length === 1 && nestdata[0].group === 'Missing') {

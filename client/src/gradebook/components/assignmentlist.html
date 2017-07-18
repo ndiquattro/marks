@@ -1,11 +1,8 @@
 <template>
-  <require from="shared/converters/dateFormat"></require>
   <require from="shared/converters/weekFormat"></require>
-  <require from="shared/attributes/bootstrap-datepicker"></require>
-  <require from="shared/attributes/tooltip"></require>
 
   <input type="text" value.bind="listWeek | weekFormat" style="text-align: center;"
-         change.delegate="jumpWeek()" class="datepicker form-control"
+         change.delegate="jumpWeek()" class="datepicker form-control border-input"
          bootstrap-datepicker>
   <br>
   <ul class="nav">

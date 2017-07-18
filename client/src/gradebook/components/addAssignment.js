@@ -49,9 +49,11 @@ export class AddAssignment {
 
       this.api.save(this.newAssignment)
               .then(data => {
-                this.ea.publish('reloadAssignments');
-                this.current.setAssignment(data);
+                this.ea.publish('assignmentAdded', data);
                 this.mode = false;
+                this.detached();
+                this.current.navigateTo('gradebook', {subject: this.current.subject.id,
+                                                      assignment: data.id});
               });
     });
   }

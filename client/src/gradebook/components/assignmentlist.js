@@ -11,6 +11,17 @@ export class AssignmentList {
     this.ea = eventaggregator;
   }
 
+  created() {
+    // Set up Subscriptions
+    this.subsub = this.ea.subscribe('subjectSet', resp => {
+      this.current.setAssignmentList(this.current.assignment.date);
+    });
+
+    this.reload = this.ea.subscribe('assignmentAdded', data => {
+      this.listWeek = moment(data.date).startOf('isoweek');
+    });
+  }
+
   attached() {
     // Populate List
     if (!this.current.assignment) {
@@ -18,17 +29,10 @@ export class AssignmentList {
       this.current.setAssignmentList(this.listWeek);
     } else {
       this.listWeek = moment(this.current.assignment.date).startOf('isoweek');
-      this.current.setAssignmentList(this.current.assignment.date);
+      // this.current.setAssignmentList(this.current.assignment.date);
     }
 
-    // Set up Subscriptions
-    this.subsub = this.ea.subscribe('subjectSet', resp => {
-      this.current.setAssignmentList(this.current.assignment.date);
-    });
 
-    this.reload = this.ea.subscribe('reloadAssignments', resp => {
-      this.current.setAssignmentList(this.current.assignment.date);
-    });
   }
 
   jumpWeek() {

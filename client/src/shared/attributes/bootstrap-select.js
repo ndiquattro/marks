@@ -2,8 +2,8 @@ import {inject} from 'aurelia-framework';
 import {selectpicker} from 'bootstrap-select';
 
 const defaultOptions = {
-  style: 'btn-success btn-simple btn-block',
-  size: false
+  // style: 'btn btn-primary btn-simple',
+  // size: false
 };
 
 @inject(Element)

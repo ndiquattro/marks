@@ -28,13 +28,15 @@
                     ${ current.user.teacherName }<span if.bind="current.year"> - ${ current.year.school } (${ current.year.first_day | dateFormat: 'YYYY' }) <i class="fa fa-cog"></i>
                   </a>
                     <ul class="dropdown-menu">
-                      <li><a route-href="route: addsubject">Add Subject</a></li>
-                      <li><a route-href="route: addstudent">Add Student</a></li>
-                      <li><a route-href="route: addyear">Add Year</a></li>
+                      <li class="dropdown-header">Manage</li>
                       <li role="separator" class="divider"></li>
-                      <li><a route-href="route: settings">Settings</a></li>
+                      <li><a route-href="route: addsubject"><i class="fa fa-book fa-fw"></i>  Subjects</a></li>
+                      <li><a route-href="route: addstudent"><i class="fa fa-users fa-fw"></i>  Students</a></li>
+                      <li><a route-href="route: addyear"><i class="fa fa-calendar-plus-o fa-fw"></i>  Years</a></li>
                       <li role="separator" class="divider"></li>
-                      <li><a href="" click.delegate="logout()">Logout</a></li>
+                      <li><a route-href="route: settings"><i class="fa fa-cogs fa-fw"></i>  Settings</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="" click.delegate="logout()"><i class="fa fa-sign-out fa-fw"></i>  Logout</a></li>
                     </ul>
                 </li>
                 <li if.bind="!auth.isAuthenticated()"><a href="#">Sign Up</a></li>

@@ -5463,7 +5463,8 @@ body > .navbar-collapse.collapse {
   top: 0;
   left: 0;
   padding: 4px;
-  margin-top: 1px;
+  /*margin-top: 1px;*/
+  margin-top: 0px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -6537,7 +6538,7 @@ body > .navbar-collapse.collapse {
 
 */
 /*
-	
+
 	1. Buttons
 
  */
@@ -6812,7 +6813,7 @@ a.pswp__share--download:hover {
 }
 
 /*
-	
+
 	4. Caption
 
  */
@@ -6902,8 +6903,8 @@ a.pswp__share--download:hover {
   margin: 0;
 }
 .pswp--css_animation .pswp__preloader__cut {
-  /* 
-  	The idea of animating inner circle is based on Polymer ("material") loading indicator 
+  /*
+  	The idea of animating inner circle is based on Polymer ("material") loading indicator
   	 by Keanu Lee https://blog.keanulee.com/2014/10/20/the-tale-of-three-spinners.html
   */
   position: relative;
@@ -6955,7 +6956,7 @@ a.pswp__share--download:hover {
   }
 }
 /*
-	
+
 	6. Additional styles
 
  */
@@ -7080,7 +7081,7 @@ $ct-series-colors: (
   rgba($orange-navbar,.6),
   rgba($red-navbar,.6),
   rgba($blue-navbar,.6)
-  
+
 ) !default;
 */
 .ct-label {

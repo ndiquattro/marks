@@ -48,3 +48,8 @@
       border-top:0 none;
   }
 }
+
+/*Scores Tables*/
+.scores tr {
+ height: 70px;
+}

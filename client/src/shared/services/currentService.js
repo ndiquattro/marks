@@ -1,14 +1,16 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {Router} from 'aurelia-router';
 import {ApiService} from './apiService';
 import {inject} from 'aurelia-framework';
 import moment from 'moment';
 
-@inject(ApiService, EventAggregator)
+@inject(ApiService, EventAggregator, Router)
 export class CurrentService {
-  constructor(api, eventaggregator) {
+  constructor(api, eventaggregator, router) {
     // Injects
     this.api = api;
     this.ea = eventaggregator;
+    this.router = router;
 
     this.subjectList = [];
   }
@@ -116,5 +118,10 @@ export class CurrentService {
   reviveYear(yearId) {
     this.api.findOne('years', yearId)
             .then(data => this.year = data);
+  }
+
+  // App Navigation
+  navigateTo(route, params) {
+    this.router.navigateToRoute(route, params, {trigger: true});
   }
 }
