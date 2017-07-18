@@ -54,16 +54,16 @@
            <div if.bind="current.subject">
             <ul class="nav nav-pills center-pills">
               <li role="presentation" class="${ editMode === 'add' ? 'active' : '' }">
-                <a href="#" click.delegate="addAssignment()" data-toggle="modal" data-target="#assignmentModal" data-toggle="tooltip" data-placement="top" data-delay='{"show":"800", "hide":"0"}' title="Add Assignment" tooltip><i class="fa fa-plus"></i></a>
+                <a click.delegate="addAssignment()" data-toggle="modal" data-target="#assignmentModal" data-toggle="tooltip" data-placement="top" data-delay='{"show":"800", "hide":"0"}' title="Add Assignment" tooltip><i class="fa fa-plus"></i></a>
               </li>
               <li role="presentation" show.bind="current.scores || editMode === 'edit'" class="${editMode === 'edit' ? 'active' : ''}">
-                <a href="#" click.delegate="editAssignment()" data-toggle="modal" data-target="#assignmentModal" data-toggle="tooltip" data-placement="top" data-delay='{"show":"800", "hide":"0"}' title="Edit Assignment" tooltip><i class="fa fa-pencil"></i></a>
+                <a click.delegate="editAssignment()" data-toggle="modal" data-target="#assignmentModal" data-toggle="tooltip" data-placement="top" data-delay='{"show":"800", "hide":"0"}' title="Edit Assignment" tooltip><i class="fa fa-pencil"></i></a>
               </li>
               <li role="presentation" show.bind="current.scores">
-                <a href="#" data-toggle="modal" data-target="#deleteModal" data-toggle="tooltip" data-placement="top" title="Delete Assignment" data-delay='{"show":"800", "hide":"0"}' tooltip><i class="fa fa-eraser"></i></a>
+                <a data-toggle="modal" data-target="#deleteModal" data-toggle="tooltip" data-placement="top" title="Delete Assignment" data-delay='{"show":"800", "hide":"0"}' tooltip><i class="fa fa-eraser"></i></a>
               </li>
               <li role="presentation" show.bind="current.scores" class="${quickEntry ? 'active' : ''}">
-                <a href="#" click.delegate="toggleQuick()"><i class="fa fa-fast-forward" data-toggle="tooltip" data-placement="top" title="Quick Entry" data-delay='{"show":"800", "hide":"0"}' tooltip></i></a>
+                <a click.delegate="toggleQuick()"><i class="fa fa-fast-forward" data-toggle="tooltip" data-placement="top" title="Quick Entry" data-delay='{"show":"800", "hide":"0"}' tooltip></i></a>
               </li>
             </ul>
             <br>
