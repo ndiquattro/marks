@@ -9,23 +9,23 @@ export class FirstTime {
 
   created() {
     this.completed = [];
-    this.todo = ['Introduction', 'Profile', 'Years', 'Students', 'Subjects'];
+    this.todo = ['Introduction', 'Setup Profile', 'Years', 'Students', 'Subjects'];
+    this.totalsteps = this.todo.length;
+    this.progress = 0;
 
     this.activeStep = 'Introduction';
   }
 
-  nextStep(step) {
-    if (step !== this.activeStep) {
-      return;
-    }
-
+  nextStep() {
     this.completed.push(this.todo.shift());
     this.activeStep = this.todo[0];
+
+    this.progress = (this.completed.length / this.totalsteps) * 100;
 
     if (this.todo.length === 0) {
       setTimeout(() => {
         this.router.navigate('gradebook');
-      }, 800);
+      }, 1000);
     }
   }
 }

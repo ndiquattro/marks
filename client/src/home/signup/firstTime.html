@@ -4,39 +4,46 @@
   <require from="gradebook/addSubject"></require>
   <require from="admin/components/profile"></require>
 
-  <div class="col-md-2">
-    <h3>Setup</h3>
-    <ul class="nav nav-stacked">
-      <li role="presentation"
-          repeat.for="step of completed">
-        <a class="text-success"><i class="fa fa-check-circle-o text-success" aria-hidden="true"></i> ${ step }</a>
-      </li>
-      <li role="presentation"
-          repeat.for="step of todo"
-          class="${ step === activeStep ? 'active' : 'disabled'}">
-        <a href click.delegate="nextStep(step)"><i class="fa fa-circle-o" aria-hidden="true"></i> ${ step }</a>
-      </li>
-    </ul>
-
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <!-- Title -->
+      <h1 class="text-right">Gradebook Setup </h1>
+      <!-- Progress Bar -->
+      <div class="progress" style="height: 10px;">
+        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: ${ progress }%;">
+          <span class="sr-only">60% Complete</span>
+        </div>
+      </div>
+      <!-- Menu -->
+        <h3>${ activeStep } <button click.delegate="nextStep()" class="btn btn-warning btn-fill pull-right">Next Step <i class="fa fa-arrow-right" aria-hidden="true"></i></button></h3>
+    </div>
   </div>
 
-  <div class="col-md-10">
-    <div class="row">
-      <div if.bind="activeStep === 'Introduction'">
-        <h3>Checklist</h3>
-        <p class="col-md-6">
-          Welcome to Marks! This guided setup will get you up and running fast.
-          After entering all the information for each step mark it done by click on the circle to the left!
-          You're done with the introduction so go ahead and "marks" it done!
-        </p>
-      </div>
-      <profile if.bind="activeStep === 'Profile'"></profile>
-      <add-year if.bind="activeStep === 'Years'"></add-year>
-      <add-student if.bind="activeStep === 'Students'"></add-student>
-      <add-subject if.bind="activeStep === 'Subjects'"></add-subject>
-      <div if.bind="todo.length === 0">
-        <h3>All done! Sending you to your gradebook!</h3>
-      </div>
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <div if.bind="activeStep === 'Introduction'">
+          <div class="card card-with-shadow card-just-text col-md-7 col-md-offset-2">
+            <div class="content">
+              <h4 class="title">Welcome to Marks!</h4>
+                <p>
+                  This guided setup will get you up and running fast.
+                  After entering all the information for each step move on to the next by clicking "Next Step" to the right!
+                  If you run into trouble feel free to e-mail <a href="#" class="info">support@reportmarks.com</a>
+                </p>
+            </div>
+          </div>
+        </div>
+        <profile if.bind="activeStep === 'Setup Profile'"></profile>
+        <add-year if.bind="activeStep === 'Years'"></add-year>
+        <add-student if.bind="activeStep === 'Students'"></add-student>
+        <add-subject if.bind="activeStep === 'Subjects'"></add-subject>
+        <div if.bind="todo.length === 0">
+          <div class="card card-with-shadow card-just-text col-md-7 col-md-offset-2">
+            <div class="content">
+              <h4 class="title">All Done! Sending you to your gradebook now!</h4>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
 </template>

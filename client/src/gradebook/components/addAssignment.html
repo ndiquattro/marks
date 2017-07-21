@@ -6,46 +6,46 @@
     <div class="modal-header">
       <h4 class="modal-title" id="assignmentModalLabel">${ title } in ${ current.subject.name }</h4>
     </div>
+    <div class="row">
+    <div class="col-md-6 col-md-offset-3">
     <div class="modal-body">
-      <form class="form-horizontal" validation-renderer="bootstrap-form">
-        <!-- Assignment Name -->
-        <div class="form-group">
-          <label class="col-md-4 control-label">Name:</label>
-          <div class="col-md-6">
+
+        <form class="form-horizontal" validation-renderer="bootstrap-form">
+          <!-- Assignment Name -->
+          <div class="form-group">
+            <label>Name</label>
             <input type="text" class="form-control border-input" value.bind="newAssignment.name & validate">
           </div>
-        </div>
-        <!-- Date of Assignment -->
-        <div class="form-group">
-          <label class="col-md-4 control-label">Date Assigned:</label>
-          <div class="col-md-6">
-            <div class="input-group border-input">
-            <input type="text" class="datepicker form-control border-input"
-                   value.bind="newAssignment.date | dateFormat: 'MMMM Do' & validate" bootstrap-datepicker>
-                   <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-            </div>
+
+          <!-- Date of Assignment -->
+          <div class="form-group">
+            <label>Date Assigned</label>
+              <div class="input-group border-input">
+              <input type="text" class="datepicker form-control border-input text-center"
+                     value.bind="newAssignment.date | dateFormat: 'MMMM Do' & validate" bootstrap-datepicker>
+                     <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+              </div>
           </div>
-        </div>
-        <!-- Assignment Type -->
-        <div class="form-group" show.bind="mode !== 'edit'">
-          <label class="col-md-4 control-label">Type:</label>
-          <div class="col-md-6">
-            <select class="selectpicker" data-style="form-control border-input" data-menu-style="" value.bind="newAssignment.type & validate" bootstrap-select>
-              <option disabled selected value="">Select Type</option>
-              <option value="Points">Points</option>
-              <option value="Checks">Checks</option>
-            </select>
+
+          <!-- Assignment Type -->
+          <div class="form-group" show.bind="mode !== 'edit'">
+            <label>Type</label>
+              <select class="selectpicker" data-style="form-control border-input" data-menu-style="" value.bind="newAssignment.type & validate" bootstrap-select>
+                <option disabled selected value="">Select Type</option>
+                <option value="Points">Points</option>
+                <option value="Checks">Checks</option>
+              </select>
           </div>
-        </div>
-        <!-- Max Points -->
-        <div class="form-group" if.bind="newAssignment.type === 'Points'">
-          <label class="col-md-4 control-label">Max Points:</label>
-          <div class="col-md-6">
+
+          <!-- Max Points -->
+          <div class="form-group" if.bind="newAssignment.type === 'Points'">
+            <label>Max Points</label>
             <input type="number" name="max" class="form-control border-input" value.bind="newAssignment.max & validate">
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
+  </div>
     <div class="modal-footer">
       <div class="left-side">
           <button type="button" click.delegate="submit()" class="btn btn-success btn-simple" data-dismiss="modal">${ btn }</button>
@@ -55,6 +55,6 @@
           <button type="button" click.delegate="cancel()" data-dismiss="modal" class="btn btn-danger btn-simple">Cancel</button>
       </div>
     </div>
-
+  </div>
   </div>
 </template>

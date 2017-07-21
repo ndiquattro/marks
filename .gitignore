@@ -2,7 +2,7 @@
 server/instance/
 /.idea
 server/*.db
-client/scripts/
+scripts
 
 
 # Byte-compiled / optimized / DLL files

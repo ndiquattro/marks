@@ -18,7 +18,8 @@ export class App {
       { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true},
 
       // User Managment
-      { route: 'settings', moduleId: './admin/settings', title: 'Settings', name: 'settings', auth: true},
+      { route: 'settings', redirect: 'settings/Profile'},
+      { route: 'settings/:section?', moduleId: './admin/settings', title: 'Settings', name: 'settings', auth: true},
       { route: 'password/:token', moduleId: './admin/components/password', title: 'Reset Password'},
 
       // Signup Routes
@@ -29,7 +30,6 @@ export class App {
       { route: 'gradebook/addsubject',  moduleId: './gradebook/addSubject', title: 'Add Subject', name: 'addsubject', auth: true},
       { route: 'gradebook/addstudent',  moduleId: './gradebook/addStudent', title: 'Add Student', name: 'addstudent', auth: true},
       { route: 'gradebook/addyear',  moduleId: './gradebook/addYear', title: 'Add Year', name: 'addyear', auth: true}
-
     ]);
 
     this.router = router;

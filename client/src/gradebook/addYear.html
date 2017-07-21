@@ -1,79 +1,96 @@
 <template>
   <require from="shared/converters/dateFormat"></require>
+  <br>
 
-  <div class="col-md-6">
-    <h3>${ title }</h3>
-    <form class="form-horizontal" submit.delegate="submit()" validation-renderer="bootstrap-form">
+  <div class="row">
+    <div class="col-md-3 col-md-offset-2">
+      <div class="card card-with-shadow">
+        <div class="content">
+          <h3 class="title">${ title }</h3>
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              <form class="form-horizontal" submit.delegate="submit()" validation-renderer="bootstrap-form">
 
-      <!-- Name Form -->
-      <div class="form-group">
-        <label class="col-md-4 control-label">School Name:</label>
-        <div class="col-md-6">
-          <input type="text" class="form-control" value.bind="newYear.school & validate" focus.bind="formStart">
+                <!-- Name Form -->
+                <div class="form-group">
+                  <label>School Name</label>
+                  <input type="text" class="form-control border-input" value.bind="newYear.school & validate" focus.bind="formStart">
+                </div>
+
+                <!-- Start Date -->
+                <div class="form-group">
+                  <label>First day of School</label>
+                  <div class="input-group border-input">
+                    <input type="text" class="datepicker form-control border-input text-center"
+                           value.bind="newYear.first_day | dateFormat: 'MMMM Do YYYY' & validate" bootstrap-datepicker>
+                           <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+                  </div>
+                </div>
+
+                <!-- End Date -->
+                <div class="form-group">
+                  <label>Last day of School</label>
+                  <div class="input-group border-input">
+                    <input type="text" class="datepicker form-control border-input text-center"
+                           value.bind="newYear.last_day | dateFormat: 'MMMM Do YYYY' & validate" bootstrap-datepicker>
+                           <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                  <div class="col-md-offset-1">
+                    <button type="submit" class="btn btn-primary">
+                      ${ bttn }
+                    </button>
+                    <button click.delegate="reset()" class="btn btn-danger">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </form>
+          </div>
         </div>
       </div>
-
-      <!-- Start Date -->
-      <div class="form-group">
-        <label class="col-md-4 control-label">First day of School:</label>
-        <div class="col-md-6">
-          <input type="date" value.bind="newYear.first_day & validate" class="form-control">
-        </div>
-      </div>
-
-      <!-- End Date -->
-      <div class="form-group">
-        <label class="col-md-4 control-label">Last day of School:</label>
-        <div class="col-md-6">
-          <input type="date" value.bind="newYear.last_day & validate" class="form-control">
-        </div>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="form-group">
-        <div class="col-md-offset-4 col-md-6 text-center">
-          <button type="submit" class="btn btn-primary">
-            ${ bttn }
-          </button>
-          <button click.delegate="reset()" class="btn btn-danger">
-            Cancel
-          </button>
-        </div>
-      </div>
-    </form>
+    </div>
   </div>
 
-  <!-- Added Years -->
-  <div class="col-md-6">
-    <h3>Saved</h3>
-    <table class="table table-hover">
-      <thead>
-      <tr>
-        <th>Year</th>
-        <th>School</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tr repeat.for="year of years.objects">
-        <td>${ year.first_day | dateFormat: 'YYYY' & oneTime}</td>
-        <td>${ year.school & oneTime }</td>
-        <td>
-          <div class="btn-group btn-group-xs" role="group">
-            <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
-                    click.delegate="current.setYear(year)">
-              <i class="fa fa-bolt"></i> Activate
-            </button>
-            <button type="button" class="btn btn-default ${ year.id === newYear.id ? 'active' : ''}"
-                    click.delegate="edit(year)">
-              <i class="fa fa-pencil"></i> Edit
-            </button>
-            <button type="button" class="btn btn-default"
-                    click.delegate="delete(year)">
-              <i class="fa fa-eraser"></i> Delete
-            </button>
-          </div>
-        </td>
-      </tr>
-    </table>
+    <!-- Added Years -->
+    <div class="col-md-5">
+      <div class="card card-with-shadow">
+        <div class="content">
+      <h3 class="title">Saved</h3>
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th class="text-center">Year</th>
+          <th class="text-center">School</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tr repeat.for="year of years.objects">
+          <td class="text-center">${ year.first_day | dateFormat: 'YYYY' & oneTime}</td>
+          <td class="text-center">${ year.school & oneTime }</td>
+          <td class="col-md-6">
+            <div class="btn-group btn-group-xs" role="group">
+              <button type="button" class="btn btn-default ${ year.id === current.year.id ? 'active' : ''}"
+                      click.delegate="current.setYear(year)">
+                <i class="fa fa-bolt"></i> Activate
+              </button>
+              <button type="button" class="btn btn-default ${ year.id === newYear.id ? 'active' : ''}"
+                      click.delegate="edit(year)">
+                <i class="fa fa-pencil"></i> Edit
+              </button>
+              <button type="button" class="btn btn-default"
+                      click.delegate="delete(year)">
+                <i class="fa fa-eraser"></i> Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+    </div>
   </div>
 </template>

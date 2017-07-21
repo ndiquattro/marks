@@ -1,12 +1,29 @@
 <template>
   <require from="admin/components/profile"></require>
   <require from="admin/components/password"></require>
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-right">Settings</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3 col-md-offset-1">
+      <ul class="nav nav-stacked">
+        <li repeat.for="sect of sections" class="${ sectionSelected === sect ? 'active' : '' }">
+          <a route-href="route: settings; params.bind: {section: sect}">
+            ${ sect }
+          </a>
+        </li>
+      </ul>
+    </div>
 
-  <div class="col-md-7 col-md-offset-3">
-    <h1>Settings</h1>
-    <hr>
-    <profile></profile>
-    <hr>
-    <password></password>
+    <div class="col-md-6">
+      <div class="card card-with-shadow">
+        <div class="content">
+          <profile if.bind="sectionSelected === 'Profile'"></profile>
+          <password if.bind="sectionSelected === 'Change Password'"></password>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
