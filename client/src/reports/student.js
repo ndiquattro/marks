@@ -1,20 +1,30 @@
 import {inject} from 'aurelia-framework';
-import {CurrentService} from '../../shared/services/currentService';
-import {ApiService} from '../../shared/services/apiService';
+import {ValidationControllerFactory} from 'aurelia-validation';
+import {CurrentService} from 'shared/services/currentService';
+import {ApiService} from 'shared/services/apiService';
 
 import moment from 'moment';
 
-@inject(CurrentService, ApiService)
+@inject(CurrentService, ApiService, ValidationControllerFactory)
 export class StudentReport {
-  constructor(current, api) {
+  constructor(current, api, controllerFactory) {
     this.current = current;
     this.api = api;
+    this.controller = controllerFactory.createForCurrentScope();
+  }
+
+  activate(params) {
+    let studentId = Number(params.id);
+    this.selected = {'start': this.current.year.first_day, 'end': moment().format('YYYY-MM-DD')};
+    this.api.findOne('students', studentId).then(data => {
+      this.selected.student = data;
+      this.generate();
+    });
   }
 
   attached() {
     this.setStudentList();
-    this.selected = {'start': this.current.year.first_day, 'end': moment().format('YYYY-MM-DD')};
-    this.reportGenerated = false;
+    this.current.setSubjectList();
   }
 
   setStudentList() {

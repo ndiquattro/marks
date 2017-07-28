@@ -17,8 +17,22 @@ export class TimePlotCustomAttribute {
   timePlot(data, type) {
     // set the dimensions and margins of the graph
     let margin = {top: 20, right: 20, bottom: 50, left: 50};
-    let width = 320 - margin.left - margin.right;
-    let height = 200 - margin.top - margin.bottom;
+    let width = 520 - margin.left - margin.right;
+    let height = 300 - margin.top - margin.bottom;
+
+    // Scatter Functions
+    let dotCalc;
+    if (type === 'Points') {
+      dotCalc = function(d, i) {
+        return Math.round((d.value / d.assignment.max) * 100);
+      };
+    } else {
+      let _movingSum2 = 0;
+      dotCalc = function(d, i) {
+        _movingSum2 += d.value;
+        return _movingSum2 / (i + 1);
+      };
+    }
 
     // parse the date / time
     let parseTime = d3.timeParse('%Y-%m-%d');
@@ -65,6 +79,19 @@ export class TimePlotCustomAttribute {
         .data([data])
         .attr('class', 'line')
         .attr('d', valueline);
+
+    // Add the scatterplot
+    svg.selectAll('dot')
+       .data(data)
+       .enter().append('circle')
+       .style('fill', '#F3BB45')
+       .attr('r', 5)
+       .attr('cx', (d) => x(d.assignment.date))
+       .attr('cy', (d, i) => y(dotCalc(d, i)));
+
+    if (type === 'Points') {
+      svg.selectAll('dot');
+    }
 
     // Add the X Axis
     svg.append('g')

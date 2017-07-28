@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
 from flask_migrate import Migrate
 from flask_security import SQLAlchemyUserDatastore, Security
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, get_raw_jwt
 from flask_mail import Mail
 
 from flask_cors import CORS
@@ -66,6 +66,8 @@ def dummy_scores(result):
 # Set up Flask-Restless APIs
 @jwt_required
 def auth_func(search_params, **kw):
+    print("auth_function run")
+    print(get_raw_jwt)
     user_filter = {'name': 'user_id', 'op': 'eq', 'val': get_jwt_identity()}
     if 'filters' in search_params:
         search_params['filters'].append(user_filter)
@@ -75,11 +77,18 @@ def auth_func(search_params, **kw):
 
 @jwt_required
 def add_pre(data):
+    print(get_jwt_identity)
+    print("add_pre function run")
     data['user_id'] = get_jwt_identity()
     return True
 
+@jwt_required
+def put_pre(**kw):
+    print(kw)
+    return True
+
 uni_preprocs = dict(POST=[add_pre], GET=[auth_func], DELETE=[auth_func],
-                    PUT=[auth_func], GET_MANY=[auth_func])
+                    PUT_SINGLE=[put_pre], GET_MANY=[auth_func])
 
 manager = APIManager(app, flask_sqlalchemy_db=db, preprocessors=uni_preprocs)
 httpmeths = ['GET', 'POST', 'DELETE', 'PUT']

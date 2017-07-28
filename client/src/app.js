@@ -15,7 +15,10 @@ export class App {
       { route: '/', moduleId: './home/index', nav: 0, title: 'Welcome', auth: false },
       // { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true},
       { route: 'gradebook/:subject?/:assignment?', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true, href: 'gradebook'},
-      { route: 'reports', moduleId: './reports/index', nav: 2, title: 'Reports', auth: true},
+
+      // Reports
+      { route: 'reports', redirect: 'gradebook'},
+      { route: 'reports/student/:id', moduleId: './reports/student', title: 'Student Report', name: 'studentreport', auth: true},
 
       // User Managment
       { route: 'settings', redirect: 'settings/Profile'},

@@ -1,0 +1,97 @@
+<template>
+  <require from="reports/converters/scoreFilter"></require>
+  <require from="reports/attributes/timePlot"></require>
+
+  <style> /* set the CSS */
+.line {
+  fill: none;
+  stroke: #68B3C8;
+  stroke-width: 3px;
+}
+</style>
+
+  <!-- Student Selection Section -->
+  <div class="row">
+    <div class="col-md-12 text-right">
+      <span class="dropdown">
+        <button class="dropdown-toggle btn btn-simple btn-block" style="font-size: 4em; padding: 0.4em;" data-toggle="dropdown"><span class="pull-right">${ selected.student.fullName } <i class="fa fa-caret-down" aria-hidden="true"></i></span></button>
+      <!-- You can add classes for different colours on the next element -->
+        <ul class="dropdown-menu dropdown-primary dropdown-menu-right scrollable-menu">
+          <li repeat.for="student of students" class="text-right">
+            <a route-href="route: studentreport; params.bind: {id: student.id }"  style="font-size: 4em">${ student.fullName }</a>
+          </li>
+        </ul>
+      </span>
+    </div>
+  </div>
+
+  <!-- Dates Menu -->
+  <div class="row">
+    <div class="col-md-6">
+    <form class="form-inline">
+      <div class="form-group">
+        <!-- <label>First Day</label> -->
+        <div class="input-group border-input">
+        <input type="text" class="datepicker form-control border-input text-center"
+               value.bind="selected.start | dateFormat: 'MMMM Do' & validate" bootstrap-datepicker>
+               <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+        </div>
+      </div>
+      <i class="fa fa-arrow-right fa-2x" aria-hidden="true" style="margin-left: 10px; margin-right: 20px;"></i>
+      <div class="form-group">
+        <!-- <label>Last Day</label> -->
+        <div class="input-group border-input">
+        <input type="text" class="datepicker form-control border-input text-center"
+               value.bind="selected.end | dateFormat: 'MMMM Do' & validate" bootstrap-datepicker>
+               <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="text-right">
+      <button click.delegate="generate()" class="btn btn-default">Update Report</button>
+    </div>
+    </div>
+    </form>
+
+  </div>
+
+  <!-- Subject Rows -->
+  <div if.bind="reportGenerated" class="row card card-with-shadow" repeat.for="subject of current.subjectList">
+    <div class="col-md-5 col-md-offset-1">
+      <h2>${ subject.name & oneTime}</h2>
+      <table class="table">
+        <div>
+          <thead>
+            <th></th>
+            <th></th>
+            <th>Max</th>
+            <th>Score</th>
+          </thead>
+        </div>
+        <tbody>
+          <tr repeat.for="score of scores | scoreFilter: subject.id">
+            <td class="col-md-6"><a class="btn btn-simple btn-info" route-href="route: gradebook; params.bind: {subject: subject.id, assignment: score.assignment.id}">${ score.assignment.name & oneTime}</a></td>
+            <td class="col-md-3">${ score.assignment.date | dateFormat: 'MMMM Do' & oneTime}</td>
+            <td class="col-md-1 text-center">${ !score.assignment.max ? '-' : score.assignment.max & oneTime}</td>
+            <td class="col-md-2 text-center" style="${ score.assignment.type === 'Points' ? 'padding-left: 30px;' : '' }" innerhtml.bind="score.value | scoreFormat: score.assignment & oneTime"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Plots -->
+    <div class="col-md-5">
+      <div class="row">
+        <h4 class="text-right" style="margin-top: 100px;">Points</h4>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Points'"></div>
+      </div>
+      <div class="row">
+        <h4 class="text-right">Checks</h4>
+        <div time-plot="scores.bind: scores | scoreFilter: subject.id; type.bind: 'Checks'"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</template>

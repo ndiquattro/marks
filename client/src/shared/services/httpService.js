@@ -30,4 +30,12 @@ export class HttpService {
 
     return req.send();
   }
+
+  refreshToken() {
+    return this.http.createRequest('auth/refresh_token')
+                    .withHeader('Access-Control-Allow-Credentials', true)
+                    .withCredentials('include')
+                    .asPost()
+                    .send();
+  }
 }

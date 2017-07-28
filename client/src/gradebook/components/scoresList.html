@@ -10,10 +10,10 @@
 
   <table class="table table-hover scores">
     <tr repeat.for="score of current.scores">
-      <td class="text-center col-md-6">${ score.student.first_name }</td>
+      <td class="text-center col-md-6"><a class="" route-href="route: studentreport; params.bind: {id: score.student.id}">${ score.student.first_name }</a></td>
       <td class="text-center col-md-6" click.delegate="editScore(score)">
         <!-- View Mode -->
-        <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assignment"><i></i></div>
+        <div if.bind="score.id !== editScoreId" innerhtml.bind="score.value | scoreFormat: score.assignment | sanitizeHTML"><i></i></div>
 
         <!-- Edit Mode -->
         <div if.bind="score.id === editScoreId">

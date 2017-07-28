@@ -24,7 +24,7 @@ export class NavBar {
   }
 
   login() {
-    this.auth.login(this.user).then(resp => location.reload());
+    this.auth.login(this.user).then(resp => console.log(resp));//location.reload());
   }
 
   logout() {

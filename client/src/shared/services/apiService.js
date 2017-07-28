@@ -1,22 +1,44 @@
 import {HttpClient} from 'aurelia-http-client';
 import {inject} from 'aurelia-framework';
 import {AuthService} from 'aurelia-auth';
+import {HttpService} from 'shared/services/httpService';
 import {User} from 'shared/models/user';
 import {Year} from 'gradebook/models/year';
 import {Student} from 'gradebook/models/student';
 import {Subject} from 'gradebook/models/subject';
 import {Assignment} from 'gradebook/models/assignment';
 import {Score} from 'gradebook/models/score';
+import moment from 'moment';
 
-@inject(HttpClient, AuthService)
+@inject(HttpClient, AuthService, HttpService)
 export class ApiService {
-  constructor(http, auth) {
+  constructor(http, auth, httpserv) {
     // Configure client
     http.configure(config => {
       config
         .withBaseUrl('http://localhost:5000/api/')
         .withHeader('Authorization', 'Bearer ' + auth.auth.getToken())
         .withInterceptor({
+          request(request) {
+            // get token
+            let token = auth.getTokenPayload();
+
+            // Check if token will expire soon
+            console.log(moment.unix(token.exp).diff(moment(), 'minutes'))
+            if (moment.unix(token.exp).diff(moment(), 'minutes') < 1) {
+              return httpserv.refreshToken()
+                             .then(response => {
+                               // Save new Token
+                               console.log(response);
+                               auth.setToken(response);
+                             }).catch(error => {
+                               // Delete Token and redirect to login
+                               console.log(error);
+                               //auth.logout()
+                             });
+            }
+            return request;
+          },
           // Parse every response to objects
           response(message) {
             // Check if this is a delete response
