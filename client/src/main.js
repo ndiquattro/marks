@@ -14,6 +14,9 @@ export function configure(aurelia) {
     ])
     .plugin('aurelia-auth', (baseConfig)=>{
       baseConfig.configure(config);
+    })
+    .plugin('aurelia-configuration', aurconfig => {
+      aurconfig.setEnvironment('development'); // Environment changes to development
     });
 
   if (environment.debug) {

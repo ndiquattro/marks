@@ -175,6 +175,11 @@
             "name": "aurelia-auth",
             "path": "../node_modules/aurelia-auth/dist/amd",
             "main": "aurelia-auth"
+          },
+          {
+            "name": "aurelia-configuration",
+            "path": "../node_modules/aurelia-configuration/dist/amd",
+            "main": "index"
           }
         ]
       }

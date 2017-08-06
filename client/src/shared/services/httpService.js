@@ -1,16 +1,17 @@
 import {inject} from 'aurelia-framework';
+import {AureliaConfiguration} from 'aurelia-configuration';
 import {HttpClient} from 'aurelia-http-client';
 import {AuthService} from 'aurelia-auth';
 
-@inject(AuthService)
+@inject(AuthService, AureliaConfiguration)
 export class HttpService {
-  constructor(auth) {
+  constructor(auth, aurconfig) {
     this.http = new HttpClient();
     this.auth = auth;
 
     // Confg this http client
     this.http.configure(config => {
-      config.withBaseUrl('http://localhost:5000/')
+      config.withBaseUrl(aurconfig.get('baseurl'))
             .withInterceptor({
               // Parse every response to objects
               response(message) {

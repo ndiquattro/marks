@@ -1,6 +1,7 @@
 import {HttpClient} from 'aurelia-http-client';
 import {inject} from 'aurelia-framework';
 import {AuthService} from 'aurelia-auth';
+import {AureliaConfiguration} from 'aurelia-configuration';
 import {HttpService} from 'shared/services/httpService';
 import {User} from 'shared/models/user';
 import {Year} from 'gradebook/models/year';
@@ -10,13 +11,13 @@ import {Assignment} from 'gradebook/models/assignment';
 import {Score} from 'gradebook/models/score';
 import moment from 'moment';
 
-@inject(HttpClient, AuthService, HttpService)
+@inject(HttpClient, AuthService, HttpService, AureliaConfiguration)
 export class ApiService {
-  constructor(http, auth, httpserv) {
+  constructor(http, auth, httpserv, aurconfig) {
     // Configure client
     http.configure(config => {
       config
-        .withBaseUrl('http://localhost:5000/api/')
+        .withBaseUrl(aurconfig.get('baseurl') + '/api/')
         .withHeader('Authorization', 'Bearer ' + auth.auth.getToken())
         .withInterceptor({
           request(request) {

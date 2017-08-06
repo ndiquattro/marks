@@ -1,0 +1,9 @@
+{
+    "development": {
+        "baseurl": "http://localhost:5000"
+    },
+
+    "production": {
+        "baseurl": "https://www.reportmarks.com"
+    }
+}
