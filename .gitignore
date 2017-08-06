@@ -1,5 +1,7 @@
 # Custom Ignores
+marksenv/
 server/instance/
+client/deployed/
 /.idea
 server/*.db
 scripts
