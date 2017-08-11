@@ -25,17 +25,15 @@ export class ApiService {
             let token = auth.getTokenPayload();
 
             // Check if token will expire soon
-            console.log(moment.unix(token.exp).diff(moment(), 'minutes'))
             if (moment.unix(token.exp).diff(moment(), 'minutes') < 1) {
               return httpserv.refreshToken()
                              .then(response => {
                                // Save new Token
-                               console.log(response);
                                auth.setToken(response);
                              }).catch(error => {
                                // Delete Token and redirect to login
                                console.log(error);
-                               //auth.logout()
+                               auth.logout()
                              });
             }
             return request;
