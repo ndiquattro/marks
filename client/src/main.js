@@ -16,7 +16,11 @@ export function configure(aurelia) {
       baseConfig.configure(config);
     })
     .plugin('aurelia-configuration', aurconfig => {
-      aurconfig.setEnvironment('development'); // Environment changes to development
+      aurconfig.setEnvironments({
+        development: ['localhost', 'dev.local'],
+        staging: ['staging.reportmarks.com', 'test.reportmarks.com'],
+        production: ['reportmarks.com']
+      }); // Environment changes to development
     });
 
   if (environment.debug) {
