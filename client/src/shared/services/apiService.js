@@ -32,6 +32,7 @@ export class ApiService {
                                auth.setToken(response);
                              }).catch(error => {
                                // Delete Token and redirect to login
+                               console.log("Refresh Token Failed")
                                console.log(error);
                                auth.logout()
                              });

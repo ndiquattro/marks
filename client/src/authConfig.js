@@ -5,7 +5,7 @@ let configForDevelopment = {
 };
 
 let configForProduction = {
-  baseUrl: 'http://www.reportmarks.com/',
+  baseUrl: 'https://www.reportmarks.com/',
   loginRedirect: 'gradebook',
   loginRoute: '/'
 };

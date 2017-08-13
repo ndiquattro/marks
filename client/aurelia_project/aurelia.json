@@ -59,7 +59,7 @@
         "displayName": "Web",
         "output": "scripts",
         "index": "index.html",
-        "baseDir": "."
+        "baseDir": "./deployed"
       }
     ],
     "loader": {
