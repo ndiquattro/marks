@@ -17,6 +17,7 @@ class Users(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     active_year = db.Column(db.Integer())
+    user_id = db.Column(db.Integer())
     years = db.relationship('Years', backref='user', lazy='dynamic')
     students = db.relationship('Students', backref='user', lazy='dynamic')
     subjects = db.relationship('Subjects', backref='user', lazy='dynamic')
