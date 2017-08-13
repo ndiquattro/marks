@@ -29,17 +29,17 @@ def signup():
     user = user_datastore.create_user(email=content['email'],
                                       password=content['password'])
 
-
-    # Add new user to the database
-    db.session.commit()
-
     # Create JWT token and return user info
-    ret = make_token(user, refresh=True)
+    response = jsonify(make_token(user))
+    set_refresh_cookies(response, create_refresh_token(identity=user.id))
 
     # Send Confirmation email
     send_confirmation_instructions(user)
 
-    return jsonify(ret), 200
+    # Add new user to the database
+    db.session.commit()
+
+    return response, 200
 
 @auth.route('/confirm_email/<string:token>', methods=['POST'])
 def confirm_email(token):
