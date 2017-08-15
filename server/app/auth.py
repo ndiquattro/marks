@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, get_jw
 from flask_security.recoverable import send_reset_password_instructions, reset_password_token_status, update_password
 from flask_security.changeable import change_user_password
 from flask_security.confirmable import send_confirmation_instructions, confirm_email_token_status, confirm_user
+from flask_security.utils import hash_password, verify_password
 from sqlalchemy import inspect
 from app import user_datastore, db
 
@@ -27,7 +28,7 @@ def signup():
 
     # Create new user object
     user = user_datastore.create_user(email=content['email'],
-                                      password=content['password'])
+                                      password=hash_password(content['password']))
 
     # Add new user to the database
     db.session.commit()
@@ -81,16 +82,14 @@ def login():
     user = user_datastore.find_user(email=content['email'])
 
     # Compare Credentials
-    if content['email'] == user.email and content['password'] == user.password:
+    if content['email'] == user.email and verify_password(content['password'], user.password):
         response = jsonify(make_token(user))
-        print(response)
         set_refresh_cookies(response, create_refresh_token(identity=user.id))
-        print(response)
         # return jsonify(make_token(user)), 200
         return response, 200
 
     # Default return
-    return "400"
+    return "Not Authorized", 401
 
 @auth.route('/refresh_token', methods=['POST'])
 @jwt_refresh_token_required
@@ -104,7 +103,7 @@ def forgot_password():
     user = user_datastore.find_user(email=content['email'])
     send_reset_password_instructions(user)
 
-    return "200"
+    return "Reset Sent", 200
 
 """ TODO: Reset Password isn't complete """
 @auth.route('/reset_password', methods=['POST'])
@@ -121,9 +120,9 @@ def reset_password():
         return jsonify({'error': 'Expired Token'})
 
     # Token checks out
-    update_password(user, content['newPassword'])
+    update_password(user, hash_password(content['newPassword']))
 
-    return jsonify({'Success': True})
+    return jsonify({'Success': True}), 200
 
 
 @auth.route('/change_password', methods=['POST'])
@@ -135,7 +134,7 @@ def change_password():
     user = user_datastore.find_user(id=token_identity)
 
     # Change password
-    change_user_password(user, content['new'])
+    change_user_password(user, hash_password(content['new']))
     user_datastore.commit()
 
-    return jsonify({'Changed': True})
+    return jsonify({'Changed': True}), 200
