@@ -26,11 +26,12 @@ export class Home {
       this.auth.signup(this.newUser)
                .then(resp => {
                  // Set as current user
+                 console.log(resp)
                  this.current.setUser(new User(resp.user));
 
                  // Move on to next step
-                 this.router.navigateToRoute('payment');
-                 location.reload();
+                 //this.router.navigateToRoute('payment');
+                 //location.reload();
                });
     });
   }
