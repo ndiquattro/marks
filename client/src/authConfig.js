@@ -1,13 +1,15 @@
 let configForDevelopment = {
   baseUrl: 'http://localhost:5000/',
   loginRedirect: 'gradebook',
-  loginRoute: '/'
+  loginRoute: '/',
+  signupRedirect: 'payment'
 };
 
 let configForProduction = {
   baseUrl: 'https://www.reportmarks.com/',
   loginRedirect: 'gradebook',
-  loginRoute: '/'
+  loginRoute: '/',
+  signupRedirect: 'payment'
 };
 
 let config;
