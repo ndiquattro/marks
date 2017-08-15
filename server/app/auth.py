@@ -29,15 +29,15 @@ def signup():
     user = user_datastore.create_user(email=content['email'],
                                       password=content['password'])
 
+    # Add new user to the database
+    db.session.commit()
+
     # Create JWT token and return user info
     response = jsonify(make_token(user))
     set_refresh_cookies(response, create_refresh_token(identity=user.id))
 
     # Send Confirmation email
     send_confirmation_instructions(user)
-
-    # Add new user to the database
-    db.session.commit()
 
     return response, 200
 
