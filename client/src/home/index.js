@@ -1,7 +1,7 @@
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {AuthService} from 'aurelia-auth';
-import {ValidationControllerFactory} from 'aurelia-validation';
+import {ValidationControllerFactory, ValidationRules} from 'aurelia-validation';
 import {CurrentService} from 'shared/services/currentService';
 import {User} from 'shared/models/user';
 
@@ -14,6 +14,8 @@ export class Home {
     this.auth = auth;
     this.current = current;
     this.controller = controllerFactory.createForCurrentScope();
+    this.confirmPassword;
+    this.password = 'hello';
   }
 
   submitSignUp() {
@@ -35,3 +37,24 @@ export class Home {
     });
   }
 }
+
+ValidationRules.customRule(
+  'matchesPassword',
+  (value, obj, otherPropertyName) =>
+    value === null
+    || value === undefined
+    || value === ''
+    || obj[otherPropertyName] === null
+    || obj[otherPropertyName] === undefined
+    || obj[otherPropertyName] === ''
+    || value === obj[otherPropertyName].password,
+  '${$displayName} must match Password',
+  otherPropertyName => ({ otherPropertyName })
+);
+
+
+ValidationRules
+  .ensure('confirmPassword')
+    .required()
+    .satisfiesRule('matchesPassword', 'newUser')
+  .on(Home);

@@ -5,8 +5,6 @@ from flask_migrate import Migrate
 from flask_security import SQLAlchemyUserDatastore, Security
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
-
-
 from flask_cors import CORS
 
 # Initiate Flask
@@ -18,8 +16,6 @@ app = Flask(__name__,
 # Load config
 app.config.from_pyfile('config.py')
 
-
-
 # Setup main route
 if app.config['LOCATION'] is 'local':
     @app.route('/')
@@ -27,7 +23,7 @@ if app.config['LOCATION'] is 'local':
         return current_app.send_static_file('index.html')
 
     # Apply Cors
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
 # Set Up Database
 db = SQLAlchemy(app)

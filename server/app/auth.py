@@ -85,6 +85,7 @@ def login():
     if content['email'] == user.email and verify_password(content['password'], user.password):
         response = jsonify(make_token(user))
         set_refresh_cookies(response, create_refresh_token(identity=user.id))
+        print(response)
         # return jsonify(make_token(user)), 200
         return response, 200
 
@@ -94,7 +95,8 @@ def login():
 @auth.route('/refresh_token', methods=['POST'])
 @jwt_refresh_token_required
 def refresh_token():
-    user = get_jwt_identity()
+    user_id = get_jwt_identity()
+    user = user_datastore.find_user(id=user_id)
     return jsonify(make_token(user)), 200
 
 @auth.route('/forgot_password', methods=['POST'])
@@ -133,8 +135,12 @@ def change_password():
     token_identity = get_jwt_identity()
     user = user_datastore.find_user(id=token_identity)
 
+    # Verify Current password
+    if not verify_password(content['current_pass'], user.password):
+        return jsonify({'msg': 'Not Authorized'}, 401)
+
     # Change password
-    change_user_password(user, hash_password(content['new']))
+    change_user_password(user, hash_password(content['new_pass']))
     user_datastore.commit()
 
     return jsonify({'Changed': True}), 200

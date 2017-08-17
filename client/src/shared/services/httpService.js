@@ -2,6 +2,7 @@ import {inject} from 'aurelia-framework';
 import {AureliaConfiguration} from 'aurelia-configuration';
 import {HttpClient} from 'aurelia-http-client';
 import {AuthService} from 'aurelia-auth';
+import moment from 'moment';
 
 @inject(AuthService, AureliaConfiguration)
 export class HttpService {
@@ -32,11 +33,48 @@ export class HttpService {
     return req.send();
   }
 
-  refreshToken() {
-    return this.http.createRequest('auth/refresh_token')
-                    .withHeader('Access-Control-Allow-Credentials', true)
+  login(userInfo) {
+    return this.http.createRequest('auth/login')
+                    // .withHeader('Access-Control-Allow-Credentials', true)
                     .withCredentials('include')
+                    .withContent(userInfo)
                     .asPost()
-                    .send();
+                    .send()
+                    .then(response => {
+                      this.auth.auth.setToken(response);
+                      return response;
+                    });
+  }
+
+  refreshToken() {
+    // Get access token
+    let token = this.auth.getTokenPayload();
+
+    // Check if token exists
+    if (!token) {
+      return 'No Token';
+    }
+
+    // Check if token will expire soon
+    if (moment.unix(token.exp).diff(moment(), 'minutes') < 1) {
+      return this.http.createRequest('auth/refresh_token')
+                      .withHeader('X-CSRF-TOKEN', document.cookie.split('=')[1])
+                      .withCredentials('include')
+                      .asPost()
+                      .send()
+                      .then(response => {
+                        // Save new Token
+                        this.auth.auth.removeToken();
+                        this.auth.auth.setToken(response, 5);
+                        console.log('new token set');
+                      }).catch(error => {
+                        // Delete Token and redirect to login
+                        console.log('Refresh Token Failed');
+                        console.log(error);
+                        this.auth.auth.logout();
+                      });
+    }
+
+    return Promise.resolve('Valid');
   }
 }

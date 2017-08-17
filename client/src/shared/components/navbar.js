@@ -24,11 +24,12 @@ export class NavBar {
   }
 
   login() {
-    this.auth.login(this.user).then(resp => location.reload());
+    // this.auth.login(this.user).then(resp => location.reload());
+    this.http.login(this.user);
   }
 
   logout() {
-    this.auth.logout().then(location.reload());
+    this.auth.logout().then(resp => location.reload());
   }
 
   toggleReset() {

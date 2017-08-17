@@ -1,9 +1,10 @@
 import {inject} from 'aurelia-framework';
 import {CurrentService} from 'shared/services/currentService';
+import {HttpService} from 'shared/services/httpService';
 import {AuthService, AuthorizeStep} from 'aurelia-auth';
 // import 'bootstrap';
 
-@inject(CurrentService, AuthService)
+@inject(CurrentService, AuthService, HttpService)
 export class App {
   configureRouter(config, router) {
     config.title = 'Marks';
@@ -38,9 +39,10 @@ export class App {
     this.router = router;
   }
 
-  constructor(current, auth) {
+  constructor(current, auth, http) {
     this.current = current;
     this.auth = auth;
+    this.http = http;
   }
 
   activate() {
@@ -51,6 +53,8 @@ export class App {
     if (this.auth.isAuthenticated()) {
       let token = this.auth.getTokenPayload();
       this.current.reviveUser(token.identity);
+    } else {
+      this.http.refreshToken();
     }
   }
 }

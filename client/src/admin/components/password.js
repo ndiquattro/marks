@@ -1,10 +1,15 @@
 import {inject} from 'aurelia-framework';
+import {ValidationControllerFactory, ValidationRules} from 'aurelia-validation';
 import {HttpService} from 'shared/services/httpService';
 
-@inject(HttpService)
+@inject(HttpService, ValidationControllerFactory)
 export class Password {
-  constructor(http) {
+  constructor(http, controllerFactory) {
     this.http = http;
+    this.controller = controllerFactory.createForCurrentScope();
+    this.currentPassword;
+    this.newPassword;
+    this.confirmPassword;
   }
 
   activate(params) {
@@ -14,10 +19,6 @@ export class Password {
     } else {
       this.reset = false;
     }
-  }
-
-  attached() {
-    this.password = {};
   }
 
   resetPassword() {
@@ -36,7 +37,40 @@ export class Password {
   }
 
   changePassword() {
-    this.http.send('auth/change_password', this.password, true)
-             .then(resp => this.feedback = resp.message);
+    // Check for Validation
+    this.controller.validate().then(result => {
+      if (!result.valid) {
+        return;
+      }
+      let payload = {'current_pass': this.currentPassword,
+                     'new_pass': this.newPassword};
+      this.http.send('auth/change_password', payload, true)
+               .then(resp => this.feedback = resp.message);
+    });
   }
 }
+
+ValidationRules.customRule(
+  'matchesPassword',
+  (value, obj, otherPropertyName) =>
+    value === null
+    || value === undefined
+    || value === ''
+    || obj[otherPropertyName] === null
+    || obj[otherPropertyName] === undefined
+    || obj[otherPropertyName] === ''
+    || value === obj[otherPropertyName],
+  '${$displayName} must match ${$getDisplayName($config.otherPropertyName)}',
+  otherPropertyName => ({ otherPropertyName })
+);
+
+
+ValidationRules
+  .ensure('newPassword')
+    .required()
+    .minLength(8)
+    .maxLength(50)
+  .ensure('confirmPassword')
+    .required()
+    .satisfiesRule('matchesPassword', 'newPassword')
+  .on(Password);

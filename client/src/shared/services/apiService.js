@@ -9,7 +9,7 @@ import {Student} from 'gradebook/models/student';
 import {Subject} from 'gradebook/models/subject';
 import {Assignment} from 'gradebook/models/assignment';
 import {Score} from 'gradebook/models/score';
-import moment from 'moment';
+
 
 @inject(HttpClient, AuthService, HttpService, AureliaConfiguration)
 export class ApiService {
@@ -18,26 +18,12 @@ export class ApiService {
     http.configure(config => {
       config
         .withBaseUrl(aurconfig.get('baseurl') + '/api/')
-        .withHeader('Authorization', 'Bearer ' + auth.auth.getToken())
+        // .withHeader('Authorization', 'Bearer ' + auth.auth.getToken())
         .withInterceptor({
           request(request) {
-            // get token
-            let token = auth.getTokenPayload();
-
-            // Check if token will expire soon
-            if (moment.unix(token.exp).diff(moment(), 'minutes') < 1) {
-              return httpserv.refreshToken()
-                             .then(response => {
-                               // Save new Token
-                               auth.setToken(response);
-                             }).catch(error => {
-                               // Delete Token and redirect to login
-                               console.log('Refresh Token Failed');
-                               console.log(error);
-                               auth.logout();
-                             });
-            }
-            return request;
+            return httpserv.refreshToken().then(resp => {
+              request.headers.add('Authorization', 'Bearer ' + auth.auth.getToken());
+            });
           },
           // Parse every response to objects
           response(message) {
