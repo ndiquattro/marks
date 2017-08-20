@@ -43,7 +43,9 @@ jwt = JWTManager(app)
 
 # Register Blueprints
 from app.auth import auth
+from app.subscription import subscription
 app.register_blueprint(auth)
+app.register_blueprint(subscription)
 
 def dummy_scores(result):
     """ Pad new assignments with Dummy Scores """

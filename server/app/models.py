@@ -6,12 +6,25 @@ roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
         db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
 
+class Subscriptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    stripe_id = db.Column(db.String(255))
+    subscription_id = db.Column(db.String(255))
+    expiration_date = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer)
+
+    def __init__(self, stripe_id, subscription_id, expiration_date, user_id):
+        self.stripe_id = stripe_id
+        self.subscription_id = subscription_id
+        self.expiration_date = expiration_date
+        self.user_id = user_id
+
+
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(4))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
-    subscribed = db.Column(db.Boolean)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.Text)
     active = db.Column(db.Boolean())

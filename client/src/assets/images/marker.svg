@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg2986"
+    sodipodi:docname="marqueur a tableau.svg"
+    viewBox="0 0 104.05 163.13"
+    version="1.1"
+    inkscape:version="0.48.0 r9654"
+  >
+  <title
+      id="title4210"
+    >marqueur</title
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="0"
+      fit-margin-left="0"
+      pagecolor="#ffffff"
+      inkscape:window-height="984"
+      inkscape:window-maximized="0"
+      inkscape:zoom="2.1929687"
+      inkscape:window-x="24"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="149.04702"
+      inkscape:cy="116.34582"
+      fit-margin-top="0"
+      fit-margin-right="0"
+      fit-margin-bottom="0"
+      inkscape:window-width="1648"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Calque 1"
+      inkscape:groupmode="layer"
+      transform="translate(-314.01 -623.91)"
+    >
+    <g
+        id="g4202"
+      >
+      <path
+          id="path2403"
+          inkscape:connector-curvature="0"
+          sodipodi:nodetypes="cccccc"
+          style="stroke-linejoin:round;stroke-dashoffset:1.5;stroke:#000000;stroke-linecap:round;stroke-width:1.5575;fill:#ffffff"
+          d="m410.42 637.09 3.5846-6.0839c-2.8241-3.094-7.0031-5.1028-11.085-6.3095l-3.3986 6.1751c3.6581 1.9736 7.6919 3.7357 10.899 6.2183z"
+      />
+      <path
+          id="path2401"
+          inkscape:connector-curvature="0"
+          sodipodi:nodetypes="ccccc"
+          style="stroke-linejoin:round;stroke-dashoffset:1.5;stroke:#000000;stroke-linecap:round;stroke-width:1.5575;fill:#ffffff"
+          d="m380.74 652.12 11.1-24.855c9.3362 3.1818 18.062 8.4526 25.442 14.158l-15.18 22.5z"
+      />
+      <g
+          id="g4154"
+          transform="matrix(1.5521 0 0 1.5721 -167.26 -377.04)"
+        >
+        <path
+            id="path7431"
+            inkscape:connector-curvature="0"
+            sodipodi:nodetypes="ccccc"
+            style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1851;fill:#ffffff"
+            d="m315 731.99-4.3396 7.4949 5.3134 0.40588 4.5054-7.1022-5.4792-0.79856z"
+        />
+        <path
+            id="path7433"
+            inkscape:connector-curvature="0"
+            sodipodi:nodetypes="cccccccc"
+            style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.2016;fill:#ffffff"
+            d="m315.49 728.88-0.30461-10.739 17.046 9.3242-9.9912 4.8246-2.7589 3.795c-3.2127-1.1859-4.2136-2.274-5.9295-3.3937l1.9382-3.8109z"
+        />
+      </g
+      >
+      <path
+          id="path2399"
+          inkscape:connector-curvature="0"
+          sodipodi:nodetypes="ccccc"
+          style="stroke-linejoin:round;stroke-dashoffset:1.5;stroke:#000000;stroke-linecap:round;stroke-width:1.765;fill:#ffffff"
+          d="m319.88 752.14c6.5039 5.7335 17.142 11.615 28.721 15.983l56.63-101.76c-8.38-7.38-17.64-12.86-28.6-16.38z"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >marqueur / marker</dc:title
+        >
+        <dc:date
+          >2011-01-13T15:42:41</dc:date
+        >
+        <dc:description
+          >Line art of a dry erase marker.</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/104611/marqueur--marker-by-lmproulx</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >lmproulx</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >line art</rdf:li
+            >
+            <rdf:li
+              >marker</rdf:li
+            >
+            <rdf:li
+              >office</rdf:li
+            >
+            <rdf:li
+              >school</rdf:li
+            >
+            <rdf:li
+              >supplies</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>
