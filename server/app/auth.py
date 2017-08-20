@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, jwt_refresh_token_required, set_refresh_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, jwt_refresh_token_required, set_refresh_cookies, unset_jwt_cookies
 from flask_security.recoverable import send_reset_password_instructions, reset_password_token_status, update_password
 from flask_security.changeable import change_user_password
 from flask_security.confirmable import send_confirmation_instructions, confirm_email_token_status, confirm_user
@@ -18,7 +18,6 @@ def make_token(user):
     user_dict = object_as_dict(user)
     del user_dict['password']
     return {'access_token': create_access_token(identity=user.id),
-            # 'refresh_token': create_refresh_token(identity=user.id),
             'user': user_dict}
 
 @auth.route('/signup', methods=['POST'])
@@ -91,6 +90,13 @@ def login():
 
     # Default return
     return "Not Authorized", 401
+
+@auth.route('/logout', methods=['POST'])
+@jwt_required
+def logout():
+    resp = jsonify({'logout': True})
+    unset_jwt_cookies(resp)
+    return resp, 200
 
 @auth.route('/refresh_token', methods=['POST'])
 @jwt_refresh_token_required

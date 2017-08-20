@@ -46,6 +46,14 @@ export class HttpService {
                     });
   }
 
+  logout() {
+    return this.http.createRequest('auth/logout')
+                    .withHeader('Authorization', 'Bearer ' + this.auth.auth.getToken())
+                    .withCredentials('include')
+                    .asPost()
+                    .send();
+  }
+
   refreshToken() {
     // Get access token
     let token = this.auth.getTokenPayload();

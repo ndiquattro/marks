@@ -29,7 +29,8 @@ export class NavBar {
   }
 
   logout() {
-    this.auth.logout().then(resp => location.reload());
+    this.http.logout().then(this.auth.logout()).then(location.reload());
+    // .then(resp => location.reload());
   }
 
   toggleReset() {
