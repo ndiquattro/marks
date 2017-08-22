@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 7309eaf9b89b
+Revision ID: 31fed375936e
 Revises: 
-Create Date: 2017-08-15 10:48:58.550425
+Create Date: 2017-08-22 11:21:01.764342
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7309eaf9b89b'
+revision = '31fed375936e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,12 +25,19 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+    op.create_table('subscriptions',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('stripe_id', sa.String(length=255), nullable=True),
+    sa.Column('subscription_id', sa.String(length=255), nullable=True),
+    sa.Column('expiration_date', sa.DateTime(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=4), nullable=True),
     sa.Column('first_name', sa.String(length=255), nullable=True),
     sa.Column('last_name', sa.String(length=255), nullable=True),
-    sa.Column('subscribed', sa.Boolean(), nullable=True),
     sa.Column('email', sa.String(length=255), nullable=True),
     sa.Column('password', sa.Text(), nullable=True),
     sa.Column('active', sa.Boolean(), nullable=True),
@@ -111,5 +118,6 @@ def downgrade():
     op.drop_table('years')
     op.drop_table('roles_users')
     op.drop_table('users')
+    op.drop_table('subscriptions')
     op.drop_table('roles')
     # ### end Alembic commands ###

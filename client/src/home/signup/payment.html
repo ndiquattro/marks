@@ -9,7 +9,7 @@
           <h3 class="title">Welcome</h3>
             <p>
               Hi, thanks for signing up for Marks! We are currently in open beta, which means things my change quickly while you are using the website.
-              It also means Marks is currently free! Once we launch you will still get a 1 month trial of the product beforing having to begin payments.
+              It also means Marks is currently free! Once we launch you will still get a 14 day trial of the product beforing having to begin payments.
               If you come across any problems please let us know via one of the options on the contact page. Thanks for trying us out and for being a teacher.
             </p>
             <a href="/first_time" class="btn">Setup Gradebook</a>
@@ -19,7 +19,7 @@
 
     <div class="col-md-5">
       <form action="http://localhost:5000/subscription/new" method="POST">
-        <div stripe-checkout></div>
+        <!-- <div stripe-checkout></div> -->
         <input type="hidden" name="user_id" value="${ current.user.id }">
       </form>
     </div>
