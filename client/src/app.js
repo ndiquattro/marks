@@ -13,11 +13,12 @@ export class App {
     config.addPipelineStep('authorize', AuthorizeStep);
     config.map([
       // Main Nav routes
-      { route: '/', moduleId: './home/index', nav: 0, title: 'Welcome', auth: false },
+      { route: '/', moduleId: './home/index', nav: 0, title: 'Home', auth: false },
       // { route: 'gradebook', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true},
       { route: 'gradebook/:subject?/:assignment?', moduleId: './gradebook/index', nav: 1, title: 'Gradebook', name: 'gradebook', auth: true, href: 'gradebook'},
       { route: '/contact', moduleId: './home/contact', title: 'Contact', auth: false },
       { route: '/tos_privacy', moduleId: './home/tos_privacy', title: 'Terms of Service & Privacy Policy', auth: false },
+      { route: '/team', moduleId: './home/team', title: 'Team', auth: false },
 
       // Reports
       { route: 'reports', redirect: 'gradebook'},
