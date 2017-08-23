@@ -3,7 +3,6 @@ import {CurrentService} from 'shared/services/currentService';
 import {HttpService} from 'shared/services/httpService';
 import {AuthService} from 'aurelia-auth';
 import {AuthorizeStep} from 'shared/AuthorizeStep';
-// import 'bootstrap';
 
 @inject(CurrentService, AuthService, HttpService)
 export class App {
