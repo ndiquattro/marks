@@ -60,7 +60,8 @@ export class HttpService {
 
     // Check if token exists
     if (!token) {
-      return 'No Token';
+      console.log('no token');
+      return Promise.resolve('No Token');
     }
 
     // Check if token will expire soon
@@ -79,6 +80,7 @@ export class HttpService {
                         // Delete Token and redirect to login
                         console.log('Refresh Token Failed');
                         console.log(error);
+                        this.logout();
                         this.auth.auth.logout();
                       });
     }
